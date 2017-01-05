@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_root"
+    style="@style/MatchParent"
+    android:background="@color/colorPrimary"
+    tools:ignore="ContentDescription">
+
+    <LinearLayout
+        style="@style/WrapContent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <com.devspark.robototextview.widget.RobotoTextView
+            android:id="@+id/text_splash_app_title"
+            style="@style/SplashAppTitleStyle"
+            android:textStyle="bold"
+
+            android:textSize="25dp"
+            android:textColor="@color/white"
+            tools:text="Iprotechs Video Calling App"/>
+
+        <com.devspark.robototextview.widget.RobotoTextView
+            android:id="@+id/text_splash_app_version"
+            style="@style/SplashAppVersionStyle"
+            android:layout_marginTop="20dp"
+            android:visibility="invisible"
+           />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_height="100dp"
+        android:layout_width="100dp"
+        android:background="@drawable/logo"
+        android:layout_marginBottom="40dp" />
+</RelativeLayout>

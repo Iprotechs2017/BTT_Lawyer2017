@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    >
+<include layout="@layout/new_toolbar" android:id="@+id/toolbar1"/>
+    <ScrollView
+        android:layout_below="@+id/toolbar1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   android:scrollbars="none"
+    >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card1"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barrister1 Dashboard"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/user_unique_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Abc123"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+<LinearLayout
+
+    android:layout_below="@+id/card1"
+    android:id="@+id/tab"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_marginTop="5dp"
+        android:background="@color/background"
+        android:id="@+id/uploaded_doc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/uploaded_doc_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Uploaded Documents"
+        android:textColor="@color/black"
+        android:textSize="15dp" />
+    <ImageView
+        android:id="@+id/show_more_uploaded_docs"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/show"
+        android:layout_width="20dp"
+        android:layout_height="20dp" />
+    </RelativeLayout>
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+android:visibility="gone"
+        android:layout_width="match_parent"
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
+        app:tabIndicatorColor="@color/colorPrimary"
+        android:layout_height="wrap_content"
+        android:background="@color/grey_transparent_10"
+        android:minHeight="?attr/actionBarSize"
+       />
+    <!-- View pager to swipe views -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="226dp"/>
+
+</LinearLayout>
+
+
+    <android.support.v7.widget.CardView
+
+        android:id="@+id/card3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tab"
+        android:layout_marginTop="1dp"
+        app:cardElevation="0dp">
+
+
+
+            <RelativeLayout
+                android:background="@color/background"
+                android:id="@+id/myCall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/video_calls_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="VideoCalls"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+<ImageView
+    android:id="@+id/show_more_video_cals"
+    android:layout_marginTop="5dp"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="10dp"
+    android:src="@drawable/show"
+    android:layout_width="20dp"
+    android:layout_height="20dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/myCallList"
+                    android:layout_width="match_parent"
+                    android:background="@color/background"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/video_calls_label"
+                    android:layout_marginTop="5dp">
+
+                </android.support.v7.widget.RecyclerView>
+                <TextView
+
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More"
+                    android:visibility="gone"
+                    android:layout_marginRight="5dp"
+                    android:layout_below="@+id/myCallList"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+            </RelativeLayout>
+
+
+
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        android:id="@+id/card4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/card3"
+        android:layout_marginTop="5dp"
+        app:cardElevation="1dp">
+
+            <RelativeLayout
+                android:id="@+id/myNotification"
+                android:background="@color/background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/notifiation_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+                <ImageView
+                    android:id="@+id/show_more_notification"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/show"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/notifcationsList"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/notifiation_label"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1.0dp"
+                android:layout_marginRight="1.0dp"
+                android:layout_marginTop="1.0dp"
+                />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card2"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/card4"
+        android:layout_marginTop="5dp"
+        app:cardElevation="10dp">
+
+
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>
+
+</ScrollView>
+    <RelativeLayout
+        android:id="@+id/slideView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_marginTop="350dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:background="@color/grey_transparent_20"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.CardView
+            android:elevation="3dp"
+
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RelativeLayout
+
+                android:background="@color/white"
+                android:orientation="vertical"
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:background="@color/grey_transparent_20"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp">
+                    <TextView
+                        android:layout_centerVertical="true"
+                        android:text="Slide"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/download"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+</RelativeLayout>

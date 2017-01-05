@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_client_after_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_transparent_20"
+    tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.ClientAfterLoginActivity">
+
+    <include
+        android:id="@+id/toolbar_layout"
+        layout="@layout/new_toolbar" />
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_layout"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:id="@+id/welcom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:text="Welcome Rajesh Yadav"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
+
+        <LinearLayout
+
+            android:id="@+id/par"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/welcom"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Solicitor:"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
+
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:id="@+id/sol_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text=""
+                android:textColor="@color/primary"
+                android:textSize="20dp" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/selected_files"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/parent"
+            android:layout_below="@+id/par"></ListView>
+
+        <RelativeLayout
+            android:id="@+id/parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/progressBar"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp">
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_rectangle"
+
+                android:text="Submit"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/uplode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/button_rectangle"
+                android:padding="10dp"
+                android:text="Select Files"
+                android:textColor="@color/white" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

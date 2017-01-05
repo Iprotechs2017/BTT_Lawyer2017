@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_margin="5dp"
+
+    card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="5dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/parent"
+                android:paddingTop="15dp"
+android:paddingBottom="10dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                >
+
+                <ImageView
+                    android:id="@+id/image_opponent_icon"
+                    style="@style/ListItemIconStyle"
+                    android:layout_marginLeft="5dp"
+                    tools:src="@drawable/ic_person" />
+
+                <TextView
+              android:layout_marginLeft="10dp"
+                    android:id="@+id/opponentsName"
+                    android:text="Rajesh"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="18dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+ />
+            </LinearLayout>
+
+            <RelativeLayout
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <LinearLayout
+                    android:id="@+id/par"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/notification"
+                        android:layout_width="37dp"
+                        android:layout_height="37dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="20dp"
+                        android:src="@drawable/send_notification" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:layout_weight="2"
+                        android:id="@+id/shred_items"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="2dp"
+                        android:src="@drawable/view"
+                        app:civ_border_color="#000" />
+
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>

@@ -1,0 +1,202 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/MatchParent"
+    android:id="@+id/parent"
+    android:visibility="visible"
+    android:background="@color/text_color_light_grey"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar_layout"
+        layout="@layout/new_toolbar" />
+
+    <RelativeLayout
+        android:id="@+id/bar_reg"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_layout">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+                 <RelativeLayout
+    android:visibility="visible"
+    android:id="@+id/bar_reg_lay"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/bar_reg_lab_lay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+          <TextView
+            android:id="@+id/bar_reg_lab"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+              android:layout_marginBottom="2dp"
+            android:layout_marginLeft="@dimen/padding_start"
+            android:paddingTop="@dimen/padding_actionbar"
+            android:text="Barrister:"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            tools:ignore="RtlHardcoded" />
+    <TextView
+        android:id="@+id/bar_name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_toRightOf="@+id/bar_reg_lab"
+        android:layout_marginLeft="@dimen/padding_start"
+        android:paddingTop="@dimen/padding_actionbar"
+        android:text="Barrister"
+        android:textColor="@color/primary"
+        android:textSize="18dp"
+        tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+        <LinearLayout
+            android:layout_margin="5dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:visibility="gone"
+                android:id="@+id/bar_registration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/primary"
+                android:text="Register"
+                android:textColor="@color/white" />
+           <LinearLayout
+               android:id="@+id/bar_after_login"
+               android:orientation="horizontal"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:visibility="visible"
+                android:id="@+id/bar_call"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/videocall_icon"
+                android:layout_marginLeft="@dimen/padding_start"
+                android:text="Call"
+                android:textColor="@color/white" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:visibility="visible"
+                android:id="@+id/bar_remove"
+                android:layout_width="30dp"
+                android:src="@drawable/delete"
+                android:layout_height="30dp"
+                android:layout_marginLeft="@dimen/padding_start"
+                android:text="Remove"
+                android:textColor="@color/white" />
+
+
+           </LinearLayout>
+        </LinearLayout>
+</RelativeLayout>
+        <RelativeLayout
+            android:visibility="gone"
+            android:id="@+id/req_doc_parent"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_alignBaseline="@+id/notification"
+                android:textColor="@color/black"
+                android:text="Send Notification To Solicitor :"
+                android:layout_width="wrap_content"
+                android:textSize="18dp"
+                android:layout_height="wrap_content"
+                />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/notification"
+
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/send_notification" />
+
+
+            <!--<Button
+                android:visibility="gone"
+                android:id="@+id/req_solicater"
+                android:textColor="@color/white"
+                android:text="Request solliciter for Documents"
+                android:background="@drawable/button_rectangle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />-->
+    </RelativeLayout>
+
+
+        </android.support.v7.widget.CardView>
+</RelativeLayout>
+
+   <RelativeLayout
+       android:layout_below="@+id/bar_reg"
+       android:layout_width="match_parent"
+       android:id="@+id/label"
+
+       android:layout_height="50dp">
+
+    <RelativeLayout
+        android:layout_marginLeft="5dp"
+android:layout_marginRight="5dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <android.support.v7.widget.CardView
+            app:cardElevation="3dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+       <TextView
+         android:id="@+id/lab"
+        android:layout_marginBottom="10dp"
+           android:gravity="left|center_vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/reload"
+        android:text="@string/text_select_user_to_call"
+        android:textColor="@color/black"
+        android:textSize="17dp"
+        tools:ignore="RtlHardcoded" />
+<de.hdodenhof.circleimageview.CircleImageView
+    android:layout_marginBottom="10dp"
+    android:layout_width="30dp"
+    android:layout_marginTop="10dp"
+    android:id="@+id/reload"
+    android:layout_gravity="end"
+    android:layout_centerVertical="true"
+    android:layout_marginRight="5dp"
+    android:layout_alignParentRight="true"
+    android:src="@drawable/refreshh"
+    android:layout_height="30dp" />
+   </android.support.v7.widget.CardView>
+    </RelativeLayout>
+   </RelativeLayout>
+    <ListView
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+android:background="@color/text_color_light_grey"
+        android:id="@+id/list_opponents"
+        android:layout_below="@+id/label"
+        style="@style/MatchWidth"
+
+        android:divider="@android:color/transparent"
+        android:dividerHeight="2dp"
+        android:padding="2dp" />
+
+
+</RelativeLayout>

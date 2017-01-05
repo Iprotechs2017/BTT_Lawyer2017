@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "951405537216",
+    "firebase_url": "https://video-b47cc.firebaseio.com",
+    "project_id": "video-b47cc",
+    "storage_bucket": "video-b47cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951405537216:android:43e4936edca980db",
+        "android_client_info": {
+          "package_name": "com.VideoCalling.sample.groupchatwebrtc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951405537216-85bmsvmpa1dnsje2aq8k077rkvjollcs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VideoCalling.sample.groupchatwebrtc",
+            "certificate_hash": "2CB12737AB1E47E6FE312D58E65CE8A778522C91"
+          }
+        },
+        {
+          "client_id": "951405537216-c200hl43ijq9dhi6g7clgukj62fs2ekd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnjhT79ymg99Q_dFSRGoq34jbSh4BPKwo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951405537216-c200hl43ijq9dhi6g7clgukj62fs2ekd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
