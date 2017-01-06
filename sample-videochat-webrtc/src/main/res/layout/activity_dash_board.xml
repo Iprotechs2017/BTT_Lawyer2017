@@ -74,7 +74,7 @@
         android:id="@+id/uploaded_doc_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Uploaded Documents"
+        android:text="Documents"
         android:textColor="@color/black"
         android:textSize="15dp" />
     <ImageView
