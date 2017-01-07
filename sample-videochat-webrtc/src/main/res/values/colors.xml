@@ -19,6 +19,12 @@
     <color name="green">#3F51B5</color>
     <color name="background_red">#F42E2D</color>
     <color name="white_green">#3F51B5</color>
+    <color name="img_drop_down">#00B5FF</color>
+    <color name="foating_button_bacground">#38b0fe</color>
+    <color name="documets_header">#4bc1fe</color>
+    <color name="date_color">#444444</color>
+    <color name="dash_video_calls_back">#fd7ee7</color>
+    <color name="notification_header">#fe6e89</color>
     <color name="black_transparent_30">#30000000</color>
     <color name="black_transparent_50">#50000000</color>
     <color name="white_transparent_80">#80FFFFFF</color>
@@ -31,6 +37,8 @@
     <color name="toolbar_subtitle_color">#6e6e6e</color>
     <color name="toolbar_title_color">#1f1f1f</color>
 <color name="background">#F5F5F5</color>
+    <color name="login_button_bg">#3251AD</color>
+    <color name="registration_link">#B3AEA7</color>
     <color name="text_color_outgoing_opponents_names_audio_call">#1f1f1f</color>
 
     <color name="background_color_selected_user_item">#eeeeee</color>

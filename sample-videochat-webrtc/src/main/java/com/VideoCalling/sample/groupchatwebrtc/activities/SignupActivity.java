@@ -150,12 +150,12 @@ Log.e("regType",regType+"--");
         password= (EditText) findViewById(R.id.input_password);
         mobiileNumber= (EditText) findViewById(R.id.number);
         btn_signup= (Button) findViewById(R.id.btn_signup);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+/*        toolbar= (Toolbar) findViewById(R.id.toolbar);
         action_layout= (LinearLayout) findViewById(R.id.action_layout);
         action_layout.setVisibility(View.GONE);
         screen_titile= (TextView) findViewById(R.id.screen_title);
         screen_titile.setText("Signup");
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);*/
         link_login= (TextView) findViewById(R.id.link_login);
         link_login.setOnClickListener(new View.OnClickListener() {
             @Override

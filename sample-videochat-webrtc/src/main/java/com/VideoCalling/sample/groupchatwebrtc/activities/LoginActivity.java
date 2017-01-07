@@ -143,16 +143,16 @@ public class LoginActivity extends BaseActivity {
         qbuserId = getSharedPreferences("QB", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         link_signup=(TextView) findViewById(R.id.link_signup);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        /*toolbar= (Toolbar) findViewById(R.id.toolbar);
         screen_title= (TextView) findViewById(R.id.screen_title);
-        screen_title.setText("Signin");
+        screen_title.setText("Signin");*/
         rq = Volley.newRequestQueue(this);
         parent= (RelativeLayout) findViewById(R.id.parent);
         pDialog = new ProgressDialog(this);
         btn_login= (Button) findViewById(R.id.btn_login);
-        setSupportActionBar(toolbar);
-        action_layout= (LinearLayout) findViewById(R.id.action_layout);
-        action_layout.setVisibility(View.GONE);
+    //    setSupportActionBar(toolbar);
+//        action_layout= (LinearLayout) findViewById(R.id.action_layout);
+  //      action_layout.setVisibility(View.GONE);
         link_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,13 +167,11 @@ public class LoginActivity extends BaseActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                email=userNameEditText.getText().toString();
-                pass=chatRoomNameEditText.getText().toString();
-                if(new NetworkCheck().isOnline(LoginActivity.this)) {
-                   new LoginAsync().execute();
-                }
-                else
-                {
+                email = userNameEditText.getText().toString();
+                pass = chatRoomNameEditText.getText().toString();
+                if (new NetworkCheck().isOnline(LoginActivity.this)) {
+                    new LoginAsync().execute();
+                } else {
                     Toast.makeText(LoginActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -182,7 +180,7 @@ public class LoginActivity extends BaseActivity {
 
             }
         });
-      //  initUI();
+        //initUI();
     }
 
     @Override
@@ -192,14 +190,14 @@ public class LoginActivity extends BaseActivity {
 
     public void initUI() {
       //  setActionBarTitle(R.string.title_login_activity);
-        userNameEditText = (EditText) findViewById(R.id.user_name);
+        userNameEditText = (EditText) findViewById(R.id.input_email);
         userNameEditText.addTextChangedListener(new LoginEditTextWatcher(userNameEditText));
 
         chatRoomNameEditText = (EditText) findViewById(R.id.chat_room_name);
         chatRoomNameEditText.addTextChangedListener(new LoginEditTextWatcher(chatRoomNameEditText));
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+       /* toolbar= (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Login");
-        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));*/
 
       //  login= (Button) findViewById(R.id.signin);
      //   signup=(TextView) findViewById(R.id.link_signup);
@@ -299,7 +297,7 @@ public class LoginActivity extends BaseActivity {
                         }
                         else
                         {
-                            startActivity(new Intent(LoginActivity.this, OpponentsActivity.class));
+                            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
                         }
                         runOnUiThread(new Runnable() {
                             @Override
@@ -342,7 +340,7 @@ public class LoginActivity extends BaseActivity {
         }
         else
         {
-            startActivity(new Intent(LoginActivity.this, OpponentsActivity.class));
+            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
         }
       /*  stopService(new Intent(LoginActivity.this, NotificationService.class));
         startService(new Intent(LoginActivity.this, NotificationService.class));*/

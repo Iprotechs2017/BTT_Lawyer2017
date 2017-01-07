@@ -5,10 +5,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -17,11 +22,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,8 +41,10 @@ import android.widget.Toast;
 import com.VideoCalling.sample.groupchatwebrtc.R;
 
 import com.VideoCalling.sample.groupchatwebrtc.adapters.TabsAdaptor;
+import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mancj.slideup.SlideUp;
 
 import org.apache.http.HttpResponse;
@@ -50,96 +62,132 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
-RecyclerView callsList,notificationsList;
+public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+    RecyclerView callsList, notificationsList;
+    de.hdodenhof.circleimageview.CircleImageView newNotification;
     ProgressDialog progressDialog;
-Dialog showMessage;
+    Dialog showMessage;
     SharedPreferences prefs;
-    ArrayList msgs=new ArrayList();
-    ArrayList notificationSenderNames=new ArrayList();
-    ArrayList notificationSentDates=new ArrayList();
-    ArrayList videocallerName=new ArrayList();
-    ArrayList videocallName=new ArrayList();
-    ArrayList videocallDate=new ArrayList();
-    HashMap userTypeDetailss=new HashMap();
+    ArrayList msgs = new ArrayList();
+    ArrayList notificationSenderNames = new ArrayList();
+    ArrayList notificationSentDates = new ArrayList();
+    ArrayList videocallerName = new ArrayList();
+    ArrayList videocallName = new ArrayList();
+    ArrayList videocallDate = new ArrayList();
+    HashMap userTypeDetailss = new HashMap();
     RecyclerViewAdapter recyclerViewAdapter;
-   VideocallAdapter videoCallAdapter;
+    VideocallAdapter videoCallAdapter;
     ViewPager mViewPager;
     //This is our tablayout
     private TabLayout tabLayout;
     //This is our viewPager
     private ViewPager viewPager;
-   // TextView show_more_notification,show_more_video_cals;
-    TextView title,senderName1,msg1,sentDate1;
+    // TextView show_more_notification,show_more_video_cals;
+    TextView title, senderName1, msg1, sentDate1,notification_to_name;
     Toolbar toolbar;
-    de.hdodenhof.circleimageview.CircleImageView call,notification,logout;
+    de.hdodenhof.circleimageview.CircleImageView call, notification, logout;
     Typeface typeface;
     RelativeLayout rel;
     View slideView;
+    EditText notification_edit_txt;
     SlideUp slideUp;
     CardView card2;
     Animation slide_down;
-    ImageView show_more_uploaded_docs,show_more_video_cals,show_more_notification;
+    ImageView show_more_uploaded_docs, show_more_video_cals, show_more_notification;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
-        progressDialog=new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
+        newNotification= (CircleImageView) findViewById(R.id.new_notification);
         progressDialog.setMessage("loading...");
-         slideView = findViewById(R.id.slideView);
+        slideView = findViewById(R.id.slideView);
         slideUp = new SlideUp(slideView);
+        notification_edit_txt= (EditText) findViewById(R.id.notification_edit_txt);
+        notification_to_name= (TextView) findViewById(R.id.notification_to_name);
+        MaterialSpinner spinner = (MaterialSpinner) findViewById(R.id.spinner);
+        spinner.setItems("Immigrant1", "Immigrant2", "Immigrant3", "Immigrant4", "Immigrant5");
+        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                Snackbar.make(view, item+" selected", Snackbar.LENGTH_LONG).show();
+            }
+        });
+    /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.documets_header));
+        }*/
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.frameParent, new UplodedDocs());
+        transaction.commit();
         slideUp.hideImmediately();
-     //   rel= (RelativeLayout) findViewById(R.id.rel);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
-        card2= (CardView) findViewById(R.id.card2);
-        call= (CircleImageView) toolbar.findViewById(R.id.videocall);
-        logout= (CircleImageView) toolbar.findViewById(R.id.logout);
-        notification= (CircleImageView) toolbar.findViewById(R.id.show_notifications);
-        show_more_uploaded_docs= (ImageView) findViewById(R.id.show_more_uploaded_docs);
-        show_more_uploaded_docs.setOnClickListener(new View.OnClickListener() {
+        //   rel= (RelativeLayout) findViewById(R.id.rel);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Immigrant1 Dashboard");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+       // getSupportActionBar()
+        newNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-          //      startActivity(new Intent(DashBoardActivity.this,UploadedDocumentsActivity.class));
+                notification_edit_txt.requestFocus();
                 slideUp.animateIn();
             }
         });
-        call.setVisibility(View.GONE);
-        typeface= Typeface.createFromAsset(getAssets(), "QuicksandRegular.ttf");
+        setSupportActionBar(toolbar);
+        /*card2 = (CardView) findViewById(R.id.card2);
+        call = (CircleImageView) toolbar.findViewById(R.id.videocall);
+        logout = (CircleImageView) toolbar.findViewById(R.id.logout);
+        notification = (CircleImageView) toolbar.findViewById(R.id.show_notifications);*/
+        show_more_uploaded_docs = (ImageView) findViewById(R.id.show_more_uploaded_docs);
+        show_more_uploaded_docs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                      startActivity(new Intent(DashBoardActivity.this,UploadedDocumentsActivity.class));
 
-        notification.setVisibility(View.GONE);
-        title= (TextView) toolbar.findViewById(R.id.screen_title);
-        showMessage=new Dialog(this);
+            }
+        });
+     //   call.setVisibility(View.GONE);
+        typeface = Typeface.createFromAsset(getAssets(), "QuicksandRegular.ttf");
+
+       // notification.setVisibility(View.GONE);
+        //title = (TextView) toolbar.findViewById(R.id.screen_title);
+        showMessage = new Dialog(this);
         showMessage.requestWindowFeature(Window.FEATURE_NO_TITLE);
         showMessage.setContentView(R.layout.dialog_notification_custom_layout);
-        senderName1 = (TextView)showMessage.findViewById(R.id.senderName);
-        msg1 = (TextView)showMessage.findViewById(R.id.msg);
-        sentDate1 = (TextView)showMessage.findViewById(R.id.sentDate);
+        senderName1 = (TextView) showMessage.findViewById(R.id.senderName);
+        msg1 = (TextView) showMessage.findViewById(R.id.msg);
+        sentDate1 = (TextView) showMessage.findViewById(R.id.sentDate);
 
-        show_more_notification= (ImageView) findViewById(R.id.show_more_notification);
-        show_more_video_cals= (ImageView) findViewById(R.id.show_more_video_cals);
+        show_more_notification = (ImageView) findViewById(R.id.show_more_notification);
+        show_more_video_cals = (ImageView) findViewById(R.id.show_more_video_cals);
         show_more_notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashBoardActivity.this,NotificationActivity.class));
+                startActivity(new Intent(DashBoardActivity.this, NotificationActivity.class));
             }
         });
         show_more_video_cals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashBoardActivity.this,VideoCallsActivity.class));
+                startActivity(new Intent(DashBoardActivity.this, VideoCallsActivity.class));
             }
         });
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
-        title.setText(prefs.getString("name","no")+" Dashboard");
+//        title.setText(prefs.getString("name", "no") + " Dashboard");
 
 
-                callsList= (RecyclerView) findViewById(R.id.myCallList);
-        notificationsList= (RecyclerView) findViewById(R.id.notifcationsList);
+        callsList = (RecyclerView) findViewById(R.id.myCallList);
+        notificationsList = (RecyclerView) findViewById(R.id.notifcationsList);
         callsList.setNestedScrollingEnabled(false);
         notificationsList.setNestedScrollingEnabled(false);
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
+
         videocallName.add("videoCall_12_12_16");
         videocallName.add("videoCall_13_12_16");
         videocallName.add("videoCall_14_12_16");
@@ -147,24 +195,68 @@ Dialog showMessage;
         videocallDate.add("12-Dec-2016");
         videocallDate.add("13-Dec-2016");
         videocallDate.add("14-Dec-2016");
-        videoCallAdapter = new VideocallAdapter(this, videocallerName,videocallName,videocallDate);
+        // notification data
+        msgs.add("This is test data for notifications list");
+        msgs.add("This is test data for notifications list");
+        msgs.add("This is test data for notifications list");
+
+        notificationSenderNames.add("Solicitor");
+        notificationSenderNames.add("Solicitor");
+        notificationSenderNames.add("Solicitor");
+
+        notificationSentDates.add("12-Dec-2016 12:12:12");
+        notificationSentDates.add("13-Dec-2016 12:12:12");
+        notificationSentDates.add("14-Dec-2016 12:12:12");
+
+        /// notifications adapter
+
+        recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+        notificationsList.setHasFixedSize(true);
+        notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
+        notificationsList.setAdapter(recyclerViewAdapter);
+
+        videoCallAdapter = new VideocallAdapter(this, videocallerName, videocallName, videocallDate);
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(this);
         callsList.setLayoutManager(recylerViewLayoutManager);
         callsList.setHasFixedSize(true);
         callsList.setAdapter(videoCallAdapter);
 
-        if(new NetworkCheck().isOnline(DashBoardActivity.this)) {
-            new getDetailsById().execute();
+        if (new NetworkCheck().isOnline(DashBoardActivity.this)) {
+           // new getDetailsById().execute();
 
-        }
-        else
-        {
+        } else {
             Toast.makeText(DashBoardActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
         }
-        initTabs();
+        // initTabs();
     }
-    public void initTabs()
+    // Initiating Menu XML file (menu.xml)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
     {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.dashboard_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+
+        switch (item.getItemId())
+        {
+            case R.id.case_action:
+                Toast.makeText(this, "Bookmark is Selected", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.log_out:
+                Toast.makeText(this, "Save is Selected", Toast.LENGTH_SHORT).show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    public void initTabs() {
+/*
 
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Uploaded Documents"));
@@ -191,6 +283,7 @@ Dialog showMessage;
 
         //Adding onTabSelectedListener to swipe views
         tabLayout.setOnTabSelectedListener(this);
+*/
 
 
     }
@@ -227,8 +320,8 @@ Dialog showMessage;
                 type = "1";
             }
             userTypeDetailss.clear();
-            for(int i=0;i<=2;i++) {
-                String url = "http://35.163.24.72:8080/VedioApp/service/user/type/"+i;
+            for (int i = 0; i <= 2; i++) {
+                String url = "http://35.163.24.72:8080/VedioApp/service/user/type/" + i;
                 Log.e("urlls", url);
                 try {
                     postAPICall1(url, DashBoardActivity.this);
@@ -246,6 +339,7 @@ Dialog showMessage;
 
         }
     }
+
     public void postAPICall1(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         HttpGet httpPost = new HttpGet(strurl);
@@ -254,7 +348,7 @@ Dialog showMessage;
         HttpResponse response = null;
         HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        if(response.getStatusLine().getStatusCode()==200) {
+        if (response.getStatusLine().getStatusCode() == 200) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -288,9 +382,7 @@ Dialog showMessage;
                 });
 
             }
-        }
-        else  if(response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -303,14 +395,15 @@ Dialog showMessage;
         //    Log.e("resultJson",userTypeDetailss.toString());
 
     }
+
     private class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
         protected Long doInBackground(URL... urls) {
-            Long aLong= Long.valueOf(1);
+            Long aLong = Long.valueOf(1);
 
 
             try {
                 //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
-                postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1)+"/limit/3", DashBoardActivity.this);
+                postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1) + "/limit/3", DashBoardActivity.this);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -321,17 +414,17 @@ Dialog showMessage;
         protected void onPostExecute(Long result) {
         }
     }
-    public void postAPICall(String strurl, final Context context) throws Exception
-    {
+
+    public void postAPICall(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
-        Log.e("strurl",strurl);
+        Log.e("strurl", strurl);
         HttpGet httpPost = new HttpGet(strurl);
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
         httpPost.setHeader("Accept", "application/json");
         HttpResponse response = null;
-        HttpClient httpClient = new MyHttpClient( context );
+        HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        if(response.getStatusLine().getStatusCode()==200) {
+        if (response.getStatusLine().getStatusCode() == 200) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -339,8 +432,8 @@ Dialog showMessage;
             while ((line = reader.readLine()) != null) {
                 resultJson += line;
             }
-            Log.e("notifications",resultJson);
-            if(resultJson!=null) {
+            Log.e("notifications", resultJson);
+            if (resultJson != null) {
                 try {
                     msgs.clear();
                     notificationSenderNames.clear();
@@ -353,10 +446,10 @@ Dialog showMessage;
                         notificationSenderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
                         notificationSentDates.add(jsonObject.getString("sentDate"));
                     }
-                    if (resultJson!=null) {
+                    if (resultJson != null) {
 
                     }
-                  //  Log.e("data -->", sentDates.size() + "--" + senderNames.size() + "--" + msgs.size() + "--");
+                    //  Log.e("data -->", sentDates.size() + "--" + senderNames.size() + "--" + msgs.size() + "--");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -369,9 +462,7 @@ Dialog showMessage;
                     });
                 } catch (Exception e) {
                 }
-            }
-            else
-            {
+            } else {
                 progressDialog.dismiss();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -380,13 +471,11 @@ Dialog showMessage;
                     }
                 });
             }
-        }
-        else  if(response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-progressDialog.dismiss();
+                    progressDialog.dismiss();
                     Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -394,34 +483,36 @@ progressDialog.dismiss();
 
         //Log.e("result", resultJson);
     }
-    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
 
-        ArrayList msgs,senderNames,sentDates;
+    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+
+        ArrayList msgs, senderNames, sentDates;
         Context context;
         View view1;
         ViewHolder viewHolder1;
-        TextView senderName,msg,sentDate;
+        TextView senderName, msg, sentDate;
 
-        public RecyclerViewAdapter(Context context1,ArrayList msgs,ArrayList senderNames,ArrayList sentDates){
+        public RecyclerViewAdapter(Context context1, ArrayList msgs, ArrayList senderNames, ArrayList sentDates) {
 
-            this.msgs=msgs;
-            this.senderNames=senderNames;
-            this.sentDates=sentDates;
+            this.msgs = msgs;
+            this.senderNames = senderNames;
+            this.sentDates = sentDates;
             context = context1;
         }
 
-        public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-            public  TextView senderName,msg,sentDate;
-public LinearLayout parent;
-            public ViewHolder(View v){
+            public TextView senderName, msg, sentDate;
+            public LinearLayout parent;
+
+            public ViewHolder(View v) {
 
                 super(v);
 
-                senderName = (TextView)v.findViewById(R.id.senderName);
-                msg = (TextView)v.findViewById(R.id.msg);
-                sentDate = (TextView)v.findViewById(R.id.sentDate);
-                parent= (LinearLayout) v.findViewById(R.id.parent);
+                senderName = (TextView) v.findViewById(R.id.senderName);
+                msg = (TextView) v.findViewById(R.id.msg);
+                sentDate = (TextView) v.findViewById(R.id.sentDate);
+                parent = (LinearLayout) v.findViewById(R.id.parent);
                 parent.setOnClickListener(this);
             }
 
@@ -430,18 +521,17 @@ public LinearLayout parent;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-try {
-    msg1.setText(msgs.get(getAdapterPosition()).toString());
-    sentDate1.setText(sentDates.get(getAdapterPosition()).toString());
-  senderName1.setText(senderNames.get(getAdapterPosition()).toString());
-    Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
-   // showMessage.show();
-   // slideUp.animateIn();
+                        try {
+                            msg1.setText(msgs.get(getAdapterPosition()).toString());
+                            sentDate1.setText(sentDates.get(getAdapterPosition()).toString());
+                            senderName1.setText(senderNames.get(getAdapterPosition()).toString());
+                            Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
+                            // showMessage.show();
+                            // slideUp.animateIn();
 
-}catch (Exception e)
-{
+                        } catch (Exception e) {
 
-}
+                        }
 
                     }
                 });
@@ -450,9 +540,9 @@ try {
         }
 
         @Override
-        public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-            view1 = LayoutInflater.from(context).inflate(R.layout.notification_custom,parent,false);
+            view1 = LayoutInflater.from(context).inflate(R.layout.notification_custom, parent, false);
 
             viewHolder1 = new ViewHolder(view1);
 
@@ -460,20 +550,20 @@ try {
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, final int position){
-try {
-    holder.msg.setText(msgs.get(position).toString());
-    holder.sentDate.setText(sentDates.get(position).toString());
-    holder.senderName.setText(senderNames.get(position).toString());
-    holder.msg.setTypeface(typeface);
-    holder.sentDate.setTypeface(typeface);
-    holder.senderName.setTypeface(typeface);
-} catch (Exception e)
-{}
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
+            try {
+                holder.msg.setText(msgs.get(position).toString());
+                holder.sentDate.setText(sentDates.get(position).toString());
+                holder.senderName.setText(senderNames.get(position).toString());
+                holder.msg.setTypeface(typeface);
+                holder.sentDate.setTypeface(typeface);
+                holder.senderName.setTypeface(typeface);
+            } catch (Exception e) {
+            }
         }
 
         @Override
-        public int getItemCount(){
+        public int getItemCount() {
 
             return msgs.size();
         }
@@ -481,40 +571,40 @@ try {
 
     //////videos lis adapter
 
-    class VideocallAdapter extends RecyclerView.Adapter<VideocallAdapter.ViewHolder>{
+    class VideocallAdapter extends RecyclerView.Adapter<VideocallAdapter.ViewHolder> {
 
-        ArrayList callerName,videoName,callDate;
+        ArrayList callerName, videoName, callDate;
         Context context;
         View view1;
         ViewHolder viewHolder1;
-        TextView senderName,msg,sentDate;
+        TextView senderName, msg, sentDate;
 
-        public VideocallAdapter(Context context1,ArrayList callerName,ArrayList videoName,ArrayList callDate){
+        public VideocallAdapter(Context context1, ArrayList callerName, ArrayList videoName, ArrayList callDate) {
 
-            this.callerName=callerName;
-            this.videoName=videoName;
-            this.callDate=callDate;
+            this.callerName = callerName;
+            this.videoName = videoName;
+            this.callDate = callDate;
             context = context1;
         }
 
-        public  class ViewHolder extends RecyclerView.ViewHolder{
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
-            public  TextView callerName,videoName,callDate;
+            public TextView callerName, videoName, callDate;
 
-            public ViewHolder(View v){
+            public ViewHolder(View v) {
 
                 super(v);
 
-                callerName = (TextView)v.findViewById(R.id.callerName);
-                videoName = (TextView)v.findViewById(R.id.videoName);
-                callDate = (TextView)v.findViewById(R.id.callDate);
+                callerName = (TextView) v.findViewById(R.id.callerName);
+                videoName = (TextView) v.findViewById(R.id.videoName);
+                callDate = (TextView) v.findViewById(R.id.callDate);
             }
         }
 
         @Override
-        public VideocallAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        public VideocallAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-            view1 = LayoutInflater.from(context).inflate(R.layout.videos_custom_layout,parent,false);
+            view1 = LayoutInflater.from(context).inflate(R.layout.videos_custom_layout, parent, false);
 
             viewHolder1 = new ViewHolder(view1);
 
@@ -522,7 +612,7 @@ try {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position){
+        public void onBindViewHolder(ViewHolder holder, int position) {
 
             holder.callerName.setText(videocallerName.get(position).toString());
             holder.videoName.setText(videocallName.get(position).toString());
@@ -533,7 +623,7 @@ try {
         }
 
         @Override
-        public int getItemCount(){
+        public int getItemCount() {
 
             return videocallDate.size();
         }

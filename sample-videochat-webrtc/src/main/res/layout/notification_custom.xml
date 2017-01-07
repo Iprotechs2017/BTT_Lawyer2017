@@ -57,10 +57,10 @@ android:id="@+id/parent"
             <TextView
                 android:text="20-11-2016"
 
-                android:textColor="@color/text_color_medium_dark_grey"
+                android:textColor="@color/date_color"
                 android:id="@+id/sentDate"
                 android:textSize="10dp"
-android:layout_alignParentBottom="true"
+
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

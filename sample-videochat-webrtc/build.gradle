@@ -98,6 +98,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'it.neokree:MaterialTabs:0.11'
     compile 'com.github.mancj:SlideUp-Android:1.0-beta'
+    compile 'com.jaredrummler:material-spinner:1.1.0'
 }
 
 apply from: "../artifacts.gradle"

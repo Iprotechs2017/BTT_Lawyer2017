@@ -1,168 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
->
-    <include layout="@layout/new_toolbar" android:id="@+id/toolbar_layout"/>
-<ScrollView
-android:layout_below="@+id/toolbar_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fitsSystemWindows="true">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/sign_up_bg">
+    <RelativeLayout
+        android:id="@+id/radio_par"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/radiobutton_group"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+
+        android:layout_marginTop="10dp">
+
+        <RadioButton
+            android:text="Immigrant"
+            android:textColor="#fff"
+            android:textSize="18dp"
+            android:buttonTint="#fff"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:id="@+id/lawyer"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:id="@+id/barister"
+            android:text="Barrister"
+            android:textSize="18dp"
+            android:buttonTint="#fff"
+            android:textColor="#fff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RadioGroup>
+    </RelativeLayout>
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="30dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp">
-
-        <ImageView android:src="@drawable/logo"
-            android:layout_width="wrap_content"
-            android:layout_height="72dp"
-            android:layout_marginBottom="24dp"
-            android:layout_gravity="center_horizontal" />
-<TextView
-    android:layout_gravity="center_horizontal"
-    android:text=""
-    android:textSize="18dp"
-    android:visibility="gone"
-    android:id="@+id/sol_name"
-    android:textColor="@color/primary"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
-        <!--  Name Label -->
-        <android.support.design.widget.TextInputLayout
+        android:orientation="vertical"
+        android:layout_below="@+id/radio_par">
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="8dp">
-
-            <EditText android:id="@+id/input_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:hint="Name" />
-        </android.support.design.widget.TextInputLayout>
-
-        <!-- Email Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:hint="Email" />
-        </android.support.design.widget.TextInputLayout>
-
-        <!-- Password Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="Password"/>
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="phone"
-                android:maxLength="10"
-                android:hint="Mobile Number"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <!-- Signup Button -->
-        <RelativeLayout
-            android:id="@+id/radio_par"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/lable"
-            android:textSize="16dip"
-            android:text="User Type :"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/input_name"
+            android:layout_below="@+id/radiobutton_group"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:hint="Name"
+            android:textColorHint="#fff"
+            android:layout_marginTop="60dp"
+            android:textColor="#ffffff"
             />
-            <RadioGroup
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-            android:layout_below="@+id/lable"
-            android:id="@+id/radiobutton_group"
-            android:layout_centerHorizontal="true"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+        <View
+            android:visibility="gone"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edt1"
+            android:id="@+id/v1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
 
-            <RadioButton
-                android:text="Immigrant"
-                android:id="@+id/lawyer"
-                android:layout_centerHorizontal="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/input_email"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/v1"
+            android:hint="Email"
+            android:textColorHint="#fff"
+            android:textSize="20dp"
+            android:textColor="#ffffff"/>
+        <View
 
-            <RadioButton
-                android:id="@+id/barister"
-                android:text="Barrister"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </RadioGroup>
-        </RelativeLayout>
-      <!--<RelativeLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content">
-        <Spinner
-            android:id="@+id/user_type"
+            android:visibility="gone"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edt1"
+            android:id="@+id/v2"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+        <EditText
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="40dp">
-
-        </Spinner>
-          <View
-              android:layout_below="@+id/user_type"
-              android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="@color/colorPrimary"/>
-      </RelativeLayout>-->
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_signup"
-            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="@color/colorPrimary"
-            android:padding="12dp"
+            android:id="@+id/input_password"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/v2"
+            android:hint="Password"
+            android:textColorHint="#fff"
+            android:textSize="20dp"
+            android:textColor="#ffffff"/>
+        <View
+            android:visibility="gone"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edt1"
+            android:id="@+id/v3"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/number"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@+id/v3"
+            android:hint="Mobile No"
+            android:textColorHint="#fff"
+            android:textSize="20dp"
+            android:textColor="#ffffff"/>
+        <View
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="1dp"
+            android:layout_below="@+id/edt1"
+            android:id="@+id/v4"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+        <android.support.v7.widget.AppCompatButton
             android:textColor="@color/white"
-            android:text="Create Account"/>
-
+            android:background="@color/documets_header"
+            android:textSize="18dp"
+            android:id="@+id/btn_signup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Account"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_below="@+id/v4"
+            android:layout_marginTop="10dp"
+            />
         <TextView android:id="@+id/link_login"
             android:layout_width="fill_parent"
-
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
             android:text="Already a member? Login"
             android:gravity="center"
-            android:textColor="@color/colorPrimary"
-            android:textSize="16dip"/>
-
+            android:textColor="#fff"
+            android:textSize="16dip"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
-</ScrollView>
 </RelativeLayout>
+
+
+

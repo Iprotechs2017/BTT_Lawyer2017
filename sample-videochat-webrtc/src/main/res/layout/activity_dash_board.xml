@@ -1,270 +1,453 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    >
-<include layout="@layout/new_toolbar" android:id="@+id/toolbar1"/>
-    <ScrollView
-        android:layout_below="@+id/toolbar1"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-   android:scrollbars="none"
-    >
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:background="@color/background">
 
-    tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity">
+    <include
+        android:id="@+id/toolbar1"
+        layout="@layout/individual_login_toolbar" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/card1"
-        android:visibility="gone"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="10dp">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar1"
+        android:scrollbars="none">
+<RelativeLayout
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/dashboard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Barrister1 Dashboard"
-                android:textColor="@color/black"
-                android:textSize="18dp" />
-
-            <TextView
-                android:id="@+id/user_unique_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Abc123"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-<LinearLayout
-
-    android:layout_below="@+id/card1"
-    android:id="@+id/tab"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity">
 
-    <RelativeLayout
-        android:layout_marginTop="5dp"
-        android:background="@color/background"
-        android:id="@+id/uploaded_doc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-    <TextView
-        android:id="@+id/uploaded_doc_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Documents"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
-    <ImageView
-        android:id="@+id/show_more_uploaded_docs"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:src="@drawable/show"
-        android:layout_width="20dp"
-        android:layout_height="20dp" />
-    </RelativeLayout>
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabLayout"
-android:visibility="gone"
-        android:layout_width="match_parent"
-        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
-        app:tabIndicatorColor="@color/colorPrimary"
-        android:layout_height="wrap_content"
-        android:background="@color/grey_transparent_10"
-        android:minHeight="?attr/actionBarSize"
-       />
-    <!-- View pager to swipe views -->
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="226dp"/>
-
-</LinearLayout>
-
-
-    <android.support.v7.widget.CardView
-
-        android:id="@+id/card3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tab"
-        android:layout_marginTop="1dp"
-        app:cardElevation="0dp">
-
-
-
-            <RelativeLayout
-                android:background="@color/background"
-                android:id="@+id/myCall"
+            <android.support.v7.widget.CardView
+                android:id="@+id/card1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:visibility="gone"
+                app:cardElevation="10dp">
 
-                <TextView
-                    android:id="@+id/video_calls_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="VideoCalls"
-                    android:textColor="@color/black"
-                    android:textSize="15dp" />
-<ImageView
-    android:id="@+id/show_more_video_cals"
-    android:layout_marginTop="5dp"
-    android:layout_alignParentRight="true"
-    android:layout_marginRight="10dp"
-    android:src="@drawable/show"
-    android:layout_width="20dp"
-    android:layout_height="20dp" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/myCallList"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:background="@color/background"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/video_calls_label"
-                    android:layout_marginTop="5dp">
+                    android:layout_margin="5dp"
+                    android:orientation="vertical">
 
-                </android.support.v7.widget.RecyclerView>
-                <TextView
+                    <TextView
+                        android:id="@+id/dashboard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Barrister1 Dashboard"
+                        android:textColor="@color/black"
+                        android:textSize="18dp" />
 
-                    android:layout_alignParentRight="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="More"
-                    android:visibility="gone"
-                    android:layout_marginRight="5dp"
-                    android:layout_below="@+id/myCallList"
-                    android:textColor="@color/black"
-                    android:textSize="15dp" />
-            </RelativeLayout>
+                    <TextView
+                        android:id="@+id/user_unique_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Abc123"
+                        android:textColor="@color/black" />
+                </LinearLayout>
 
+            </android.support.v7.widget.CardView>
 
+            <LinearLayout
 
-    </android.support.v7.widget.CardView>
-    <android.support.v7.widget.CardView
-        android:id="@+id/card4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/card3"
-        android:layout_marginTop="5dp"
-        app:cardElevation="1dp">
-
-            <RelativeLayout
-                android:id="@+id/myNotification"
-                android:background="@color/background"
+                android:id="@+id/tab"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/notifiation_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notifications"
-                    android:textColor="@color/black"
-                    android:textSize="15dp" />
-
-                <ImageView
-                    android:id="@+id/show_more_notification"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/show"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/notifcationsList"
-                android:layout_width="match_parent"
-                android:layout_below="@+id/notifiation_label"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1.0dp"
-                android:layout_marginRight="1.0dp"
-                android:layout_marginTop="1.0dp"
-                />
+                android:layout_below="@+id/card1"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/uploaded_doc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/background"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/uploaded_doc_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Documents"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:visibility="gone" />
+
+                    <com.jaredrummler.materialspinner.MaterialSpinner
+                        android:id="@+id/spinner"
+                        ms_background_color="@color/img_drop_down"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <ImageView
+                        android:id="@+id/show_more_uploaded_docs"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/show"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/grey_transparent_10"
+                    android:minHeight="?attr/actionBarSize"
+                    android:visibility="gone"
+                    app:tabIndicatorColor="@color/colorPrimary"
+                    app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget" />
+                <!-- View pager to swipe views -->
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="226dp"
+                    android:visibility="gone" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RelativeLayout
+                        android:id="@+id/documents_label_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@color/documets_header">
+
+                        <ImageView
+
+                            android:id="@+id/documents_menu_icon"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/documents_list" />
+
+                        <TextView
+
+                            android:id="@+id/documents_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toRightOf="@+id/documents_menu_icon"
+
+                            android:text="Documents"
+                            android:textColor="@color/white"
+                            android:textSize="20dp" />
+
+                        <ImageView
+                            android:id="@+id/show_more_documents"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="10dp"
+                            android:src="@drawable/show_more_icon" />
+
+                    </RelativeLayout>
+
+                    <FrameLayout
+                        android:id="@+id/frameParent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/documents_label_layout"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp">
+
+                    </FrameLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tab"
+                android:layout_marginTop="1dp"
+                android:visibility="visible"
+                app:cardElevation="0dp">
+
+
+                <RelativeLayout
+                    android:id="@+id/myCall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:id="@+id/video_calls_label_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@color/dash_video_calls_back">
+
+                        <ImageView
+
+                            android:id="@+id/video_menu_icon"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/video_calls_menu_icon" />
+
+                        <TextView
+
+                            android:id="@+id/video_calls_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toRightOf="@+id/video_menu_icon"
+
+                            android:text="VideoCalls"
+                            android:textColor="@color/white"
+                            android:textSize="20dp" />
+
+                        <ImageView
+                            android:id="@+id/show_more_video_cals"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="10dp"
+                            android:src="@drawable/show_more_icon" />
+
+                    </RelativeLayout>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/myCallList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/video_calls_label_layout"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@color/background">
+
+                    </android.support.v7.widget.RecyclerView>
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@+id/myCallList"
+                        android:layout_marginRight="5dp"
+                        android:text="More"
+                        android:textColor="@color/black"
+                        android:textSize="15dp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/card3">
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/card3"
+                    android:layout_marginTop="5dp"
+                    app:cardElevation="1dp">
+
+                    <RelativeLayout
+                        android:id="@+id/myNotification"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/background">
+
+                        <RelativeLayout
+                            android:id="@+id/notfications_label_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@color/notification_header">
+
+                            <TextView
+                                android:id="@+id/notifiation_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="10dp"
+                                android:layout_toRightOf="@+id/notification_header_label"
+                                android:text="Notifications"
+                                android:textColor="@color/white"
+                                android:textSize="20dp" />
+
+                            <ImageView
+                                android:id="@+id/notification_header_label"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="20dp"
+                                android:src="@drawable/white_notification_icon" />
+
+                            <ImageView
+                                android:id="@+id/show_more_notification"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginRight="10dp"
+                                android:src="@drawable/show_more_icon" />
+
+                        </RelativeLayout>
+
+                        <FrameLayout
+                            android:id="@+id/frame"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/notfications_label_layout">
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/notifcationsList"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:layout_marginTop="1.0dp" />
+
+
+                        </FrameLayout>
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/new_notification"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@+id/frame"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/circle_new_notification"
+                            android:padding="5dp"
+                            android:src="@drawable/edit" />
+                    </RelativeLayout>
+                </android.support.v7.widget.CardView>
+
+            </FrameLayout>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                app:cardElevation="10dp">
+
+
+            </android.support.v7.widget.CardView>
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card2"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/card4"
-        android:layout_marginTop="5dp"
-        app:cardElevation="10dp">
-
-
-
-    </android.support.v7.widget.CardView>
 
 </RelativeLayout>
-
-</ScrollView>
-    <RelativeLayout
+    </ScrollView>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/slideView"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_marginTop="350dp"
-        android:layout_marginRight="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
         android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="130dp"
         android:background="@color/grey_transparent_20"
-        android:layout_height="wrap_content">
-        <android.support.v7.widget.CardView
-            android:elevation="3dp"
+        android:orientation="vertical">
 
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:elevation="3dp"
+            android:visibility="visible">
+
             <RelativeLayout
 
-                android:background="@color/white"
-                android:orientation="vertical"
-
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+
+                android:background="@color/white"
+                android:orientation="vertical">
+
                 <RelativeLayout
-                    android:background="@color/grey_transparent_20"
+
+                    android:id="@+id/header"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="50dp"
+                    android:background="@color/notification_header">
+
                     <TextView
-                        android:layout_centerVertical="true"
-                        android:text="Slide"
+                        android:id="@+id/notification_to_name"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="Immigrant1"
+                        android:textColor="@color/white"
+                        android:textSize="18dp" />
+
                     <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/download"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp" />
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/msg_send"
+                        android:visibility="visible" />
                 </RelativeLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    style="@style/customTheam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/header"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="30dp">
+
+                    <EditText
+                        android:id="@+id/notification_edit_txt"
+                        style="@style/customTheam"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="true"
+                        android:hint="Enter Message"
+                        android:inputType="textCapWords" />
+                </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
         </android.support.v7.widget.CardView>
     </RelativeLayout>
+
+
 </RelativeLayout>
