@@ -15,6 +15,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -62,7 +63,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
     RecyclerView callsList, notificationsList;
     de.hdodenhof.circleimageview.CircleImageView newNotification;
     ProgressDialog progressDialog;
@@ -75,6 +76,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList videocallName = new ArrayList();
     ArrayList videocallDate = new ArrayList();
     HashMap userTypeDetailss = new HashMap();
+    ArrayList ImmigrantNames = new ArrayList();
+    ArrayList ImmigrantIds = new ArrayList();
     RecyclerViewAdapter recyclerViewAdapter;
     VideocallAdapter videoCallAdapter;
     ViewPager mViewPager;
@@ -91,10 +94,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     View slideView;
     EditText notification_edit_txt;
     SlideUp slideUp;
+    int userType=0;
     CardView card2;
     Animation slide_down;
     ImageView show_more_uploaded_docs, show_more_video_cals, show_more_notification;
-
+    MaterialSpinner spinner;
+    int selectedImmigrantId;
+    SwipeRefreshLayout swipeRefreshLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,13 +112,15 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         slideUp = new SlideUp(slideView);
         notification_edit_txt= (EditText) findViewById(R.id.notification_edit_txt);
         notification_to_name= (TextView) findViewById(R.id.notification_to_name);
-        MaterialSpinner spinner = (MaterialSpinner) findViewById(R.id.spinner);
-        spinner.setItems("Immigrant1", "Immigrant2", "Immigrant3", "Immigrant4", "Immigrant5");
+         spinner = (MaterialSpinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Snackbar.make(view, item+" selected", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, ImmigrantIds.get(position)+" selected", Snackbar.LENGTH_LONG).show();
+                selectedImmigrantId=Integer.parseInt(ImmigrantIds.get(position).toString());
+                new DownloadFilesTask().execute();
+
             }
         });
     /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -161,7 +169,6 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         senderName1 = (TextView) showMessage.findViewById(R.id.senderName);
         msg1 = (TextView) showMessage.findViewById(R.id.msg);
         sentDate1 = (TextView) showMessage.findViewById(R.id.sentDate);
-
         show_more_notification = (ImageView) findViewById(R.id.show_more_notification);
         show_more_video_cals = (ImageView) findViewById(R.id.show_more_video_cals);
         show_more_notification.setOnClickListener(new View.OnClickListener() {
@@ -177,9 +184,6 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             }
         });
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
-//        title.setText(prefs.getString("name", "no") + " Dashboard");
-
-
         callsList = (RecyclerView) findViewById(R.id.myCallList);
         notificationsList = (RecyclerView) findViewById(R.id.notifcationsList);
         callsList.setNestedScrollingEnabled(false);
@@ -196,7 +200,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         videocallDate.add("13-Dec-2016");
         videocallDate.add("14-Dec-2016");
         // notification data
-        msgs.add("This is test data for notifications list");
+        /*msgs.add("This is test data for notifications list");
         msgs.add("This is test data for notifications list");
         msgs.add("This is test data for notifications list");
 
@@ -206,14 +210,14 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         notificationSentDates.add("12-Dec-2016 12:12:12");
         notificationSentDates.add("13-Dec-2016 12:12:12");
-        notificationSentDates.add("14-Dec-2016 12:12:12");
+        notificationSentDates.add("14-Dec-2016 12:12:12");*/
 
         /// notifications adapter
 
-        recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+        /*recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
         notificationsList.setHasFixedSize(true);
         notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-        notificationsList.setAdapter(recyclerViewAdapter);
+        notificationsList.setAdapter(recyclerViewAdapter);*/
 
         videoCallAdapter = new VideocallAdapter(this, videocallerName, videocallName, videocallDate);
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(this);
@@ -222,7 +226,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         callsList.setAdapter(videoCallAdapter);
 
         if (new NetworkCheck().isOnline(DashBoardActivity.this)) {
-           // new getDetailsById().execute();
+           new getDetailsById().execute();
 
         } else {
             Toast.makeText(DashBoardActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
@@ -303,6 +307,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
     }
 
+
     private class getDetailsById extends AsyncTask<URL, Integer, Long> {
         @Override
         protected void onPreExecute() {
@@ -320,22 +325,31 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 type = "1";
             }
             userTypeDetailss.clear();
-            for (int i = 0; i <= 2; i++) {
-                String url = "http://35.163.24.72:8080/VedioApp/service/user/type/" + i;
+            /*for (int i = 0; i <= 2; i++) {*/
+                String url = "http://35.163.24.72:8080/VedioApp/service/user/type/" + userType;
                 Log.e("urlls", url);
                 try {
                     postAPICall1(url, DashBoardActivity.this);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+           /* }*/
+
 
             return aLong;
         }
 
 
         protected void onPostExecute(Long result) {
-
+//            swipeRefreshLayout.setRefreshing(false);
+            userType++;
+          if(userType<3)
+          {
+              new getDetailsById().execute();
+          }
+           if(ImmigrantNames.size()>0){
+               spinner.setItems(ImmigrantNames);
+           }
 
         }
     }
@@ -356,19 +370,28 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             while ((line = reader.readLine()) != null) {
                 resultJson += line;
             }
-            Log.e("resultJson", resultJson);
+            Log.e("resultJson--->", resultJson);
             try {
 
                 JSONArray jsonArray = new JSONArray(resultJson);
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
                     userTypeDetailss.put(jsonObject.getInt("id"), jsonObject.getString("name"));
-
+                    if(jsonObject.getInt("userType")==0)
+                    {
+                        if(ImmigrantIds.size()==0)
+                        {
+                            selectedImmigrantId  =jsonObject.getInt("id");
+                        }
+                    ImmigrantIds.add(jsonObject.getInt("id"));
+                    ImmigrantNames.add(jsonObject.getString("name"));
+                    }
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+
                         new DownloadFilesTask().execute();
                     }
                 });
@@ -403,7 +426,12 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
             try {
                 //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
-                postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1) + "/limit/3", DashBoardActivity.this);
+                if (prefs.getInt("userType", -1) == 0) {
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1) + "/limit/3", DashBoardActivity.this);
+                } else {
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + selectedImmigrantId + "/limit/3", DashBoardActivity.this);
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

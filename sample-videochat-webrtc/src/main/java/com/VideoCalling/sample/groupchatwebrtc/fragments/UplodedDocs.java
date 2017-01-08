@@ -61,7 +61,7 @@ public class UplodedDocs  extends Fragment {
         recycler_view= (RecyclerView) view.findViewById(R.id.recycler_view);
         prefs = getActivity().getSharedPreferences("loginDetails", getActivity().MODE_PRIVATE);
         typeface= Typeface.createFromAsset(getActivity().getAssets(), "QuicksandRegular.ttf");
-        videocallerName.add("Solicitor");
+    /*    videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
 
@@ -76,8 +76,8 @@ public class UplodedDocs  extends Fragment {
             LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
             recycler_view.setLayoutManager(recylerViewLayoutManager);
             recycler_view.setHasFixedSize(true);
-            recycler_view.setAdapter(documentsAdapter);
-       // new getSharedDocs().execute();
+            recycler_view.setAdapter(documentsAdapter);*/
+        new getSharedDocs().execute();
         return  view;
     }
     class VideocallAdapter extends RecyclerView.Adapter<VideocallAdapter.ViewHolder>{
@@ -85,24 +85,24 @@ public class UplodedDocs  extends Fragment {
         Context context;
         View view1;
         ViewHolder viewHolder1;
-       // ArrayList<DocumentDetails> documentsList;
+        ArrayList<DocumentDetails> documentsList;
         //ArrayList<DocumentDetails> documentsList
-       ArrayList videocallerName = new ArrayList();
+       //ArrayList videocallerName = new ArrayList();
         ArrayList videocallName = new ArrayList();
         ArrayList videocallDate = new ArrayList();
-/*        public VideocallAdapter(Context context1,ArrayList<DocumentDetails> documentsList)
+        public VideocallAdapter(Context context1,ArrayList<DocumentDetails> documentsList)
         {
-          //  this.documentsList=documentsList;
+            this.documentsList=documentsList;
             context = context1;
-        }*/
-public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList videocallName,ArrayList videocallDate)
+        }
+/*public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList videocallName,ArrayList videocallDate)
 {
     //  this.documentsList=documentsList;
     this.videocallName=videocallName;
     this.videocallerName=videocallerName;
     this.videocallDate=videocallDate;
     context = context1;
-}
+}*/
 
 
         public  class ViewHolder extends RecyclerView.ViewHolder{
@@ -131,15 +131,15 @@ public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList vid
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position){
-          /*  final DocumentDetails documentDetails = documentsList.get(position);
-            String docName = documentDetails.getName().toString();*/
+            final DocumentDetails documentDetails = documentsList.get(position);
+            String docName = documentDetails.getName().toString();
             holder.contactImage.setImageResource(R.drawable.pdf_icon);
-            /*holder.callerName.setText(documentDetails.getUploadedTo()+"");
+            holder.callerName.setText(documentDetails.getUploadedTo()+"");
             holder.videoName.setText(documentDetails.getName().toString());
-            holder.callDate.setText(documentDetails.getUploadedDate().toString());*/
-            holder.callerName.setText(videocallName.get(position).toString());
+            holder.callDate.setText(documentDetails.getUploadedDate().toString());
+       /*     holder.callerName.setText(videocallName.get(position).toString());
             holder.videoName.setText(videocallerName.get(position).toString());
-            holder.callDate.setText(videocallDate.get(position).toString());
+            holder.callDate.setText(videocallDate.get(position).toString());*/
             holder.callerName.setTypeface(typeface);
             holder.videoName.setTypeface(typeface);
             holder.callDate.setTypeface(typeface);
@@ -148,7 +148,7 @@ public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList vid
         @Override
         public int getItemCount(){
 
-            return videocallerName.size();
+            return documentsList.size();
         }
     }
 
@@ -163,7 +163,7 @@ public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList vid
             Long aLong= Long.valueOf(1);
             String url;
             JSONObject jsonObject=new JSONObject();
-            url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+prefs.getInt("userId",0)+"/sharedTo/"+1+"/limit/3";
+            url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+31+"/sharedTo/"+1+"/limit/3";
             Log.e("url", url);
             try {
                 getUploadedDocsIds(url, jsonObject.toString(), getActivity());
@@ -217,13 +217,13 @@ public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList vid
                   @Override
                   public void run() {
                       try {
-                           /*  documentsAdapter = new VideocallAdapter(getActivity(),DocumentDetailsArray);
+                             documentsAdapter = new VideocallAdapter(getActivity(),DocumentDetailsArray);
                           LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
                           recycler_view.setLayoutManager(recylerViewLayoutManager);
                           recycler_view.setHasFixedSize(true);
-                          recycler_view.setAdapter(documentsAdapter);*/
+                          recycler_view.setAdapter(documentsAdapter);
                       } catch (Exception e) {
-
+                         e.printStackTrace();
                       }
                   }
               });

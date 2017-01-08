@@ -91,7 +91,7 @@ public class SplashActivity extends CoreSplashActivity {
                   }
                   else if((prefs.getInt("userType", 0) == 1)||(prefs.getInt("userType", 0) == 2))
                   {
-                      startActivity(new Intent(SplashActivity.this, OpponentsActivity.class));
+                      startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                   }
                   finish();
               }
@@ -121,7 +121,7 @@ public class SplashActivity extends CoreSplashActivity {
         }
         else if((prefs.getInt("userType", 0) == 1)||(prefs.getInt("userType", 0) == 2))
         {
-            startActivity(new Intent(SplashActivity.this, OpponentsActivity.class));
+            startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
         }
         //OpponentsActivity.start(SplashActivity.this, false);
         finish();
@@ -136,7 +136,7 @@ public class SplashActivity extends CoreSplashActivity {
                         qbuserId.putInt("qbUserId",result.getId());
                         qbuserId.commit();
                         if (prefs.getInt("userType", 0) != 0) {
-                            startActivity(new Intent(SplashActivity.this, OpponentsActivity.class));
+                            startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                         } else {
                             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                         }
@@ -166,7 +166,7 @@ public class SplashActivity extends CoreSplashActivity {
                 if (deleteCurrentUser) {
                     removeAllUserData(result);
                 } else {
-                    subscribeToPushes();
+                  //  subscribeToPushes();
                     loginToChat(result);
                     startOpponentsActivity();
                 }
