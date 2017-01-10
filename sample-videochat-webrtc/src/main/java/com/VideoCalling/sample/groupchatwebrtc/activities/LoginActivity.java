@@ -545,7 +545,7 @@ public class LoginActivity extends BaseActivity {
         HttpResponse response = null;
         HttpClient httpClient = new MyHttpClient( context );
         response = httpClient.execute(httpPost);
-        Log.e("status code --->",response.getStatusLine().getStatusCode()+"---");
+        Log.e("status code --  ->",response.getStatusLine().getStatusCode()+"---");
         InputStream in = response.getEntity().getContent();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;
