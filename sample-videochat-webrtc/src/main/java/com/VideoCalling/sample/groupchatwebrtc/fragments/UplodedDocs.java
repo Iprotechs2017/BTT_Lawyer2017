@@ -1,5 +1,6 @@
 package com.VideoCalling.sample.groupchatwebrtc.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -17,10 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
+import com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.OpponentsActivity;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.utils.DocumentDetails;
 import com.VideoCalling.sample.groupchatwebrtc.utils.DocumentsDetailsWithIds;
+import com.VideoCalling.sample.groupchatwebrtc.utils.ShareFile;
+import com.VideoCalling.sample.groupchatwebrtc.utils.fileDownload;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -52,31 +56,19 @@ public class UplodedDocs  extends Fragment {
     ArrayList videocallerName = new ArrayList();
     ArrayList videocallName = new ArrayList();
     ArrayList videocallDate = new ArrayList();
-
+    String limitornot;
     Typeface typeface;
+
+ProgressDialog progressDialog;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        limitornot = getArguments().getString("yes");
 
         View view= inflater.inflate(R.layout.docs_custom_tabs_layout, container, false);
+        progressDialog=new ProgressDialog(getActivity());
         recycler_view= (RecyclerView) view.findViewById(R.id.recycler_view);
         prefs = getActivity().getSharedPreferences("loginDetails", getActivity().MODE_PRIVATE);
         typeface= Typeface.createFromAsset(getActivity().getAssets(), "QuicksandRegular.ttf");
-    /*    videocallerName.add("Solicitor");
-        videocallerName.add("Solicitor");
-        videocallerName.add("Solicitor");
-
-        videocallName.add("Document1");
-        videocallName.add("Document2");
-        videocallName.add("Document3");
-
-        videocallDate.add("12-Dec-2016");
-        videocallDate.add("13-Dec-2016");
-        videocallDate.add("14-Dec-2016");
-            documentsAdapter = new VideocallAdapter(getActivity(),videocallName,videocallerName,videocallDate);
-            LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
-            recycler_view.setLayoutManager(recylerViewLayoutManager);
-            recycler_view.setHasFixedSize(true);
-            recycler_view.setAdapter(documentsAdapter);*/
         new getSharedDocs().execute();
         return  view;
     }
@@ -86,36 +78,27 @@ public class UplodedDocs  extends Fragment {
         View view1;
         ViewHolder viewHolder1;
         ArrayList<DocumentDetails> documentsList;
-        //ArrayList<DocumentDetails> documentsList
-       //ArrayList videocallerName = new ArrayList();
-        ArrayList videocallName = new ArrayList();
-        ArrayList videocallDate = new ArrayList();
         public VideocallAdapter(Context context1,ArrayList<DocumentDetails> documentsList)
         {
             this.documentsList=documentsList;
             context = context1;
         }
-/*public VideocallAdapter(Context context1,ArrayList videocallerName,ArrayList videocallName,ArrayList videocallDate)
-{
-    //  this.documentsList=documentsList;
-    this.videocallName=videocallName;
-    this.videocallerName=videocallerName;
-    this.videocallDate=videocallDate;
-    context = context1;
-}*/
+
 
 
         public  class ViewHolder extends RecyclerView.ViewHolder{
 
             public  TextView callerName,videoName,callDate;
-            public ImageView contactImage;
+            public ImageView contactImage,download_video,share_video;
             public ViewHolder(View v){
 
                 super(v);
                 contactImage= (ImageView) v.findViewById(R.id.contactImage);
+                download_video=(ImageView) v.findViewById(R.id.download_video);
                 callerName = (TextView)v.findViewById(R.id.callerName);
                 videoName = (TextView)v.findViewById(R.id.videoName);
                 callDate = (TextView)v.findViewById(R.id.callDate);
+                share_video=(ImageView) v.findViewById(R.id.share_video);
             }
         }
 
@@ -130,19 +113,29 @@ public class UplodedDocs  extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position){
+        public void onBindViewHolder(ViewHolder holder, final int position){
             final DocumentDetails documentDetails = documentsList.get(position);
             String docName = documentDetails.getName().toString();
             holder.contactImage.setImageResource(R.drawable.pdf_icon);
-            holder.callerName.setText(documentDetails.getUploadedTo()+"");
+            holder.callerName.setText(documentDetails.getUploadedTo() + "");
             holder.videoName.setText(documentDetails.getName().toString());
             holder.callDate.setText(documentDetails.getUploadedDate().toString());
-       /*     holder.callerName.setText(videocallName.get(position).toString());
-            holder.videoName.setText(videocallerName.get(position).toString());
-            holder.callDate.setText(videocallDate.get(position).toString());*/
             holder.callerName.setTypeface(typeface);
             holder.videoName.setTypeface(typeface);
             holder.callDate.setTypeface(typeface);
+            holder.share_video.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new ShareFile(getActivity(),DocumentsDetailsWithIdsArraylist,position);
+                }
+            });
+            holder.download_video.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(getActivity(), "Ok", Toast.LENGTH_SHORT).show();
+                    new fileDownload(getActivity(),DocumentDetailsArray,position);
+                }
+            });
         }
 
         @Override
@@ -157,14 +150,27 @@ public class UplodedDocs  extends Fragment {
 
         @Override
         protected void onPreExecute() {
+
+
             super.onPreExecute();
+            progressDialog.show();
+            progressDialog.setMessage("loading...");
+            progressDialog.show();
         }
         protected Long doInBackground(URL... urls) {
             Long aLong= Long.valueOf(1);
             String url;
             JSONObject jsonObject=new JSONObject();
-            url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+31+"/sharedTo/"+1+"/limit/3";
-            Log.e("url", url);
+            if(limitornot.equalsIgnoreCase("full"))
+            {
+                url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/get/sharedBy/"+DashBoardActivity.selectedImmigrantId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString());
+            }
+            else
+            {
+                url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+DashBoardActivity.selectedImmigrantId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString())+"/limit/3";
+            }
+
+                        Log.e("url", url);
             try {
                 getUploadedDocsIds(url, jsonObject.toString(), getActivity());
             } catch (Exception e) {
@@ -173,90 +179,105 @@ public class UplodedDocs  extends Fragment {
             return aLong;
         }
         protected void onPostExecute(Long result) {
+            progressDialog.dismiss();
         }
     }
-    public void getUploadedDocsIds(String strurl, String jsonString, final Context context) throws Exception
-    {
+    public void getUploadedDocsIds(String strurl, String jsonString, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
-
         HttpGet httpPost = new HttpGet(strurl);
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
         httpPost.setHeader("Accept", "application/json");
         HttpResponse response = null;
-        HttpClient httpClient = new MyHttpClient( context );
+        HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        InputStream in = response.getEntity().getContent();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
-        String resultJson = "";
-        while ((line = reader.readLine()) != null)
-        {
-            resultJson += line;
-        }
-        Log.e("responseeee",resultJson);
-        try {
-            JSONArray jsonArray=new JSONArray(resultJson);
-            if(jsonArray.length()>0)
-            {
-                for (int i=0;i<=jsonArray.length()-1;i++)
-                {
+        if (response.getStatusLine().getStatusCode() == 200) {
+            try {
+                InputStream in = response.getEntity().getContent();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line = null;
+                String resultJson = "";
+                while ((line = reader.readLine()) != null) {
+                    resultJson += line;
+                }
+                Log.e("responseeee", resultJson);
+                Log.e(" documents statusCode", response.getStatusLine().getStatusCode()+"---");
 
-                    JSONObject jsonObject=jsonArray.getJSONObject(i);
-                    documentId=jsonObject.getInt("documentId");
-                    String url="http://35.163.24.72:8080/VedioApp/service/document/getdocumentdata/id/"+documentId;
-                    try {
-                        getDocumentDetailsById(url, jsonObject.toString(),getActivity());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                JSONArray jsonArray = new JSONArray(resultJson);
+                if (jsonArray.length() > 0) {
+                    for (int i = 0; i <= jsonArray.length() - 1; i++) {
+
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        documentId = jsonObject.getInt("documentId");
+                        String url = "http://35.163.24.72:8080/VedioApp/service/document/getdocumentdata/id/" + documentId;
+                        try {
+                            getDocumentDetailsById(url, jsonObject.toString(), getActivity());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        DocumentsDetailsWithIds documentsDetailsWithIds = new DocumentsDetailsWithIds(jsonObject.getInt("id"), jsonObject.getInt("documentId"), jsonObject.getInt("sharedBy"), jsonObject.getInt("docOwner"), jsonObject.getInt("sharedTo"), jsonObject.getString("sharedDate"));
+                        DocumentsDetailsWithIdsArraylist.add(documentsDetailsWithIds);
+
                     }
-                    DocumentsDetailsWithIds documentsDetailsWithIds=new DocumentsDetailsWithIds(jsonObject.getInt("id"),jsonObject.getInt("documentId"),jsonObject.getInt("sharedBy"),jsonObject.getInt("docOwner"),jsonObject.getInt("sharedTo"),jsonObject.getString("sharedDate"));
-                    DocumentsDetailsWithIdsArraylist.add(documentsDetailsWithIds);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                documentsAdapter = new VideocallAdapter(getActivity(), DocumentDetailsArray);
+                                LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
+                                recycler_view.setLayoutManager(recylerViewLayoutManager);
+                                recycler_view.setHasFixedSize(true);
+                                recycler_view.setAdapter(documentsAdapter);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "data not available...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
                 }
-              getActivity().runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                      try {
-                             documentsAdapter = new VideocallAdapter(getActivity(),DocumentDetailsArray);
-                          LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
-                          recycler_view.setLayoutManager(recylerViewLayoutManager);
-                          recycler_view.setHasFixedSize(true);
-                          recycler_view.setAdapter(documentsAdapter);
-                      } catch (Exception e) {
-                         e.printStackTrace();
-                      }
-                  }
-              });
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
-            else
+        }
+        else if(response.getStatusLine().getStatusCode()==204)
+        {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), "Documents not available...", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else if (response.getStatusLine().getStatusCode() == 500) {
             {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, "data not available...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "server is busy try again...!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
             }
 
-
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
-                }
-            });
-
+        //    Log.e("resultJson", resultJson);
         }
-
-        Log.e("resultJson",resultJson);
     }
-
     public void getDocumentDetailsById(String strurl, String jsonString, final Context context) throws Exception
     {
 
@@ -283,13 +304,14 @@ public class UplodedDocs  extends Fragment {
         {
             resultJson += line;
         }
+        if (response.getStatusLine().getStatusCode() == 200) {
         try {
            /* JSONArray jsonArray=new JSONArray(resultJson);
             for (int i=0;i<=jsonArray.length()-1;i++)
             {*/
 
             JSONObject jsonObject=new JSONObject(resultJson);
-            DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),jsonObject.getString("uploadedDate"),jsonObject.getInt("uploadedTo"));
+            DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),jsonObject.getString("uploadedDate"), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
             DocumentDetailsArray.add(documentsDetailsWithIds);
             //  }
 
@@ -305,7 +327,19 @@ public class UplodedDocs  extends Fragment {
 
         }
 
-        Log.e("resultJson", resultJson);
+        } else if (response.getStatusLine().getStatusCode() == 500) {
+            {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "server is busy try again...!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            Log.e("resultJson", resultJson);
+        }
     }
 
 }

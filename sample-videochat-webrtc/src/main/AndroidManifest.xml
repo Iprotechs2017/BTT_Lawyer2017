@@ -33,13 +33,13 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.SplashActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            </activity>
+        </activity>
 
         <receiver android:name=".services.BootCompletedIntentReceiver">
             <intent-filter>
@@ -140,11 +140,11 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activities.DashBoardActivity">
-
-        </activity>
+        <activity android:name=".activities.DashBoardActivity" />
         <activity android:name=".activities.VideoCallsActivity" />
-        <activity android:name=".activities.UploadedDocumentsActivity"></activity>
+        <activity android:name=".activities.UploadedDocumentsActivity" />
+        <activity android:name=".activities.ShowmoreDocumentsActivity" />
+        <activity android:name=".activities.CloseCaseActivity"></activity>
     </application>
 
 </manifest>

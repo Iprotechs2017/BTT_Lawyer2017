@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -91,7 +93,7 @@ public class LoginActivity extends BaseActivity {
     JsonObjectRequest jsonObjReq;
     public RequestQueue rq;
     String email,pass;
-
+    int userCaseStatus=1;
     String room="ipro20";
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -150,9 +152,6 @@ public class LoginActivity extends BaseActivity {
         parent= (RelativeLayout) findViewById(R.id.parent);
         pDialog = new ProgressDialog(this);
         btn_login= (Button) findViewById(R.id.btn_login);
-    //    setSupportActionBar(toolbar);
-//        action_layout= (LinearLayout) findViewById(R.id.action_layout);
-  //      action_layout.setVisibility(View.GONE);
         link_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,12 +174,60 @@ public class LoginActivity extends BaseActivity {
                     Toast.makeText(LoginActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
                 }
 
-
-                //startActivity(new Intent(LoginActivity.this,OpponentsActivity.class));
-
             }
         });
         //initUI();
+      /* */
+    }
+    public void chekCaseStaus(int status)
+    {
+        if(0==status)
+        {
+     //       displayUserCaseStatus("Your case is in pending status");
+            stopService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    startSignUpNewUser(createUserWithEnteredData());
+                }
+            });
+        }
+        else if(1==status)
+        {
+   //         displayUserCaseStatus("Your case is approved");
+            stopService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    startSignUpNewUser(createUserWithEnteredData());
+                }
+            });
+        }
+        else if(2==status)
+        {
+            displayUserCaseStatus("Your case has closed");
+        }
+        else if(3==status)
+        {
+            displayUserCaseStatus("Your case has rejected");
+        }
+    }
+    public void displayUserCaseStatus(String message)
+    {
+        new AlertDialog.Builder(this)
+        .setMessage(message)
+        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    LoginActivity.this.finish();
+                    }
+                })
+              .setCancelable(false)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     @Override
@@ -293,7 +340,7 @@ public class LoginActivity extends BaseActivity {
                         if (prefs.getInt("userType", -1) == -1) {
                             startActivity(new Intent(LoginActivity.this, LoginActivity.class));
                         } else if(prefs.getInt("userType", 0) == 0) {
-                            startActivity(new Intent(LoginActivity.this, ClientAfterLoginActivity.class));
+                            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
                         }
                         else
                         {
@@ -336,7 +383,7 @@ public class LoginActivity extends BaseActivity {
         if (prefs.getInt("userType", -1) == -1) {
             startActivity(new Intent(LoginActivity.this, LoginActivity.class));
         } else if(prefs.getInt("userType", 0) == 0) {
-            startActivity(new Intent(LoginActivity.this, ClientAfterLoginActivity.class));
+            startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
         }
         else
         {
@@ -508,24 +555,9 @@ public class LoginActivity extends BaseActivity {
         {
             resultJson += line;
         }
-      /*  Log.e("status",response.getStatusLine().getStatusCode()+"");
-
-        int code=response.getStatusLine().getStatusCode();
-        String statuseeee=response.getStatusLine().getReasonPhrase();
-
-        Log.e("resultJson",resultJson);
-        responseObject.put("code",code);
-        responseObject1=  new JSONObject(resultJson);
-        responseObject.put("result",responseObject1);*/
 
         try {
-
-                /*for(int i=0;i<=4;i++)
-                {*/
-
-          //  Log.e("resultJson",resultObject.toString());
-            if(response.getStatusLine().getStatusCode()==200)
-            {
+            if(response.getStatusLine().getStatusCode() == 200) {
                 responseObject=new JSONObject(resultJson);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -542,29 +574,27 @@ public class LoginActivity extends BaseActivity {
                     editor.putInt("userType", responseObject.getInt("userType"));
                     editor.putString("email", responseObject.getString("email"));
                     editor.commit();
-                    stopService(new Intent(this, NotificationService.class));
-                    startService(new Intent(this, NotificationService.class));
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    if(responseObject.getInt("userType")==0) {
+                        chekCaseStaus(responseObject.getInt("status"));
+                    }
+                    else {
+                        stopService(new Intent(this, NotificationService.class));
+                        startService(new Intent(this, NotificationService.class));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
 
-                            startSignUpNewUser(createUserWithEnteredData());
-                        }
-                    });
-
+                                startSignUpNewUser(createUserWithEnteredData());
+                            }
+                        });
+                    }
 
                 } catch (Exception e) {
                     hideProgressDialog();
                     e.printStackTrace();
-
-
                 }
 
-
-                //  break;
             }
-
-            //}
             if(response.getStatusLine().getStatusCode()==500)
             {
                 runOnUiThread(new Runnable() {

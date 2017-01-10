@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -64,28 +67,27 @@ RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
-        call= (CircleImageView) toolbar.findViewById(R.id.videocall);
-        logout= (CircleImageView) toolbar.findViewById(R.id.logout);
-        notification= (CircleImageView) toolbar.findViewById(R.id.show_notifications);
-        call.setVisibility(View.GONE);
-        notification.setVisibility(View.GONE);
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("loading...");
-
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+        if (prefs.getInt("userType", -1) == 0) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_theam_color);
+        } else if (prefs.getInt("userType", -1) == 1) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicor_theam_color);
+        } else if (prefs.getInt("userType", -1) == 2) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_theam_color);
+        }
 
-
-        title= (TextView) toolbar.findViewById(R.id.screen_title);
-        title.setText("Notifications");
-        action_layout= (LinearLayout) toolbar.findViewById(R.id.action_layout);
-        //action_layout.setVisibility(View.INVISIBLE);
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         if(new NetworkCheck().isOnline(NotificationActivity.this)) {
 
             new getDetailsById().execute();
 
             LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(this);
-            logout.setOnClickListener(new View.OnClickListener() {
+            /*logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new AlertDialog.Builder(NotificationActivity.this)
@@ -106,15 +108,8 @@ RecyclerView recyclerView;
                             .show();
 
                 }
-            });
+            });*/
             recyclerView.setLayoutManager(recylerViewLayoutManager);
-/*
-            recyclerView.setLayoutManager(recylerViewLayoutManager);
-
-            recyclerViewAdapter = new RecyclerViewAdapter(this, msgs,senderNames,sentDates);
-
-            recyclerView.setAdapter(recyclerViewAdapter);*/
-
         }
         else
         {
@@ -122,13 +117,13 @@ RecyclerView recyclerView;
         }
 
 
-        if (prefs.getInt("userType", -1) == 1) {
+/*        if (prefs.getInt("userType", -1) == 1) {
             notification.setVisibility(View.VISIBLE);
         }
         else
         {
             notification.setVisibility(View.GONE);
-        }
+        }*/
 
 
     }
@@ -347,6 +342,14 @@ runOnUiThread(new Runnable() {
         protected void onPostExecute(Long result) {
 
 
+        }
+    }
+    public void changeTheam(int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(color));
         }
     }
 }

@@ -3,6 +3,7 @@ package com.VideoCalling.sample.groupchatwebrtc.activities;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +34,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,8 +46,12 @@ import com.VideoCalling.sample.groupchatwebrtc.R;
 
 import com.VideoCalling.sample.groupchatwebrtc.adapters.TabsAdaptor;
 import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
+import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
+import com.VideoCalling.sample.groupchatwebrtc.utils.SendNotitcation;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mancj.slideup.SlideUp;
 
@@ -52,20 +59,21 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
 public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
     RecyclerView callsList, notificationsList;
-    de.hdodenhof.circleimageview.CircleImageView newNotification;
+    com.github.clans.fab.FloatingActionButton newNotification;
     ProgressDialog progressDialog;
     Dialog showMessage;
     SharedPreferences prefs;
@@ -75,8 +83,11 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList videocallerName = new ArrayList();
     ArrayList videocallName = new ArrayList();
     ArrayList videocallDate = new ArrayList();
-    HashMap userTypeDetailss = new HashMap();
+    public static HashMap userTypeDetailss = new HashMap();
+    public static HashMap<Integer,JSONObject> immigrantProfiles = new HashMap<Integer,JSONObject>();
     ArrayList ImmigrantNames = new ArrayList();
+    public static  HashMap solicitor=new HashMap();
+    public static  HashMap barrister=new HashMap();
     ArrayList ImmigrantIds = new ArrayList();
     RecyclerViewAdapter recyclerViewAdapter;
     VideocallAdapter videoCallAdapter;
@@ -94,62 +105,149 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     View slideView;
     EditText notification_edit_txt;
     SlideUp slideUp;
+    ImageView sendNotification;
+    com.github.clans.fab.FloatingActionButton callf;
     int userType=0;
     CardView card2;
     Animation slide_down;
-    ImageView show_more_uploaded_docs, show_more_video_cals, show_more_notification;
+    ImageView show_more_uploaded_docs, show_more_video_cals, show_more_notification,show_more_documents;
     MaterialSpinner spinner;
-    int selectedImmigrantId;
+    public static int selectedImmigrantId;
     SwipeRefreshLayout swipeRefreshLayout;
+    JSONObject notificationObject=new JSONObject();
+    com.github.clans.fab.FloatingActionMenu floating_parent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         progressDialog = new ProgressDialog(this);
-        newNotification= (CircleImageView) findViewById(R.id.new_notification);
+        callf= (FloatingActionButton) findViewById(R.id.call);
+        callf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                floating_parent.hideMenu(true);
+            }
+        });
+        newNotification= (FloatingActionButton) findViewById(R.id.new_notification);
+        floating_parent= (FloatingActionMenu) findViewById(R.id.floating_parent);
+        sendNotification= (ImageView) findViewById(R.id.sendNotification);
+        sendNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    notificationObject.put("notification", notification_edit_txt.getText().toString());
+                    notificationObject.put("sentBy",prefs.getInt("userId", -1) );
+                    notificationObject.put("sentDate",  new SimpleDateFormat("yyyy-MM-ddHH:mm:ss"));
+                    if (prefs.getInt("userType", -1) == 1) {
+
+                        notificationObject.put("sentTo",94 );
+                    }
+                    else if (prefs.getInt("userType", -1) == 2)
+                    {
+                        notificationObject.put("sentTo",95);
+                    }
+                    Log.e("notificationObject",notificationObject.toString());
+                    notificationObject.put("sentFor", selectedImmigrantId);
+                    slideUp.hideImmediately();
+                    new SendNotitcation(DashBoardActivity.this,notificationObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
         progressDialog.setMessage("loading...");
         slideView = findViewById(R.id.slideView);
         slideUp = new SlideUp(slideView);
         notification_edit_txt= (EditText) findViewById(R.id.notification_edit_txt);
         notification_to_name= (TextView) findViewById(R.id.notification_to_name);
-         spinner = (MaterialSpinner) findViewById(R.id.spinner);
+        show_more_documents= (ImageView) findViewById(R.id.show_more_documents);
+        spinner = (MaterialSpinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Snackbar.make(view, ImmigrantIds.get(position)+" selected", Snackbar.LENGTH_LONG).show();
-                selectedImmigrantId=Integer.parseInt(ImmigrantIds.get(position).toString());
+               // Snackbar.make(view, ImmigrantIds.get(position) + " selected", Snackbar.LENGTH_LONG).show();
+                toolbar.setTitle(item+" Dashboard");
+                msgs.clear();
+                notificationSenderNames.clear();
+                notificationSentDates.clear();
+                recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+                notificationsList.setHasFixedSize(true);
+                notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
+                notificationsList.setAdapter(recyclerViewAdapter);
+                selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(position).toString());
                 new DownloadFilesTask().execute();
-
+                Bundle bundle = new Bundle();
+                bundle.putString("yes", "no");
+                UplodedDocs uplodedDocs=new UplodedDocs();
+                uplodedDocs.setArguments(bundle);
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.frameParent,uplodedDocs );
+                transaction.commit();
             }
         });
-    /*    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.documets_header));
-        }*/
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.frameParent, new UplodedDocs());
-        transaction.commit();
-        slideUp.hideImmediately();
-        //   rel= (RelativeLayout) findViewById(R.id.rel);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Immigrant1 Dashboard");
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_theam_color);
+            }
+        else if(prefs.getInt("userType", -1) == 1)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicor_theam_color);
+          }
+        else if(prefs.getInt("userType", -1) == 2)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_theam_color);
+        }
+
+         slideUp.hideImmediately();
+        toolbar.setTitle("Dashboard");
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-       // getSupportActionBar()
         newNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                floating_parent.setVisibility(View.GONE);
+               //  floating_parent.performClick();
                 notification_edit_txt.requestFocus();
                 slideUp.animateIn();
             }
         });
+        slideUp.setSlideListener(new SlideUp.SlideListener() {
+
+
+            @Override
+            public void onSlideDown(float v) {
+                if(v>=100)
+                {
+                //    floating_parent.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+
+                }
+              //  floating_parent.setAlpha(1 - (v / 100));
+            Log.e("float",v+"--");
+            }
+
+            @Override
+            public void onVisibilityChanged(int visibility) {
+                if (visibility == View.GONE) {
+                   floating_parent.hideMenuButton(true);
+
+                }
+                else
+                {
+                    floating_parent.showMenuButton(true);
+                }
+            }
+        });
         setSupportActionBar(toolbar);
-        /*card2 = (CardView) findViewById(R.id.card2);
-        call = (CircleImageView) toolbar.findViewById(R.id.videocall);
-        logout = (CircleImageView) toolbar.findViewById(R.id.logout);
-        notification = (CircleImageView) toolbar.findViewById(R.id.show_notifications);*/
         show_more_uploaded_docs = (ImageView) findViewById(R.id.show_more_uploaded_docs);
         show_more_uploaded_docs.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +256,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
             }
         });
+        show_more_documents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class));
+            }
+        });
+
      //   call.setVisibility(View.GONE);
         typeface = Typeface.createFromAsset(getAssets(), "QuicksandRegular.ttf");
 
@@ -184,7 +289,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             }
         });
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
-        callsList = (RecyclerView) findViewById(R.id.myCallList);
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            userType=1;
+            selectedImmigrantId=prefs.getInt("userId", -1);
+            spinner.setVisibility(View.GONE);
+        }
+            callsList = (RecyclerView) findViewById(R.id.myCallList);
         notificationsList = (RecyclerView) findViewById(R.id.notifcationsList);
         callsList.setNestedScrollingEnabled(false);
         notificationsList.setNestedScrollingEnabled(false);
@@ -199,26 +310,6 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         videocallDate.add("12-Dec-2016");
         videocallDate.add("13-Dec-2016");
         videocallDate.add("14-Dec-2016");
-        // notification data
-        /*msgs.add("This is test data for notifications list");
-        msgs.add("This is test data for notifications list");
-        msgs.add("This is test data for notifications list");
-
-        notificationSenderNames.add("Solicitor");
-        notificationSenderNames.add("Solicitor");
-        notificationSenderNames.add("Solicitor");
-
-        notificationSentDates.add("12-Dec-2016 12:12:12");
-        notificationSentDates.add("13-Dec-2016 12:12:12");
-        notificationSentDates.add("14-Dec-2016 12:12:12");*/
-
-        /// notifications adapter
-
-        /*recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
-        notificationsList.setHasFixedSize(true);
-        notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-        notificationsList.setAdapter(recyclerViewAdapter);*/
-
         videoCallAdapter = new VideocallAdapter(this, videocallerName, videocallName, videocallDate);
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(this);
         callsList.setLayoutManager(recylerViewLayoutManager);
@@ -226,6 +317,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         callsList.setAdapter(videoCallAdapter);
 
         if (new NetworkCheck().isOnline(DashBoardActivity.this)) {
+            userTypeDetailss.clear();
+
            new getDetailsById().execute();
 
         } else {
@@ -234,6 +327,14 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         // initTabs();
     }
     // Initiating Menu XML file (menu.xml)
+    public void changeTheam(int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(color));
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -247,12 +348,32 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         switch (item.getItemId())
         {
+            case R.id.barrisetr:
+              startActivity(new Intent(DashBoardActivity.this,OpponentsActivity.class));
+                return true;
+
             case R.id.case_action:
-                Toast.makeText(this, "Bookmark is Selected", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(DashBoardActivity.this,CloseCaseActivity.class));
                 return true;
 
             case R.id.log_out:
-                Toast.makeText(this, "Save is Selected", Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                    .setMessage("Are you sure you want to Logout?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            new LogoutClass().clearSesson(DashBoardActivity.this);
+                            DashBoardActivity.this.finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+
                 return true;
 
             default:
@@ -324,7 +445,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             } else {
                 type = "1";
             }
-            userTypeDetailss.clear();
+
             /*for (int i = 0; i <= 2; i++) {*/
                 String url = "http://35.163.24.72:8080/VedioApp/service/user/type/" + userType;
                 Log.e("urlls", url);
@@ -346,6 +467,17 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
           if(userType<3)
           {
               new getDetailsById().execute();
+          }
+            else
+          {
+              Bundle bundle = new Bundle();
+              bundle.putString("yes", "limit");
+              UplodedDocs uplodedDocs=new UplodedDocs();
+              uplodedDocs.setArguments(bundle);
+              FragmentManager manager = getSupportFragmentManager();
+              FragmentTransaction transaction = manager.beginTransaction();
+              transaction.replace(R.id.frameParent,uplodedDocs );
+              transaction.commit();
           }
            if(ImmigrantNames.size()>0){
                spinner.setItems(ImmigrantNames);
@@ -375,16 +507,37 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
                 JSONArray jsonArray = new JSONArray(resultJson);
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    final JSONObject jsonObject = jsonArray.getJSONObject(i);
                     userTypeDetailss.put(jsonObject.getInt("id"), jsonObject.getString("name"));
                     if(jsonObject.getInt("userType")==0)
                     {
+
                         if(ImmigrantIds.size()==0)
                         {
+                            immigrantProfiles.put(jsonObject.getInt("id"),jsonObject);
                             selectedImmigrantId  =jsonObject.getInt("id");
+                           runOnUiThread(new Runnable() {
+                               @Override
+                               public void run() {
+                                   try {
+                                       toolbar.setTitle(jsonObject.getString("name") + " Dashboard");
+                                   } catch (JSONException e) {
+                                       e.printStackTrace();
+                                   }
+                               }
+                           });
+
                         }
                     ImmigrantIds.add(jsonObject.getInt("id"));
                     ImmigrantNames.add(jsonObject.getString("name"));
+                    }
+                    else if(jsonObject.getInt("userType")==1)
+                    {
+                        solicitor.put("id",jsonObject.getInt("id"));
+                    }
+                    else if(jsonObject.getInt("userType")==2)
+                    {
+                        barrister.put("id",jsonObject.getInt("id"));
                     }
                 }
                 runOnUiThread(new Runnable() {
@@ -426,11 +579,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
             try {
                 //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
-                if (prefs.getInt("userType", -1) == 0) {
-                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1) + "/limit/3", DashBoardActivity.this);
-                } else {
                     postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + selectedImmigrantId + "/limit/3", DashBoardActivity.this);
-                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -452,6 +601,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         HttpResponse response = null;
         HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
+        Log.e("response",response.getStatusLine().getStatusCode()+"--");
         if (response.getStatusLine().getStatusCode() == 200) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -467,6 +617,15 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     notificationSenderNames.clear();
                     notificationSentDates.clear();
                     JSONArray jsonArray = new JSONArray(resultJson);
+                    if(jsonArray.length()==0)
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
                         JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
                         msgs.add(jsonObject.getString("notification"));
@@ -490,7 +649,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     });
                 } catch (Exception e) {
                 }
-            } else {
+            }
+                        else {
                 progressDialog.dismiss();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -499,7 +659,18 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     }
                 });
             }
-        } else if (response.getStatusLine().getStatusCode() == 500) {
+        }
+        else if(response.getStatusLine().getStatusCode()==204)
+        {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

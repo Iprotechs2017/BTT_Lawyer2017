@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
-    <!-- Single menu item 
-         Set id, icon and Title for each menu item
-    -->
-    <item android:id="@+id/show_immigrants"
+    <item android:id="@+id/barrisetr"
 
-        android:title="Show Immigrants" />
+        android:title="Barrister Details" />
     <item android:id="@+id/case_action"
 
-        android:title="Accept or Reject Case" />
+        android:title="Close case" />
 
     <item android:id="@+id/log_out"
         android:title="Logout" />

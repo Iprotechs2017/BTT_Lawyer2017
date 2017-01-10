@@ -574,7 +574,7 @@ Log.e("strurl",strurl);
             {*/
 
                 JSONObject jsonObject=new JSONObject(resultJson);
-                DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),jsonObject.getString("uploadedDate"),jsonObject.getInt("uploadedTo"));
+                DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),jsonObject.getString("uploadedDate"),DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
                 DocumentDetailsArray.add(documentsDetailsWithIds);
           //  }
 

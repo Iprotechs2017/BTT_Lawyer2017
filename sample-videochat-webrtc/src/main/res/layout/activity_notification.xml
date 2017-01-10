@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-<include layout="@layout/new_toolbar" android:id="@+id/toolbar_layout"/>
+<include layout="@layout/individual_login_toolbar" android:id="@+id/toolbar_layout"/>
     <android.support.v7.widget.RecyclerView
         android:layout_margin="10dp"
         android:layout_below="@+id/toolbar_layout"

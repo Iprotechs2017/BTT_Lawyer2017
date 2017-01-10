@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,18 +47,21 @@ public class VideoCallsActivity extends Activity {
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("loading...");
         toolbar= (Toolbar) findViewById(R.id.toolbar);
-        call= (CircleImageView) toolbar.findViewById(R.id.videocall);
-        notification= (CircleImageView) toolbar.findViewById(R.id.show_notifications);
-        call.setVisibility(View.GONE);
-        notification.setVisibility(View.GONE);
-
-
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+        if (prefs.getInt("userType", -1) == 0) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_theam_color);
+        } else if (prefs.getInt("userType", -1) == 1) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicor_theam_color);
+        } else if (prefs.getInt("userType", -1) == 2) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_theam_color);
+        }
+
+
         callsList= (RecyclerView) findViewById(R.id.myCallList);
         callsList.setNestedScrollingEnabled(false);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
-        title= (TextView) toolbar.findViewById(R.id.screen_title);
-        title.setText("VideoCallsList");
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
@@ -154,6 +160,14 @@ public class VideoCallsActivity extends Activity {
         public int getItemCount(){
 
             return videocallDate.size();
+        }
+    }
+    public void changeTheam(int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(color));
         }
     }
 }

@@ -85,7 +85,7 @@ public class GooglePlayServicesHelper {
      * shared preferences.
      */
     public void registerInGcmInBackground(final String senderId) {
-        new AsyncTask<String, Void, String>() {
+        /*new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... params) {
                 try {
@@ -129,11 +129,11 @@ public class GooglePlayServicesHelper {
                             });
                 }
             }
-        }.execute(senderId);
+        }.execute(senderId);*/
     }
 
     private void unregisterInGcmInBackground(String senderId) {
-        new AsyncTask<String, Void, Void>() {
+      /*  new AsyncTask<String, Void, Void>() {
             @Override
             protected Void doInBackground(String... params) {
                 try {
@@ -153,7 +153,7 @@ public class GooglePlayServicesHelper {
             protected void onPostExecute(Void gcmRegId) {
                 deleteGcmRegIdFromPreferences();
             }
-        }.execute(senderId);
+        }.execute(senderId);*/
     }
 
     protected void saveGcmRegIdToPreferences(String gcmRegId) {

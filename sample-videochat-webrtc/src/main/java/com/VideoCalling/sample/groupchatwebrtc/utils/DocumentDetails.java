@@ -9,12 +9,12 @@ public class DocumentDetails {
     String name;
     String docType;
     String uploadedDate;
-    int uploadedTo;
+    String uploadedTo;
     public DocumentDetails(int id,
             String name,
             String docType,
             String uploadedDate,
-            int uploadedTo   )
+            String uploadedTo   )
     {
         this.id=id;
         this.name=name;
@@ -38,7 +38,7 @@ public class DocumentDetails {
     public String getUploadedDate() {
         return uploadedDate;
     }
-    public int getUploadedTo()
+    public String getUploadedTo()
     {
         return uploadedTo;
     }

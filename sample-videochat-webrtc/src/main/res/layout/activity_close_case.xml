@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/background"
+    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.CloseCaseActivity">
+<include layout="@layout/individual_login_toolbar" android:id="@+id/toolbar_layout"/>
+<RelativeLayout
+    android:layout_margin="10dp"
+
+    android:layout_below="@+id/toolbar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/accept_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+
+            android:textSize="20dp"
+            android:text="Accept"
+            android:id="@+id/accept_radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </RadioButton>
+<TextView
+    android:layout_marginTop="5dp"
+    android:textColor="@color/black"
+    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget lacus lorem. Donec luctus fermentum volutpat. Fusce eu ex tortor. Vestibulum sit amet fringilla ex. Ut dictum eget lectus in semper. Morbi ac iaculis nulla. Maecenas vestibulum condimentum aliquet. Curabitur placerat enim nec porta luctus. Suspendisse ac sapien tellus. Fusce elementum gravida ultricies"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/accept_layout"
+        android:orientation="vertical"
+        android:id="@+id/reject_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+
+            android:textSize="20dp"
+            android:text="Reject"
+            android:id="@+id/reject_radio"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content">
+
+        </RadioButton>
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget lacus lorem. Donec luctus fermentum volutpat. Fusce eu ex tortor. Vestibulum sit amet fringilla ex. Ut dictum eget lectus in semper. Morbi ac iaculis nulla. Maecenas vestibulum condimentum aliquet. Curabitur placerat enim nec porta luctus. Suspendisse ac sapien tellus. Fusce elementum gravida ultricies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <Button
+    android:id="@+id/confirm_case"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_below="@+id/reject_layout"
+        android:text="Confirm"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
+
+
+</RelativeLayout>
+</ScrollView>

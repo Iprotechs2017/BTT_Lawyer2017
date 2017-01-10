@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,6 +10,7 @@
     <include
         android:id="@+id/toolbar1"
         layout="@layout/individual_login_toolbar" />
+
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,6 +23,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,15 +85,20 @@
                         android:textColor="@color/black"
                         android:textSize="15dp"
                         android:visibility="gone" />
-
+<RelativeLayout
+    android:layout_marginRight="2dp"
+    android:layout_marginLeft="2dp"
+    android:background="@color/img_drop_down"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
                     <com.jaredrummler.materialspinner.MaterialSpinner
                         android:id="@+id/spinner"
                         ms_background_color="@color/img_drop_down"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp" />
-
+                    android:layout_margin="5dp"
+                     />
+</RelativeLayout>
                     <ImageView
                         android:id="@+id/show_more_uploaded_docs"
                         android:layout_width="20dp"
@@ -119,6 +127,7 @@
                     android:visibility="gone" />
 
                 <RelativeLayout
+                    android:layout_marginTop="1dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -338,8 +347,9 @@
                         </FrameLayout>
 
                         <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/new_notification"
+                            android:id="@+id/new_notification1"
                             android:layout_width="50dp"
+                            android:visibility="gone"
                             android:layout_height="50dp"
                             android:layout_alignParentRight="true"
                             android:layout_below="@+id/frame"
@@ -371,6 +381,7 @@
     </ScrollView>
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/slideView"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginLeft="5dp"
@@ -415,6 +426,7 @@
                         android:textSize="18dp" />
 
                     <ImageView
+                        android:id="@+id/sendNotification"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_alignParentRight="true"
@@ -441,13 +453,57 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="true"
+                        android:inputType="textMultiLine"
+                    android:lines="8"
+                    android:minLines="6"
+                    android:gravity="top|left"
+                    android:maxLines="10"
+                    android:scrollbars="vertical"
                         android:hint="Enter Message"
-                        android:inputType="textCapWords" />
+                      />
                 </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
         </android.support.v7.widget.CardView>
     </RelativeLayout>
 
+    <com.github.clans.fab.FloatingActionMenu
 
+        android:id="@+id/floating_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        fab:menu_labels_style="@style/MenuLabelsStyle"
+        fab:menu_labels_showAnimation="@anim/jump_from_down"
+        fab:menu_labels_hideAnimation="@anim/jump_to_down"
+        fab:menu_animationDelayPerItem="0"
+        fab:menu_shadowColor="#444"
+        fab:menu_colorNormal="@color/foating_button_bacground"
+        fab:menu_colorPressed="@color/foating_button_bacground"
+        fab:menu_colorRipple="@color/white">
+   <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/call"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+       android:padding="20dp"
+       android:visibility="gone"
+            android:src="@drawable/video_calls_menu_icon"
+            fab:fab_label="Call"
+            style="@style/MenuButtonsStyle" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/new_notification"
+            android:layout_width="30dp"
+            android:src="@drawable/ic_edit1"
+            android:layout_height="30dp"
+            fab:fab_label="New Notification"
+            android:padding="20dp"
+            style="@style/MenuButtonsStyle" />
+
+    </com.github.clans.fab.FloatingActionMenu>
 </RelativeLayout>

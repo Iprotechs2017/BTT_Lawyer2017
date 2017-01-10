@@ -28,6 +28,7 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -145,7 +146,8 @@ public class OpponentsActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     LinearLayout bar_after_login;
         HashMap baristerQB=new HashMap();
-    public static de.hdodenhof.circleimageview.CircleImageView bar_call,bar_remove;
+    public static de.hdodenhof.circleimageview.CircleImageView bar_remove;
+    public static ImageView bar_call;
     String type="";
 
     RelativeLayout  bar_reg_lay,parent;
@@ -187,7 +189,7 @@ public class OpponentsActivity extends BaseActivity {
 
 
         }
-        scribeFromPushes();
+       // scribeFromPushes();
         checker = new PermissionsChecker(getApplicationContext());
         bar_after_login = (LinearLayout) findViewById(R.id.bar_after_login);
         bar_name = (TextView) findViewById(R.id.bar_name);
@@ -320,7 +322,7 @@ public void callTo(String callto)
         makeCall = (ImageView) findViewById(R.id.videocall);
 
         show_notifications = (ImageView) findViewById(R.id.show_notifications);
-        bar_call= (CircleImageView) findViewById(R.id.bar_call);
+        bar_call= (ImageView) findViewById(R.id.bar_call);
         reload= (CircleImageView) findViewById(R.id.reload);
         reload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -343,7 +345,7 @@ public void callTo(String callto)
                 }
                 catch (Exception e)
                 {
-e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
         });
@@ -371,6 +373,22 @@ e.printStackTrace();
         }
         screen_title = (TextView) findViewById(R.id.screen_title);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_theam_color);
+        }
+        else if(prefs.getInt("userType", -1) == 1)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicor_theam_color);
+        }
+        else if(prefs.getInt("userType", -1) == 2)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_theam_color);
+        }
+
         screen_title.setText("Immigrants List");
         bar_registration = (Button) findViewById(R.id.bar_registration);
         bar_remove = (CircleImageView) findViewById(R.id.bar_remove);
@@ -504,7 +522,14 @@ e.printStackTrace();
         }
            proceedInitUsersList();
     }
-
+    public void changeTheam(int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(color));
+        }
+    }
     private void proceedInitUsersList() {
         currentOpponentsList = currentOpponentsList1;
         Log.e("barister",currentOpponentsList.toString()+"--"+currentOpponentsList.size());
