@@ -28,6 +28,7 @@
             android:textSize="20dp"
             android:text="Accept"
             android:id="@+id/accept_radio"
+            android:buttonTint="@color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -35,7 +36,7 @@
 <TextView
     android:layout_marginTop="5dp"
     android:textColor="@color/black"
-    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget lacus lorem. Donec luctus fermentum volutpat. Fusce eu ex tortor. Vestibulum sit amet fringilla ex. Ut dictum eget lectus in semper. Morbi ac iaculis nulla. Maecenas vestibulum condimentum aliquet. Curabitur placerat enim nec porta luctus. Suspendisse ac sapien tellus. Fusce elementum gravida ultricies"
+    android:text="This indicates that the immigrant application is granted"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 
@@ -53,14 +54,14 @@
             android:text="Reject"
             android:id="@+id/reject_radio"
             android:layout_width="wrap_content"
-
+            android:buttonTint="@color/black"
             android:layout_height="wrap_content">
 
         </RadioButton>
         <TextView
             android:layout_marginTop="5dp"
             android:textColor="@color/black"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget lacus lorem. Donec luctus fermentum volutpat. Fusce eu ex tortor. Vestibulum sit amet fringilla ex. Ut dictum eget lectus in semper. Morbi ac iaculis nulla. Maecenas vestibulum condimentum aliquet. Curabitur placerat enim nec porta luctus. Suspendisse ac sapien tellus. Fusce elementum gravida ultricies"
+            android:text="This indicates that the immigrant application is rejected"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

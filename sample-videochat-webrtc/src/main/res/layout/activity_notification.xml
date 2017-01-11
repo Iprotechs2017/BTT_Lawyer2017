@@ -11,5 +11,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"/>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/slideView"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="130dp"
+        android:background="@color/grey_transparent_20"
+        android:orientation="vertical">
 
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:elevation="3dp"
+            android:visibility="visible">
+
+            <RelativeLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:background="@color/white"
+                android:orientation="vertical">
+
+
+                <RelativeLayout
+                    android:visibility="visible"
+                    android:id="@+id/header1"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/notification_header">
+
+                    <ImageView
+                        android:id="@+id/icons"
+                        android:src="@drawable/contact"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:text="Immigrant1"
+                        android:textColor="@color/white"
+                        android:textSize="18dp" />
+                    <TextView
+                        android:layout_toRightOf="@+id/icons"
+                        android:textColor="@color/white"
+                        android:id="@+id/userName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:text="12-12-12 10:10:10"
+                        android:visibility="visible" />
+                    <TextView
+                        android:textColor="@color/white"
+                        android:id="@+id/time_stamp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:text="12-12-12 10:10:10"
+                        android:visibility="visible" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/view_msg"
+                    android:visibility="visible"
+                    android:layout_margin="3dp"
+                    android:layout_below="@+id/header1"
+                    android:layout_centerVertical="true"
+                    android:text="ajlkdjlaksjdlksjdlkkjalsjdlks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
 </RelativeLayout>

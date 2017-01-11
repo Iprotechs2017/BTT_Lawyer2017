@@ -25,6 +25,18 @@ Toolbar toolbar;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showmore_documents);
             toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Documents");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShowmoreDocumentsActivity.this.finish();
+            }
+        });
             prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
             if (prefs.getInt("userType", -1) == 0) {
                 toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));

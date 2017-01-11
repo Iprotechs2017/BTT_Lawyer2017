@@ -30,6 +30,7 @@ import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
+import com.mancj.slideup.SlideUp;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -55,11 +56,15 @@ RecyclerView recyclerView;
     ArrayList msgs=new ArrayList();
     ArrayList senderNames=new ArrayList();
     ArrayList sentDates=new ArrayList();
+    View slideView;
     ProgressDialog progressDialog;
     SharedPreferences prefs;
     LinearLayout action_layout;
     HashMap userTypeDetailss=new HashMap();
     TextView title;
+    TextView userName;
+    TextView view_msg,time_stamp;
+    SlideUp slideUp;
     Toolbar toolbar;
     de.hdodenhof.circleimageview.CircleImageView call,notification,logout;
     @Override
@@ -67,6 +72,24 @@ RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Notifications");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationActivity.this.finish();
+            }
+        });
+        view_msg= (TextView) findViewById(R.id.view_msg);
+        userName= (TextView) findViewById(R.id.userName);
+        time_stamp= (TextView) findViewById(R.id.time_stamp);
+        slideView = findViewById(R.id.slideView);
+        slideUp = new SlideUp(slideView);
+        slideUp.hideImmediately();
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("loading...");
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
@@ -143,10 +166,10 @@ RecyclerView recyclerView;
             context = context1;
         }
 
-        public  class ViewHolder extends RecyclerView.ViewHolder{
+        public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
             public  TextView senderName,msg,sentDate;
-
+            public LinearLayout parent;
             public ViewHolder(View v){
 
                 super(v);
@@ -154,6 +177,30 @@ RecyclerView recyclerView;
                 senderName = (TextView)v.findViewById(R.id.senderName);
                 msg = (TextView)v.findViewById(R.id.msg);
                 sentDate = (TextView)v.findViewById(R.id.sentDate);
+                parent = (LinearLayout) v.findViewById(R.id.parent);
+                parent.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            view_msg.setText(msgs.get(getAdapterPosition()).toString());
+                            time_stamp.setText(sentDates.get(getAdapterPosition()).toString());
+                            userName.setText(senderNames.get(getAdapterPosition()).toString());
+                            slideUp.animateIn();
+                            Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
+                            // showMessage.show();
+                            // slideUp.animateIn();
+
+                        } catch (Exception e) {
+e.printStackTrace();
+                        }
+
+                    }
+                });
             }
         }
 
@@ -241,8 +288,16 @@ RecyclerView recyclerView;
 
 
             try {
-              //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
-                postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
+                if (prefs.getInt("userType", -1) == 0) {
+
+                    //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1), NotificationActivity.this);
+                }
+                else
+                {
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + DashBoardActivity.selectedImmigrantId, NotificationActivity.this);
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

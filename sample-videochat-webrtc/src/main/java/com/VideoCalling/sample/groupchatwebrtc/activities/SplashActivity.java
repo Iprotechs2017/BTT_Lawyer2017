@@ -87,7 +87,7 @@ public class SplashActivity extends CoreSplashActivity {
                   if (prefs.getInt("userType", -1) == -1) {
                       startActivity(new Intent(SplashActivity.this, LoginActivity.class));
                   } else if(prefs.getInt("userType", 0) == 0) {
-                      startActivity(new Intent(SplashActivity.this, ClientAfterLoginActivity.class));
+                      startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                   }
                   else if((prefs.getInt("userType", 0) == 1)||(prefs.getInt("userType", 0) == 2))
                   {
@@ -117,7 +117,7 @@ public class SplashActivity extends CoreSplashActivity {
         if (prefs.getInt("userType", -1) == -1) {
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
         } else if(prefs.getInt("userType", 0) == 0) {
-            startActivity(new Intent(SplashActivity.this, ClientAfterLoginActivity.class));
+            startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
         }
         else if((prefs.getInt("userType", 0) == 1)||(prefs.getInt("userType", 0) == 2))
         {

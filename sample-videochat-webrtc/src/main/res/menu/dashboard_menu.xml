@@ -3,10 +3,13 @@
     >
     <item android:id="@+id/barrisetr"
 
-        android:title="Barrister Details" />
+        android:title="Show Immigrants" />
+    <item android:id="@+id/uploaded"
+
+        android:title="Upload Documents " />
     <item android:id="@+id/case_action"
 
-        android:title="Close case" />
+        android:title="Case status" />
 
     <item android:id="@+id/log_out"
         android:title="Logout" />

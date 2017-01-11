@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +20,7 @@ import com.VideoCalling.sample.groupchatwebrtc.utils.CloseCaseStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CloseCaseActivity extends Activity {
+public class CloseCaseActivity extends AppCompatActivity {
     Toolbar toolbar;
     SharedPreferences prefs;
     Button confirm_case;
@@ -32,6 +33,18 @@ public class CloseCaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_close_case);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Case status");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CloseCaseActivity.this.finish();
+            }
+        });
         confirm_case= (Button) findViewById(R.id.confirm_case);
         accept_layout= (LinearLayout) findViewById(R.id.accept_layout);
         reject_layout= (LinearLayout) findViewById(R.id.reject_layout);
@@ -57,6 +70,46 @@ public class CloseCaseActivity extends Activity {
 
             }
         });
+        accept_radio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(reject_radio.isChecked())
+                {
+                    reject_radio.setChecked(false);
+                }
+                accept_radio.setChecked(true);
+                updatedStatus=1;
+                try {
+                    immigrant.put("status", updatedStatus);
+                    Log.e("immigrant", immigrant.toString());
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        reject_radio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(accept_radio.isChecked())
+                {
+                    accept_radio.setChecked(false);
+                }
+                reject_radio.setChecked(true);
+                updatedStatus=2;
+                try {
+                    immigrant.put("status", updatedStatus);
+                    Log.e("immigrant", immigrant.toString());
+
+                } catch (JSONException e) {
+
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
         reject_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

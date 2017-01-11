@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -17,9 +18,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -96,7 +101,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
     private TextView txtPercentage;
     private QBUser currentUser;
     private String filePath = null;
-
+             Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,22 +122,36 @@ public class ClientAfterLoginActivity extends BaseActivity {
         selected_files = (ListView) findViewById(R.id.selected_files);
         sol_name = (TextView) findViewById(R.id.sol_name);
         new getSolaciter().execute();
-
+/*
         welcom = (TextView) findViewById(R.id.welcom);
         if (!prefs.getString("name", "test").equalsIgnoreCase("test")) {
             welcom.setText("Welcome " + prefs.getString("name", "test"));
         }
-        screen_title = (TextView) findViewById(R.id.screen_title);
+        screen_title = (TextView) findViewById(R.id.screen_title);*/
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        ImageView show_notifications = (ImageView) findViewById(R.id.show_notifications);
+        toolbar.setTitle("Upload Documents");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClientAfterLoginActivity.this.finish();
+            }
+        });
+        toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+        changeTheam(R.color.immigrant_theam_color);
+        /*ImageView show_notifications = (ImageView) findViewById(R.id.show_notifications);
         show_notifications.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(ClientAfterLoginActivity.this, NotificationActivity.class));
             }
-        });
-        final Intent intent = new Intent();
-        screen_title.setText("Upload Documents");
+        });*/
+        intent = new Intent();
+//        screen_title.setText("Upload Documents");
         ActivityCompat.requestPermissions(
                 this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1
@@ -155,7 +174,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                 }
             }
         });
-        makeCall = (ImageView) findViewById(R.id.videocall);
+       /* makeCall = (ImageView) findViewById(R.id.videocall);
         makeCall.setVisibility(View.GONE);
         makeCall.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,8 +183,8 @@ public class ClientAfterLoginActivity extends BaseActivity {
                 startPermissionsActivity(false);
             }
         });
-        screen_title.setText("Upload Documents");
-        logout.setOnClickListener(new View.OnClickListener() {
+        screen_title.setText("Upload Documents");*/
+        /*logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(ClientAfterLoginActivity.this)
@@ -184,7 +203,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                         .setCancelable(false)
                         .show();
             }
-        });
+        });*/
         uplode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +216,52 @@ public class ClientAfterLoginActivity extends BaseActivity {
         selected_files.setAdapter(fileAdapter);
         fileAdapter.notifyDataSetChanged();
     }
+    public void changeTheam(int color)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(color));
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.immigrant_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
 
+        switch (item.getItemId())
+        {
+            case R.id.attach:
+                intent.setType("*/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);//
+                startActivityForResult(Intent.createChooser(intent, "Select Files To Upload"), 121);
+                return true;
+
+            case R.id.send:
+
+
+                if (selectedFiles.size() > 0) {
+                    if (new NetworkCheck().isOnline(ClientAfterLoginActivity.this)) {
+                        new LoginAsync().execute();
+                    } else {
+                        Toast.makeText(ClientAfterLoginActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ClientAfterLoginActivity.this, "Please select file to uplode...!", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 121) {
@@ -234,7 +298,12 @@ public class ClientAfterLoginActivity extends BaseActivity {
     public void fileUplode(String filePath) {
         String ex = paths.get(0).toString().split("/")[filePath.split("/").length - 1].toString();
         Log.e("ex", ex.replaceAll("\\s+", "").split(".").length + "--" + ex);
-        String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" + ex.replaceAll("\\s+", "").split("\\.")[0] + "/type/" + paths.get(0).toString().substring(filePath.lastIndexOf(".")) + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
+       Log.e("paths",paths.toString());
+        String type=paths.get(0).toString().substring(paths.get(0).toString().lastIndexOf("."));
+        Log.e("type",type);
+       // type=type.substring(type.indexOf("."));
+       Log.e("type",type);
+        String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" + ex.replaceAll("\\s+", "").split("\\.")[0] + "/type/" +type + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
         Log.e("urlServer", urlServer);
         try {
 
@@ -402,9 +471,20 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             new LoginAsync().execute();
                         } else {
                             progressDialog.dismiss();
-                            Toast.makeText(ClientAfterLoginActivity.this, "All files are uploded successfully...!", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ClientAfterLoginActivity.this, "All files are uploded successfully...!", Toast.LENGTH_SHORT).show();
+                            new AlertDialog.Builder(ClientAfterLoginActivity.this)
+                                    .setMessage("All files are uploded successfully")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                          //  new LogoutClass().clearSesson(ClientAfterLoginActivity.this);
+                                            ClientAfterLoginActivity.this.finish();
+                                        }
+                                    })
+
+                                    .setCancelable(false)
+                                    .show();
                         }
-                        Toast.makeText(context, "File Successfully Shared...!", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(context, "File Successfully Shared...!", Toast.LENGTH_SHORT).show();
                     }
                 });
 

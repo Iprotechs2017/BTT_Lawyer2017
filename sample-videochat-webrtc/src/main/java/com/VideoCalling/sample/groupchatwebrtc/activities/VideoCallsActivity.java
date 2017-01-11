@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class VideoCallsActivity extends Activity {
+public class VideoCallsActivity extends AppCompatActivity {
     RecyclerView callsList,notificationsList;
     ProgressDialog progressDialog;
     TextView title;
@@ -47,6 +48,18 @@ public class VideoCallsActivity extends Activity {
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("loading...");
         toolbar= (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Video calls");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoCallsActivity.this.finish();
+            }
+        });
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         if (prefs.getInt("userType", -1) == 0) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));

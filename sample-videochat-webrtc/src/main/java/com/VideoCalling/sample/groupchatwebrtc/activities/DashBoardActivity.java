@@ -86,6 +86,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static HashMap userTypeDetailss = new HashMap();
     public static HashMap<Integer,JSONObject> immigrantProfiles = new HashMap<Integer,JSONObject>();
     ArrayList ImmigrantNames = new ArrayList();
+    RelativeLayout header1,header;
+    TextView userName;
     public static  HashMap solicitor=new HashMap();
     public static  HashMap barrister=new HashMap();
     ArrayList ImmigrantIds = new ArrayList();
@@ -108,12 +110,14 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ImageView sendNotification;
     com.github.clans.fab.FloatingActionButton callf;
     int userType=0;
+    TextView view_msg,time_stamp;
     CardView card2;
     Animation slide_down;
     ImageView show_more_uploaded_docs, show_more_video_cals, show_more_notification,show_more_documents;
     MaterialSpinner spinner;
     public static int selectedImmigrantId;
     SwipeRefreshLayout swipeRefreshLayout;
+    String selectedPersonName;
     JSONObject notificationObject=new JSONObject();
     com.github.clans.fab.FloatingActionMenu floating_parent;
     @Override
@@ -132,31 +136,39 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         newNotification= (FloatingActionButton) findViewById(R.id.new_notification);
         floating_parent= (FloatingActionMenu) findViewById(R.id.floating_parent);
         sendNotification= (ImageView) findViewById(R.id.sendNotification);
+        header1= (RelativeLayout) findViewById(R.id.header1);
+        header= (RelativeLayout) findViewById(R.id.header);
+
+        view_msg= (TextView) findViewById(R.id.view_msg);
+        userName= (TextView) findViewById(R.id.userName);
+        time_stamp= (TextView) findViewById(R.id.time_stamp);
         sendNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     notificationObject.put("notification", notification_edit_txt.getText().toString());
-                    notificationObject.put("sentBy",prefs.getInt("userId", -1) );
-                    notificationObject.put("sentDate",  new SimpleDateFormat("yyyy-MM-ddHH:mm:ss"));
+                    notificationObject.put("sentBy", prefs.getInt("userId", -1));
+                    notificationObject.put("sentDate", new SimpleDateFormat("yyyy-MM-ddHH:mm:ss"));
                     if (prefs.getInt("userType", -1) == 1) {
 
-                        notificationObject.put("sentTo",94 );
+                        notificationObject.put("sentTo", 94);
+                    } else if (prefs.getInt("userType", -1) == 2) {
+                        notificationObject.put("sentTo", 95);
                     }
-                    else if (prefs.getInt("userType", -1) == 2)
-                    {
-                        notificationObject.put("sentTo",95);
-                    }
-                    Log.e("notificationObject",notificationObject.toString());
+                    Log.e("notificationObject", notificationObject.toString());
                     notificationObject.put("sentFor", selectedImmigrantId);
                     slideUp.hideImmediately();
-                    new SendNotitcation(DashBoardActivity.this,notificationObject);
+                    new SendNotitcation(DashBoardActivity.this, notificationObject);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
             }
         });
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            floating_parent.setVisibility(View.GONE);
+        }
         progressDialog.setMessage("loading...");
         slideView = findViewById(R.id.slideView);
         slideUp = new SlideUp(slideView);
@@ -170,6 +182,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
                // Snackbar.make(view, ImmigrantIds.get(position) + " selected", Snackbar.LENGTH_LONG).show();
                 toolbar.setTitle(item+" Dashboard");
+                selectedPersonName=item;
+                notification_to_name.setText(item.toString());
                 msgs.clear();
                 notificationSenderNames.clear();
                 notificationSentDates.clear();
@@ -212,8 +226,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         newNotification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                floating_parent.setVisibility(View.GONE);
-               //  floating_parent.performClick();
+                //  floating_parent.performClick();
+                header1.setVisibility(View.GONE);
+                view_msg.setVisibility(View.GONE);
+
+                header.setVisibility(View.VISIBLE);
+                notification_edit_txt.setVisibility(View.VISIBLE);
+                notification_to_name.setText(selectedPersonName);
                 notification_edit_txt.requestFocus();
                 slideUp.animateIn();
             }
@@ -223,27 +242,24 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
             @Override
             public void onSlideDown(float v) {
-                if(v>=100)
-                {
-                //    floating_parent.setVisibility(View.VISIBLE);
-                }
-                else
-                {
+                if (v >= 100) {
+                } else {
 
                 }
-              //  floating_parent.setAlpha(1 - (v / 100));
-            Log.e("float",v+"--");
+                Log.e("float", v + "--");
             }
 
             @Override
             public void onVisibilityChanged(int visibility) {
                 if (visibility == View.GONE) {
-                   floating_parent.hideMenuButton(true);
+                    if (prefs.getInt("userType", -1) != 0) {
 
-                }
-                else
-                {
-                    floating_parent.showMenuButton(true);
+                        floating_parent.setVisibility(View.VISIBLE);
+                        Log.e("visss", "gone");
+                    }
+                } else {
+                    floating_parent.setVisibility(View.INVISIBLE);
+                    Log.e("visss", "visible");
                 }
             }
         });
@@ -262,12 +278,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 startActivity(new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class));
             }
         });
-
-     //   call.setVisibility(View.GONE);
         typeface = Typeface.createFromAsset(getAssets(), "QuicksandRegular.ttf");
-
-       // notification.setVisibility(View.GONE);
-        //title = (TextView) toolbar.findViewById(R.id.screen_title);
         showMessage = new Dialog(this);
         showMessage.requestWindowFeature(Window.FEATURE_NO_TITLE);
         showMessage.setContentView(R.layout.dialog_notification_custom_layout);
@@ -291,6 +302,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         if (prefs.getInt("userType", -1) == 0)
         {
+            toolbar.setTitle(prefs.getString("name", "")+" Dashboard");
+
             userType=1;
             selectedImmigrantId=prefs.getInt("userId", -1);
             spinner.setVisibility(View.GONE);
@@ -302,11 +315,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
         videocallerName.add("Solicitor");
-
         videocallName.add("videoCall_12_12_16");
         videocallName.add("videoCall_13_12_16");
         videocallName.add("videoCall_14_12_16");
-
         videocallDate.add("12-Dec-2016");
         videocallDate.add("13-Dec-2016");
         videocallDate.add("14-Dec-2016");
@@ -340,6 +351,24 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.dashboard_menu, menu);
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            MenuItem barrisetr = menu.findItem(R.id.barrisetr);
+            barrisetr.setVisible(false);
+            MenuItem case_action = menu.findItem(R.id.case_action);
+            case_action.setVisible(false);
+        }
+        else if(prefs.getInt("userType", -1) == 1) {
+            MenuItem uploaded = menu.findItem(R.id.uploaded);
+            uploaded.setVisible(false);
+
+        }
+        else if(prefs.getInt("userType", -1) == 2) {
+            MenuItem uploaded = menu.findItem(R.id.uploaded);
+            uploaded.setVisible(false);
+            MenuItem barrisetr = menu.findItem(R.id.barrisetr);
+            barrisetr.setVisible(false);
+        }
         return true;
     }
     @Override
@@ -348,6 +377,10 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         switch (item.getItemId())
         {
+            case R.id.uploaded:
+                startActivity(new Intent(DashBoardActivity.this,ClientAfterLoginActivity.class));
+                return true;
+
             case R.id.barrisetr:
               startActivity(new Intent(DashBoardActivity.this,OpponentsActivity.class));
                 return true;
@@ -511,12 +544,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     userTypeDetailss.put(jsonObject.getInt("id"), jsonObject.getString("name"));
                     if(jsonObject.getInt("userType")==0)
                     {
-
+                        immigrantProfiles.put(jsonObject.getInt("id"),jsonObject);
                         if(ImmigrantIds.size()==0)
                         {
-                            immigrantProfiles.put(jsonObject.getInt("id"),jsonObject);
+
                             selectedImmigrantId  =jsonObject.getInt("id");
-                           runOnUiThread(new Runnable() {
+                            selectedPersonName=jsonObject.getString("name").toString();
+                            runOnUiThread(new Runnable() {
                                @Override
                                public void run() {
                                    try {
@@ -591,7 +625,25 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         protected void onPostExecute(Long result) {
         }
     }
+    private class VideoCallLogs extends AsyncTask<URL, Integer, Long> {
+        protected Long doInBackground(URL... urls) {
+            Long aLong = Long.valueOf(1);
 
+
+            try {
+                //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
+                postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + selectedImmigrantId + "/limit/3", DashBoardActivity.this);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return aLong;
+        }
+
+
+        protected void onPostExecute(Long result) {
+        }
+    }
     public void postAPICall(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         Log.e("strurl", strurl);
@@ -721,10 +773,17 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     @Override
                     public void run() {
                         try {
-                            msg1.setText(msgs.get(getAdapterPosition()).toString());
-                            sentDate1.setText(sentDates.get(getAdapterPosition()).toString());
-                            senderName1.setText(senderNames.get(getAdapterPosition()).toString());
-                            Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
+
+                            header1.setVisibility(View.VISIBLE);
+                            view_msg.setVisibility(View.VISIBLE);
+                            header.setVisibility(View.GONE);
+                            notification_edit_txt.setVisibility(View.GONE);
+
+                            view_msg.setText(msgs.get(getAdapterPosition()).toString());
+                            time_stamp.setText(sentDates.get(getAdapterPosition()).toString());
+                            userName.setText(senderNames.get(getAdapterPosition()).toString());
+                            slideUp.animateIn();
+                            //Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
                             // showMessage.show();
                             // slideUp.animateIn();
 
@@ -789,7 +848,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         public class ViewHolder extends RecyclerView.ViewHolder {
 
             public TextView callerName, videoName, callDate;
-
+LinearLayout share_and_down;
             public ViewHolder(View v) {
 
                 super(v);
@@ -797,6 +856,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 callerName = (TextView) v.findViewById(R.id.callerName);
                 videoName = (TextView) v.findViewById(R.id.videoName);
                 callDate = (TextView) v.findViewById(R.id.callDate);
+                share_and_down= (LinearLayout) v.findViewById(R.id.share_and_down);
             }
         }
 
@@ -812,7 +872,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-
+            holder.share_and_down.setVisibility(View.GONE);
             holder.callerName.setText(videocallerName.get(position).toString());
             holder.videoName.setText(videocallName.get(position).toString());
             holder.callDate.setText(videocallDate.get(position).toString());

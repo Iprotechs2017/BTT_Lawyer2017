@@ -59,17 +59,18 @@ public class UploadedDocumentsActivity extends AppCompatActivity {
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
-        toolbar_parent= (RelativeLayout) findViewById(R.id.toolbar_parent);
-        toolbar_parent.setVisibility(View.VISIBLE);
+       /* toolbar_parent= (RelativeLayout) findViewById(R.id.toolbar_parent);
+        toolbar_parent.setVisibility(View.VISIBLE);*/
         toolbar= (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
-        title= (TextView) toolbar.findViewById(R.id.screen_title);
+       /* title= (TextView) toolbar.findViewById(R.id.screen_title);
         title.setText("Uploaded Documents");
         call= (CircleImageView) toolbar.findViewById(R.id.videocall);
         logout= (CircleImageView) toolbar.findViewById(R.id.logout);
         notification= (CircleImageView) toolbar.findViewById(R.id.show_notifications);
         call.setVisibility(View.GONE);
-        notification.setVisibility(View.GONE);
+        notification.setVisibility(View.GONE);*/
         recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         typeface = Typeface.createFromAsset(getAssets(), "QuicksandRegular.ttf");
