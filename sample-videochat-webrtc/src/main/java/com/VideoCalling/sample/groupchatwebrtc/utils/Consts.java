@@ -7,10 +7,10 @@ import android.Manifest;
  */
 public interface Consts {
 
- String APP_ID = "51611";
+ /*String APP_ID = "51611"; venkat testing data
     String AUTH_KEY = "2-uUwTDbGUeVRAB";
     String AUTH_SECRET = "aW4YtYgvQQ9bRkg";
-    String ACCOUNT_KEY = "Mjvhxnkk3xpZCoxfwHJZ";
+    String ACCOUNT_KEY = "Mjvhxnkk3xpZCoxfwHJZ";*/
 
    /*
    iprotechs mail
@@ -18,7 +18,10 @@ public interface Consts {
    String AUTH_KEY = "8-78-MgSqRCSJd-";
    String AUTH_SECRET = "agQUeyCKRc9uf2V";
    String ACCOUNT_KEY = "VGUn7vY2nkBSzG9QdAFf";*/
-
+   String APP_ID = "52195";
+    String AUTH_KEY = "rpRtYP-fw53VMfJ";
+    String AUTH_SECRET = "d7QLDVKpwXMEDv4";
+    String ACCOUNT_KEY = "VGUn7vY2nkBSzG9QdAFf";
 
     // In GCM, the Sender ID is a project ID that you acquire from the API console
     String GCM_SENDER_ID = "951405537216";

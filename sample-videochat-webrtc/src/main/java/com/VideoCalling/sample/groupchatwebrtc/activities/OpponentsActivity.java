@@ -217,6 +217,7 @@ public void callTo(String callto)
 
     if (callto.equalsIgnoreCase("sol")) {
         startCall(true);
+
         startPermissionsActivity(false);
     } else if (callto.equalsIgnoreCase("bar")) {
         Log.e("error", "error");
@@ -338,7 +339,7 @@ public void callTo(String callto)
                 connection = "normal";
                 callto="bar";
                 try {
-
+                    DashBoardActivity.callTo1=Integer.parseInt(userTypeDetails.get("id").toString());
                     String data=userTypeDetails.get("id").toString()+"-splspli-"+"call";
                     mWebSocketClient.send(data);
                     callTo(callto);
@@ -439,6 +440,8 @@ public void callTo(String callto)
                                     connection = "normal";
                                     callto="sol";
                                     type="group";
+                                    DashBoardActivity.callTo2=Integer.parseInt(userTypeDetails.get("id").toString());
+
                                     try {
                                         callTo(callto);
                                     }

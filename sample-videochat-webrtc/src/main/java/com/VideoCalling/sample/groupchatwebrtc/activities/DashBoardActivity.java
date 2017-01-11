@@ -118,6 +118,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static int selectedImmigrantId;
     SwipeRefreshLayout swipeRefreshLayout;
     String selectedPersonName;
+    public static int callTo1,callTo2;
+
+    public static  String startTime,endtime;
     JSONObject notificationObject=new JSONObject();
     com.github.clans.fab.FloatingActionMenu floating_parent;
     @Override

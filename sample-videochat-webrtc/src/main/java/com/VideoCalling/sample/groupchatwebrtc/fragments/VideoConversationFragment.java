@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.icu.text.SimpleDateFormat;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
@@ -85,7 +87,9 @@ import org.webrtc.VideoRenderer;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -888,16 +892,25 @@ ProgressDialog progressDialog;
     @Override
     public void onCallRejectByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo) {
         setStatusForOpponent(userId, getString(R.string.text_status_rejected));
+        Log.e("callaccepted", "onCallRejectByUser");
     }
 
     @Override
     public void onCallAcceptByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo) {
         setStatusForOpponent(userId, getString(R.string.accepted));
+        Log.e("callaccepted", "accepted");
+        Calendar c = Calendar.getInstance();
+        System.out.println("Current time => " + c.getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
+        String formattedDate = df.format(c.getTime());
+        Log.e("startTime",formattedDate);
+        DashBoardActivity.startTime=formattedDate;
     }
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
-
+        Log.e("callaccepted","HangUpFromUser");
     }
 
     @Override
@@ -917,6 +930,12 @@ ProgressDialog progressDialog;
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId) {
+        Log.e("callaccepted","onReceiveHangUpFromUser");
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
+        String formattedDate = df.format(c.getTime());
+        Log.e("endTime",formattedDate);
+        DashBoardActivity.endtime=formattedDate;
         setStatusForOpponent(userId, getString(R.string.text_status_hang_up));
         Log.e(TAG, "onReceiveHangUpFromUser userId= " + userId);
         if (!isPeerToPeerCall) {
