@@ -506,7 +506,7 @@ runOnUiThread(new Runnable() {
                        try {
                            Log.e("name",jsonObject.getString("name").toString());
                            soli_id=jsonObject.getInt("id");
-                           sol_name.setText(jsonObject.getString("name").toString());
+                          // sol_name.setText(jsonObject.getString("name").toString());
                        } catch (JSONException e) {
                            e.printStackTrace();
                        }

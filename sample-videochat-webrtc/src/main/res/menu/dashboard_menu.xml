@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/barrisetr"
-
-        android:title="Show Immigrants" />
+        android:title="Make a video calll" />
     <item android:id="@+id/uploaded"
-
-        android:title="Upload Documents " />
+        android:title="Upload Documents" />
     <item android:id="@+id/case_action"
-
         android:title="Case status" />
-
     <item android:id="@+id/log_out"
         android:title="Logout" />
 </menu>

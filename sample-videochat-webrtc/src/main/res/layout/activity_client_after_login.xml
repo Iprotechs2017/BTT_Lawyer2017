@@ -64,6 +64,17 @@
 
         </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="20dp"
+        android:textColor="@color/grey_transparent_50"
+        android:gravity="center"
+        android:id="@+id/info"
+        android:layout_margin="5dp"
+        android:text="Select files by clicking above attachment icon"
+        />
         <ListView
             android:id="@+id/selected_files"
             android:layout_width="match_parent"

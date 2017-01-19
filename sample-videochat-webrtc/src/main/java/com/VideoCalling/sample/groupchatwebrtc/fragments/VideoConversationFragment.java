@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.hardware.Camera;
-import android.icu.text.SimpleDateFormat;
+
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -86,6 +86,7 @@ import org.webrtc.VideoRenderer;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -198,9 +199,8 @@ ProgressDialog progressDialog;
 
     @Override
     int getFragmentLayout() {
-
         prefs = getActivity().getSharedPreferences("loginDetails", getActivity().MODE_PRIVATE);
-
+        OpponentsActivity.connection="normal";
         return R.layout.fragment_video_conversation;
     }
 
@@ -898,19 +898,23 @@ ProgressDialog progressDialog;
     @Override
     public void onCallAcceptByUser(QBRTCSession session, Integer userId, Map<String, String> userInfo) {
         setStatusForOpponent(userId, getString(R.string.accepted));
-        Log.e("callaccepted", "accepted");
-        Calendar c = Calendar.getInstance();
-        System.out.println("Current time => " + c.getTime());
+        if (OpponentsActivity.connection.equalsIgnoreCase("reconnect"))
+        {
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
-        String formattedDate = df.format(c.getTime());
-        Log.e("startTime",formattedDate);
-        DashBoardActivity.startTime=formattedDate;
+        }
+        else
+        {
+            Log.e("callaccepted", "accepted");
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            String formattedDate = df.format(c.getTime());
+            Log.e("startTime", formattedDate);
+            DashBoardActivity.startTime = formattedDate;
+        }
     }
-
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
-        Log.e("callaccepted","HangUpFromUser");
+        Log.e("callaccepted", "HangUpFromUser");
     }
 
     @Override
@@ -924,18 +928,25 @@ ProgressDialog progressDialog;
     }
 
     @Override
-    public void onSessionStartClose(QBRTCSession qbrtcSession) {
+    public void onSessionStartClose(QBRTCSession qbrtcSession)
+    {
 
     }
-
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId) {
         Log.e("callaccepted","onReceiveHangUpFromUser");
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss");
-        String formattedDate = df.format(c.getTime());
-        Log.e("endTime",formattedDate);
-        DashBoardActivity.endtime=formattedDate;
+        if (OpponentsActivity.connection.equalsIgnoreCase("reconnect"))
+        {
+
+        }
+        else {
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            String formattedDate = df.format(c.getTime());
+            DashBoardActivity.service = "yes";
+            Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
+            DashBoardActivity.endtime = formattedDate;
+        }
         setStatusForOpponent(userId, getString(R.string.text_status_hang_up));
         Log.e(TAG, "onReceiveHangUpFromUser userId= " + userId);
         if (!isPeerToPeerCall) {
@@ -958,6 +969,7 @@ ProgressDialog progressDialog;
             @Override
             public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                 //      hideProgressDialog();
+                dbManager.clear();
                 dbManager.saveAllUsers(result, true);
                 proceedInitUsersList();
 
@@ -991,6 +1003,7 @@ ProgressDialog progressDialog;
         videoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DashBoardActivity.service="no";
                 conversationFragmentCallbackListener.onHangUpCurrentSession();
                 startCall(true);
             }
@@ -999,19 +1012,21 @@ ProgressDialog progressDialog;
         logout.setVisibility(View.GONE);
         bar_reg.setVisibility(View.GONE);
         ListView opponentsListView= (ListView) dialog.findViewById(R.id.list_opponents);
-       // Button call= (Button) dialog.findViewById(R.id.call);
-       /* call.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-             //   conversationFragmentCallbackListener.onHangUpCurrentSession();
-             //   startCall(true);
-            }
-        });*/
+        Button call= (Button) dialog.findViewById(R.id.call);
+//        call.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DashBoardActivity.service="no";
+//                conversationFragmentCallbackListener.onHangUpCurrentSession();
+//                startCall(true);
+//            }
+//        });
         currentOpponentsList = dbManager.getAllUsers();
+        OpponentsActivity.currentOpponentsList=dbManager.getAllUsers();;
         Log.e(TAG, "proceedInitUsersList currentOpponentsList= " + currentOpponentsList);
         SharedPrefsHelper    sharedPrefsHelper = SharedPrefsHelper.getInstance();
         currentOpponentsList.remove(sharedPrefsHelper.getQbUser());
-            opponentsAdapter1 = new OpponentsAdapter(getActivity(), currentOpponentsList,true);
+        opponentsAdapter1 = new OpponentsAdapter(getActivity(), currentOpponentsList,true);
         opponentsAdapter1.setSelectedItemsCountsChangedListener(new OpponentsAdapter.SelectedItemsCountsChangedListener() {
             @Override
             public void onCountSelectedItemsChanged(int count) {
@@ -1076,6 +1091,8 @@ if(OpponentsActivity.callType.equalsIgnoreCase("imm"))
         Log.e(TAG, "startCall()");
         ArrayList<Integer> opponentsList = CollectionsUtils.getIdsSelectedOpponents(opponentsAdapter1.getSelectedItems());
         opponentsList.add(OpponentsActivity.onlineUser);
+        DashBoardActivity.callTo1=Integer.parseInt(opponentsList.get(0)+"");
+        DashBoardActivity.callTo2=Integer.parseInt(opponentsList.get(1)+"");
         QBRTCTypes.QBConferenceType conferenceType = isVideoCall
                 ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
                 : QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
@@ -1085,10 +1102,9 @@ if(OpponentsActivity.callType.equalsIgnoreCase("imm"))
         QBRTCSession newQbRtcSession = qbrtcClient.createNewSessionWithOpponents(opponentsList, conferenceType);
 
         WebRtcSessionManager.getInstance(getActivity()).setCurrentSession(newQbRtcSession);
-
         PushNotificationSender.sendPushMessage(opponentsList, currentUser.getFullName());
         OpponentsActivity.connection="reconnect";
-      CallActivity.start(getActivity(),false);
+        CallActivity.start(getActivity(),false);
         getActivity().finish();
     }
 

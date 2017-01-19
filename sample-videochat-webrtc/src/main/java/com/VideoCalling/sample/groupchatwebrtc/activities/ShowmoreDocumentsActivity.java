@@ -20,6 +20,7 @@ import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
 public class ShowmoreDocumentsActivity extends AppCompatActivity {
 Toolbar toolbar;
     SharedPreferences prefs;
+    int userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +29,20 @@ Toolbar toolbar;
         toolbar.setTitle("Documents");
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
+        Bundle bundle = new Bundle();
+        bundle.putString("yes", "full");
+
+        if(!getIntent().getStringExtra("id").equalsIgnoreCase("0"))
+        {
+
+            userId=Integer.parseInt(getIntent().getStringExtra("id"));
+            bundle.putString("userId", userId + "");
+        }
+        else
+        {
+            userId=DashBoardActivity.selectedImmigrantId;
+            bundle.putString("userId",  userId+"");
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
@@ -38,19 +53,22 @@ Toolbar toolbar;
             }
         });
             prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
-            if (prefs.getInt("userType", -1) == 0) {
-                toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
-                changeTheam(R.color.immigrant_theam_color);
-            } else if (prefs.getInt("userType", -1) == 1) {
-                toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
-                changeTheam(R.color.solicor_theam_color);
-            } else if (prefs.getInt("userType", -1) == 2) {
-                toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
-                changeTheam(R.color.barrister_theam_color);
-            }
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_notifi_color);
+        }
+        else if(prefs.getInt("userType", -1) == 1)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicitor_notifi_color);
+        }
+        else if(prefs.getInt("userType", -1) == 2)
+        {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_notifi_color);
+        }
 
-        Bundle bundle = new Bundle();
-        bundle.putString("yes", "full");
         UplodedDocs uplodedDocs=new UplodedDocs();
         uplodedDocs.setArguments(bundle);
         FragmentManager manager = getSupportFragmentManager();

@@ -676,7 +676,7 @@ ProgressDialog progressDialog;
                 int lenghtOfFile = conection.getContentLength();
                 InputStream input = new BufferedInputStream(url.openStream(),
                         8192);
-                File myDirectory = new File(Environment.getExternalStorageDirectory(), "VideoCalling");
+                File myDirectory = new File(Environment.getExternalStorageDirectory(), "BTTLawyer");
                 if(!myDirectory.exists()) {
                     myDirectory.mkdirs();
                 }
@@ -685,10 +685,10 @@ ProgressDialog progressDialog;
                 // Output stream
                 OutputStream output = new FileOutputStream(Environment
                         .getExternalStorageDirectory().toString()
-                        + "/VideoCalling/"+fileName+"."+DocumentDetailsArray.get(selectedDocument).getDocType());
+                        + "/BTTLawyer/"+fileName+"."+DocumentDetailsArray.get(selectedDocument).getDocType());
               openfile=  new File(Environment
                         .getExternalStorageDirectory().toString()
-                        + "/VideoCalling/"+fileName+"."+DocumentDetailsArray.get(selectedDocument).getDocType());
+                        + "/BTTLawyer/"+fileName+"."+DocumentDetailsArray.get(selectedDocument).getDocType());
                 byte data[] = new byte[1024];
 
                 long total = 0;

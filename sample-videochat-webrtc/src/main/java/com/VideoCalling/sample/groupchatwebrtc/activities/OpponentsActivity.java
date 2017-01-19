@@ -143,6 +143,7 @@ public class OpponentsActivity extends BaseActivity {
     de.hdodenhof.circleimageview.CircleImageView notification;
     SharedPreferences prefs;
     TextView bar_name;
+    ImageView back;
     private static final String TAG = "MainActivity";
     LinearLayout bar_after_login;
         HashMap baristerQB=new HashMap();
@@ -179,15 +180,12 @@ public class OpponentsActivity extends BaseActivity {
         userTypeDetails=new HashMap();
         qb = getSharedPreferences("QB", MODE_PRIVATE);
         connectWebSocket();
-
         initFields();
         initDefaultActionBar();
         initUi();
         if (isRunForCall && webRtcSessionManager.getCurrentSession() != null) {
 
                 CallActivity.start(OpponentsActivity.this, true);
-
-
         }
        // scribeFromPushes();
         checker = new PermissionsChecker(getApplicationContext());
@@ -217,7 +215,6 @@ public void callTo(String callto)
 
     if (callto.equalsIgnoreCase("sol")) {
         startCall(true);
-
         startPermissionsActivity(false);
     } else if (callto.equalsIgnoreCase("bar")) {
         Log.e("error", "error");
@@ -236,16 +233,18 @@ public void callTo(String callto)
     protected void onResume()
     {
         super.onResume();
-        selectedArray.clear();
-        showBarrister();
-        initFields();
-        initDefaultActionBar();
-            initUi();
-        connectWebSocket();
-        new getDetailsById().execute();
-        new LoginAsyncGetAll().execute();
-        startLoadUsers();
+        if(DashBoardActivity.service.equalsIgnoreCase("no")) {
 
+            selectedArray.clear();
+            showBarrister();
+            initFields();
+            initDefaultActionBar();
+            initUi();
+            connectWebSocket();
+            new getDetailsById().execute();
+            new LoginAsyncGetAll().execute();
+            startLoadUsers();
+        }
     }
     @Override
     protected void onNewIntent(Intent intent)
@@ -262,13 +261,20 @@ public void callTo(String callto)
     @Override
     protected void onDestroy()
     {
+        DashBoardActivity.onResume="yes";
         super.onDestroy();
         hideProgressDialog();
+
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         super.onStart();
+        if(DashBoardActivity.service.equalsIgnoreCase("yes"))
+        {
+            new InsertVideoLogs().execute();
+        }
 
     }
 
@@ -339,10 +345,12 @@ public void callTo(String callto)
                 connection = "normal";
                 callto="bar";
                 try {
+                    callTo(callto);
                     DashBoardActivity.callTo1=Integer.parseInt(userTypeDetails.get("id").toString());
+                    DashBoardActivity.callTo2=Integer.parseInt(userTypeDetails.get("id").toString());
                     String data=userTypeDetails.get("id").toString()+"-splspli-"+"call";
                     mWebSocketClient.send(data);
-                    callTo(callto);
+
                 }
                 catch (Exception e)
                 {
@@ -374,6 +382,14 @@ public void callTo(String callto)
         }
         screen_title = (TextView) findViewById(R.id.screen_title);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        back= (ImageView) findViewById(R.id.back);
+        back.setVisibility(View.VISIBLE);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OpponentsActivity.this.finish();
+            }
+        });
         if (prefs.getInt("userType", -1) == 0)
         {
             toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
@@ -458,6 +474,7 @@ public void callTo(String callto)
                                     connection = "normal";
                                     callto="sol";
                                     type="single";
+                                    DashBoardActivity.callTo2=DashBoardActivity.callTo1;
                                     try {
                                         callTo(callto);
                                     }
@@ -576,7 +593,15 @@ public void callTo(String callto)
         }
 
     }
- private void startCall(boolean isVideoCall) {
+
+    @Override
+    public void onBackPressed() {
+        DashBoardActivity.onResume="yes";
+        super.onBackPressed();
+
+    }
+
+    private void startCall(boolean isVideoCall) {
 
         callType="imm";
         if (opponentsAdapter.getSelectedItems().size() > Consts.MAX_OPPONENTS_COUNT) {
@@ -818,7 +843,8 @@ startLoadUsers();
                     OpponentNames.add(jsonObject.getString("name"));
                     OpponentIds.add(jsonObject.getInt("id"));
                 }
-
+                Log.e("OpponentNames",OpponentNames.toString());
+                Log.e("OpponentNames",OpponentIds.toString());
             } catch (Exception e) {
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
@@ -1045,6 +1071,37 @@ Log.e("resultJson",resultJson);
             }
         });
     }
+    public class InsertVideoLogs extends AsyncTask<URL, Integer, Long> {
+        protected Long doInBackground(URL... urls) {
+            Long aLong= Long.valueOf(1);
+            JSONObject jsonObject=new JSONObject();
+            SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+            try {
+                jsonObject.put("callFrom",DashBoardActivity.solicitor.get("id"));
+                jsonObject.put("startTime",DashBoardActivity.startTime);
+                jsonObject.put("endTime", DashBoardActivity.endtime);
+                jsonObject.put("callTo1",DashBoardActivity.callTo1);
+                jsonObject.put("callTo2", DashBoardActivity.callTo2);
+                Log.e("jsonObject",jsonObject.toString());
+                } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                insertVideoLog("http://35.163.24.72:8080/VedioApp/service/VideoLog/insert", jsonObject.toString(), OpponentsActivity.this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return aLong;
+        }
+
+
+        protected void onPostExecute(Long result) {
+
+
+
+
+        }
+    }
     public class SendNotificationAcync extends AsyncTask<URL, Integer, Long> {
         protected Long doInBackground(URL... urls) {
             Long aLong= Long.valueOf(1);
@@ -1052,17 +1109,16 @@ Log.e("resultJson",resultJson);
             SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
             try {
                 jsonObject.put("notification",message);
-                jsonObject.put("sentBy",prefs.getInt("userId",0));
+                jsonObject.put("sentBy",prefs.getInt("userId", 0));
                 jsonObject.put("sentDate", DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-                jsonObject.put("sentTo",Integer.parseInt(userTypeDetails.get("id").toString()));
+                jsonObject.put("sentTo", Integer.parseInt(userTypeDetails.get("id").toString()));
                 Log.e("jsonObject",jsonObject.toString());
-                // jsonObject.put("sentTo",(OpponentsActivity.OpponentNames.indexOf(QbUsersDbManager.opponentsNames.get(selectedPerson))));
-                Log.e("jsonObject",jsonObject.toString());
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
-                sendNotificationAPICall("http://35.163.24.72:8080/VedioApp/service/notifications",jsonObject.toString(), OpponentsActivity.this);
+                sendNotificationAPICall("http://35.163.24.72:8080/VedioApp/service/notifications", jsonObject.toString(), OpponentsActivity.this);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1101,6 +1157,58 @@ Log.e("resultJson",resultJson);
             while ((line = reader.readLine()) != null) {
                 resultJson += line;
             }
+            try {
+                JSONObject jsonObject = new JSONObject(resultJson);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+
+            }
+            Log.e("resultJson", resultJson);
+        }
+        else if (response.getStatusLine().getStatusCode()==500)
+        {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else
+        {
+
+        }
+
+    }
+    public void insertVideoLog(String strurl, String jsonString, final Context context) throws Exception
+    {
+         strurl = strurl.replace(" ", "%20");
+        HttpPost httpPost = new HttpPost(strurl);
+        if (jsonString != null)
+        {
+            StringEntity entity = new StringEntity(jsonString);
+            httpPost.setEntity(entity);
+        }
+        httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
+        httpPost.setHeader("Accept", "application/json");
+        HttpResponse response = null;
+        HttpClient httpClient = new MyHttpClient( context );
+        response = httpClient.execute(httpPost);
+        if(response.getStatusLine().getStatusCode()==200) {
+            DashBoardActivity.callTo1=0;
+            DashBoardActivity.callTo2=0;
+            DashBoardActivity.startTime="";
+            DashBoardActivity.endtime="";
+            DashBoardActivity.service="no";
+            InputStream in = response.getEntity().getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            String resultJson = "";
+            while ((line = reader.readLine()) != null) {
+                resultJson += line;
+            }
+            Log.e("resultJson",resultJson.toString());
             try {
                 JSONObject jsonObject = new JSONObject(resultJson);
             } catch (Exception e) {

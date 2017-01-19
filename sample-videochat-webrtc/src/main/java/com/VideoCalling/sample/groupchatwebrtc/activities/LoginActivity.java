@@ -179,11 +179,17 @@ public class LoginActivity extends BaseActivity {
         //initUI();
       /* */
     }
-    public void chekCaseStaus(int status)
-    {
-        if(0==status)
+    public void chekCaseStaus(int status,JSONObject responseObject) throws JSONException {
+    /*    if(status==0)
         {
-     //       displayUserCaseStatus("Your case is in pending status");
+            editor.putInt("userId", responseObject.getInt("id"));
+            editor.putString("name", responseObject.getString("name"));
+            editor.putString("phoneNumber", responseObject.getString("phoneNumber"));
+            editor.putInt("userType", responseObject.getInt("userType"));
+            editor.putString("email", responseObject.getString("email"));
+            editor.commit();
+
+            //       displayUserCaseStatus("Your case is in pending status");
             stopService(new Intent(this, NotificationService.class));
             startService(new Intent(this, NotificationService.class));
             runOnUiThread(new Runnable() {
@@ -194,40 +200,57 @@ public class LoginActivity extends BaseActivity {
                 }
             });
         }
-        else if(1==status)
+        else if(status==1)
         {
-   //         displayUserCaseStatus("Your case is approved");
+            displayUserCaseStatus("Your case has approved");
             stopService(new Intent(this, NotificationService.class));
             startService(new Intent(this, NotificationService.class));
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
 
-                    startSignUpNewUser(createUserWithEnteredData());
-                }
-            });
         }
-        else if(2==status)
-        {
-            displayUserCaseStatus("Your case has closed");
-        }
-        else if(3==status)
+        else if(status==2)
         {
             displayUserCaseStatus("Your case has rejected");
-        }
+            stopService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
+        }*/
+        editor.putInt("userId", responseObject.getInt("id"));
+        editor.putString("name", responseObject.getString("name"));
+        editor.putString("phoneNumber", responseObject.getString("phoneNumber"));
+        editor.putInt("userType", responseObject.getInt("userType"));
+        editor.putString("email", responseObject.getString("email"));
+        editor.commit();
+
+        //       displayUserCaseStatus("Your case is in pending status");
+        stopService(new Intent(this, NotificationService.class));
+        startService(new Intent(this, NotificationService.class));
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                startSignUpNewUser(createUserWithEnteredData());
+            }
+        });
+
+
     }
-    public void displayUserCaseStatus(String message)
+    public void displayUserCaseStatus(final String message)
     {
-        new AlertDialog.Builder(this)
-        .setMessage(message)
-        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    LoginActivity.this.finish();
-                    }
-                })
-              .setCancelable(false)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(LoginActivity.this)
+                        .setMessage(message)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                LoginActivity.this.finish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
     }
 
     @Override
@@ -568,14 +591,9 @@ public class LoginActivity extends BaseActivity {
                 try {
 
 
-                    editor.putInt("userId", responseObject.getInt("id"));
-                    editor.putString("name", responseObject.getString("name"));
-                    editor.putString("phoneNumber", responseObject.getString("phoneNumber"));
-                    editor.putInt("userType", responseObject.getInt("userType"));
-                    editor.putString("email", responseObject.getString("email"));
-                    editor.commit();
-                    if(responseObject.getInt("userType")==0) {
-                        chekCaseStaus(responseObject.getInt("status"));
+                    chekCaseStaus(responseObject.getInt("status"),responseObject);
+                    /*if(responseObject.getInt("userType")==0) {
+
                     }
                     else {
                         stopService(new Intent(this, NotificationService.class));
@@ -587,7 +605,7 @@ public class LoginActivity extends BaseActivity {
                                 startSignUpNewUser(createUserWithEnteredData());
                             }
                         });
-                    }
+                    }*/
 
                 } catch (Exception e) {
                     hideProgressDialog();

@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.utils.CloseCaseStatus;
@@ -28,6 +29,7 @@ public class CloseCaseActivity extends AppCompatActivity {
     RadioButton accept_radio,reject_radio;
     LinearLayout accept_layout,reject_layout;
     int updatedStatus;
+    TextView immigrant_name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,8 @@ public class CloseCaseActivity extends AppCompatActivity {
         toolbar.setTitle("Case status");
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
+        immigrant_name= (TextView) findViewById(R.id.immigrant_name);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
@@ -51,15 +55,32 @@ public class CloseCaseActivity extends AppCompatActivity {
         accept_radio= (RadioButton) findViewById(R.id.accept_radio);
         reject_radio= (RadioButton) findViewById(R.id.reject_radio);
         immigrant=DashBoardActivity.immigrantProfiles.get(DashBoardActivity.selectedImmigrantId);
+        try {
+            immigrant_name.setText(immigrant.getString("name")+" Immigration case status form");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(immigrant.getInt("status")==1)
+            {
+                confirm_case.setEnabled(false);
+            }
+            else if(immigrant.getInt("status")==2)
+            {
+                confirm_case.setEnabled(false);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         accept_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(reject_radio.isChecked())
-                {
+                if (reject_radio.isChecked()) {
                     reject_radio.setChecked(false);
                 }
                 accept_radio.setChecked(true);
-                updatedStatus=1;
+                updatedStatus = 1;
                 try {
                     immigrant.put("status", updatedStatus);
                     Log.e("immigrant", immigrant.toString());
@@ -73,12 +94,11 @@ public class CloseCaseActivity extends AppCompatActivity {
         accept_radio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(reject_radio.isChecked())
-                {
+                if (reject_radio.isChecked()) {
                     reject_radio.setChecked(false);
                 }
                 accept_radio.setChecked(true);
-                updatedStatus=1;
+                updatedStatus = 1;
                 try {
                     immigrant.put("status", updatedStatus);
                     Log.e("immigrant", immigrant.toString());
@@ -162,8 +182,6 @@ public class CloseCaseActivity extends AppCompatActivity {
             confirm_case.setBackgroundColor((getResources().getColor(R.color.barrister_theam_color)));
         }
 
-        toolbar.setTitle("Close Case");
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
 
     }
     public void changeTheam(int color)
@@ -174,8 +192,5 @@ public class CloseCaseActivity extends AppCompatActivity {
             window.setStatusBarColor(getResources().getColor(color));
         }
     }
-    public static void closeApp()
-    {
 
-    }
 }

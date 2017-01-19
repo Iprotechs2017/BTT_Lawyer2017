@@ -50,6 +50,7 @@ public class fileDownload {
             super.onPreExecute();
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Downloading...");
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
 
@@ -69,7 +70,7 @@ public class fileDownload {
                 int lenghtOfFile = conection.getContentLength();
                 InputStream input = new BufferedInputStream(url.openStream(),
                         8192);
-                File myDirectory = new File(Environment.getExternalStorageDirectory(), "VideoCalling");
+                File myDirectory = new File(Environment.getExternalStorageDirectory(), "BTTLawyer");
                 if (!myDirectory.exists()) {
                     myDirectory.mkdirs();
                 }
@@ -78,10 +79,10 @@ public class fileDownload {
                 // Output stream
                 OutputStream output = new FileOutputStream(Environment
                         .getExternalStorageDirectory().toString()
-                        + "/VideoCalling/" + fileName + "." + DocumentDetailsArray.get(selectedDocument).getDocType());
+                        + "/BTTLawyer/" + fileName + "." + DocumentDetailsArray.get(selectedDocument).getDocType().replace(".",""));
                 openfile = new File(Environment
                         .getExternalStorageDirectory().toString()
-                        + "/VideoCalling/" + fileName + "." + DocumentDetailsArray.get(selectedDocument).getDocType());
+                        + "/BTTLawyer/" + fileName + "." + DocumentDetailsArray.get(selectedDocument).getDocType().replace(".",""));
                 byte data[] = new byte[1024];
 
                 long total = 0;
@@ -106,6 +107,7 @@ public class fileDownload {
             } catch (Exception e) {
                 type = " not downloaded";
                 Log.e("Error: ", e.getMessage());
+
             }
 
             return type;
@@ -124,38 +126,48 @@ public class fileDownload {
 
             if(downloaded.equalsIgnoreCase("downloaded"))
             {
-                new AlertDialog.Builder(context)
+
+                /*new AlertDialog.Builder(context)
                         .setMessage("File Downloaded Successfully...")
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-
 
 
                             }
                         })
                         .setNegativeButton("Open", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                             try {
-                                 Uri uri_path = Uri.fromFile(openfile);
-                                 String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
-                                         (MimeTypeMap.getFileExtensionFromUrl(openfile.getAbsolutePath()));
+                                try {
+                                    Uri uri_path = Uri.fromFile(openfile);
+                                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
+                                            (MimeTypeMap.getFileExtensionFromUrl(openfile.getAbsolutePath()));
 
 
-                                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                                 intent.setType(mimeType);
-                                 intent.setDataAndType(uri_path, mimeType);
-                                 context.startActivity(intent);
-                             }
-                             catch (Exception e)
-                             {
-                                 Toast.makeText(context,DocumentDetailsArray.get(selectedDocument).getDocType()+ "  supported app not installed", Toast.LENGTH_SHORT).show();
-                             }
-                             }
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setType(mimeType);
+                                    intent.setDataAndType(uri_path, mimeType);
+                                    context.startActivity(intent);
+                                } catch (Exception e) {
+                                    Toast.makeText(context, DocumentDetailsArray.get(selectedDocument).getDocType() + " file supported app not installed", Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         })
+                        .setCancelable(false)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                        .show();*/
+                try {
+                    Uri uri_path = Uri.fromFile(openfile);
+                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
+                            (MimeTypeMap.getFileExtensionFromUrl(openfile.getAbsolutePath()));
 
 
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setType(mimeType);
+                    intent.setDataAndType(uri_path, mimeType);
+                    context.startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(context, DocumentDetailsArray.get(selectedDocument).getDocType() + " file supported app not installed", Toast.LENGTH_SHORT).show();
+                }
             }
             else
             {
@@ -166,7 +178,7 @@ public class fileDownload {
 
                             }
                         })
-
+                        .setCancelable(false)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
 

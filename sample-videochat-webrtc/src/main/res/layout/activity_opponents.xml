@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
               android:layout_marginLeft="@dimen/padding_start"
             android:paddingTop="5sp"
-            android:text="Barrister:"
+            android:text="Barrister"
             android:textColor="@color/black"
             android:textSize="20dp"
             tools:ignore="RtlHardcoded" />
@@ -75,10 +75,11 @@
                android:layout_width="wrap_content"
                android:layout_height="wrap_content">
             <ImageView
+                android:layout_gravity="bottom"
                 android:visibility="visible"
                 android:id="@+id/bar_call"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@drawable/grayvideo"
                 android:layout_marginLeft="@dimen/padding_start"
                 android:text="Call"

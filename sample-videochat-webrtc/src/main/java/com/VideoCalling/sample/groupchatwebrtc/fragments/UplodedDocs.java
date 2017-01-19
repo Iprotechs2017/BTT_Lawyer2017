@@ -2,10 +2,13 @@ package com.VideoCalling.sample.groupchatwebrtc.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +16,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,10 +38,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by Harishma Velagala on 01-01-2017.
@@ -49,10 +56,12 @@ public class UplodedDocs  extends Fragment {
     ArrayList uploaded_doc_sender=new ArrayList();
     VideocallAdapter   documentsAdapter;
     SharedPreferences prefs;
+    int userId;
     VideocallAdapter videoCallAdapter;
     ArrayList<DocumentsDetailsWithIds> DocumentsDetailsWithIdsArraylist=new ArrayList<DocumentsDetailsWithIds>();
     ArrayList<DocumentDetails> DocumentDetailsArray=new ArrayList<DocumentDetails>();
     int documentId;
+    int userId1;
     ArrayList videocallerName = new ArrayList();
     ArrayList videocallName = new ArrayList();
     ArrayList videocallDate = new ArrayList();
@@ -63,12 +72,28 @@ ProgressDialog progressDialog;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         limitornot = getArguments().getString("yes");
-
+        userId1=Integer.parseInt(getArguments().getString("userId"));
         View view= inflater.inflate(R.layout.docs_custom_tabs_layout, container, false);
         progressDialog=new ProgressDialog(getActivity());
         recycler_view= (RecyclerView) view.findViewById(R.id.recycler_view);
         prefs = getActivity().getSharedPreferences("loginDetails", getActivity().MODE_PRIVATE);
-        typeface= Typeface.createFromAsset(getActivity().getAssets(), "QuicksandRegular.ttf");
+        if (prefs.getInt("userType", -1) == 0)
+        {
+            userId=prefs.getInt("userId", -1);
+        }
+        else
+        {
+if(userId1==0)
+{
+    userId=DashBoardActivity.selectedImmigrantId;
+}
+            else
+{
+    userId=userId1;
+}
+
+        }
+            typeface= Typeface.createFromAsset(getActivity().getAssets(), "QuicksandRegular.ttf");
         new getSharedDocs().execute();
         return  view;
     }
@@ -90,6 +115,7 @@ ProgressDialog progressDialog;
 
             public  TextView callerName,videoName,callDate;
             public ImageView contactImage,download_video,share_video;
+            public LinearLayout parent;
             public ViewHolder(View v){
 
                 super(v);
@@ -99,6 +125,7 @@ ProgressDialog progressDialog;
                 videoName = (TextView)v.findViewById(R.id.videoName);
                 callDate = (TextView)v.findViewById(R.id.callDate);
                 share_video=(ImageView) v.findViewById(R.id.share_video);
+                parent= (LinearLayout) v.findViewById(R.id.parent);
             }
         }
 
@@ -126,7 +153,7 @@ ProgressDialog progressDialog;
             holder.share_video.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new ShareFile(getActivity(),DocumentsDetailsWithIdsArraylist,position);
+                    new ShareFile(getActivity(), DocumentsDetailsWithIdsArraylist, position);
                 }
             });
             holder.download_video.setOnClickListener(new View.OnClickListener() {
@@ -134,6 +161,36 @@ ProgressDialog progressDialog;
                 public void onClick(View v) {
                     //Toast.makeText(getActivity(), "Ok", Toast.LENGTH_SHORT).show();
                     new fileDownload(getActivity(),DocumentDetailsArray,position);
+                }
+            });
+            holder.parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    File file = new File(Environment.getExternalStorageDirectory() + "/BTTLawyer/" + documentDetails.getName().toString()+ "." + documentDetails.getDocType().toString().replace(".",""));
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (file.exists()) {
+                        try {
+                            Uri uri_path = Uri.fromFile(file);
+                            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
+                                    (MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath()));
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setType(mimeType);
+                            intent.setDataAndType(uri_path, mimeType);
+                            context.startActivity(intent);
+                        } catch (Exception e) {
+                            Toast.makeText(context, documentDetails.getDocType().toString() + " file supported app not installed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        new fileDownload(getActivity(),DocumentDetailsArray,position);
+
+                    }
                 }
             });
         }
@@ -160,22 +217,30 @@ ProgressDialog progressDialog;
         protected Long doInBackground(URL... urls) {
             Long aLong= Long.valueOf(1);
             String url;
-            JSONObject jsonObject=new JSONObject();
-            if(limitornot.equalsIgnoreCase("full"))
+            try
             {
-                url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/get/sharedBy/"+DashBoardActivity.selectedImmigrantId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString());
+                JSONObject jsonObject=new JSONObject();
+                if(limitornot.equalsIgnoreCase("full"))
+                {
+                    url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/get/sharedBy/"+userId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString());
+                }
+                else
+                {
+                    url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+userId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString())+"/limit/3";
+                }
+
+                Log.e("url", url);
+                try {
+                    getUploadedDocsIds(url, jsonObject.toString(), getActivity());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            else
+            catch (Exception e)
             {
-                url="http://35.163.24.72:8080/VedioApp/service/DocumentShare/getlimit/sharedBy/"+DashBoardActivity.selectedImmigrantId+"/sharedTo/"+Integer.parseInt(DashBoardActivity.solicitor.get("id").toString())+"/limit/3";
+
             }
 
-                        Log.e("url", url);
-            try {
-                getUploadedDocsIds(url, jsonObject.toString(), getActivity());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             return aLong;
         }
         protected void onPostExecute(Long result) {
@@ -222,7 +287,10 @@ ProgressDialog progressDialog;
                         @Override
                         public void run() {
                             try {
-                                documentsAdapter = new VideocallAdapter(getActivity(), DocumentDetailsArray);
+                                if(limitornot.equalsIgnoreCase("full")) {
+                                    Collections.reverse(DocumentDetailsArray);
+                                }
+                                    documentsAdapter = new VideocallAdapter(getActivity(), DocumentDetailsArray);
                                 LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getActivity());
                                 recycler_view.setLayoutManager(recylerViewLayoutManager);
                                 recycler_view.setHasFixedSize(true);

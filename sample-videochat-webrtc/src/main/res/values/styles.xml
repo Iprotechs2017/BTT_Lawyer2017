@@ -13,7 +13,12 @@
     <style name="spinnerItemStyle">
         <item name="android:gravity">center</item>
     </style>
+    <style name="MyDialogTheme" parent="android:Theme.Dialog">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
 
+    </style>
     <style name="spinnerDropDownItemStyle">
         <item name="android:gravity">center</item>
     </style>

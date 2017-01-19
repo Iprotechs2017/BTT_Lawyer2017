@@ -20,6 +20,7 @@ import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.activities.CallActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.NotificationActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.OpponentsActivity;
+import com.VideoCalling.sample.groupchatwebrtc.activities.ShowmoreDocumentsActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.SplashActivity;
 
 import org.java_websocket.client.WebSocketClient;
@@ -87,20 +88,42 @@ public  void showNotification(String data)
    }
     else
    {
-       Intent intent = new Intent(this, NotificationActivity.class);
-       PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-       Notification n = new Notification.Builder(this)
-               .setContentTitle("BTT Lawyer")
-               .setContentText(split[3].toString() + ":" + split[2].toString())
-               .setSmallIcon(R.drawable.logo)
-               .setContentIntent(pIntent)
-               .setAutoCancel(true)
-               .build();
-       NotificationManager notificationManager =
-               (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-       n.flags |= Notification.FLAG_AUTO_CANCEL;
-       n.defaults = Notification.DEFAULT_ALL;
-       notificationManager.notify(NOTIFICATION_ID++, n);
+       if(split[2].toString().indexOf("documents...")<0) {
+           Intent intent = new Intent(NotificationService.this, NotificationActivity.class);
+           PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
+           Notification noti = new Notification.Builder(NotificationService.this)
+                   .setSmallIcon(R.drawable.logo)
+                   .setContentTitle("BTT Lawyer")
+                   .setContentText(split[3].toString() + ":" + split[2].toString())
+                   .setContentIntent(pIntent)
+                   .build();
+           // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+
+           NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+           noti.flags |= Notification.FLAG_AUTO_CANCEL;
+           noti.defaults = Notification.DEFAULT_ALL;
+           notificationManager.notify(NOTIFICATION_ID++, noti);
+           //Log.e("datata", split[3].toString() + ":" + split[2].toString());
+       }
+       else
+       {
+           Intent intent = new Intent(NotificationService.this, ShowmoreDocumentsActivity.class);
+           intent.putExtra("id",split[0].toString());
+           PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
+           Notification noti = new Notification.Builder(NotificationService.this)
+                   .setSmallIcon(R.drawable.logo)
+                   .setContentTitle("BTT Lawyer")
+                   .setContentText(split[2].toString())
+                   .setContentIntent(pIntent)
+                   .build();
+           // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+
+           NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+           noti.flags |= Notification.FLAG_AUTO_CANCEL;
+           noti.defaults = Notification.DEFAULT_ALL;
+           notificationManager.notify(NOTIFICATION_ID++, noti);
+
+       }
    }
    }
     /** Called when The service is no longer used and is being destroyed */

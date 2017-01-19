@@ -1,57 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_arrow_back_w" />
+
             <TextView
 
-                android:textStyle="bold"
-                android:textSize="15dp"
-                android:textColor="@color/white"
+                android:layout_toRightOf="@+id/back"
                 android:id="@+id/screen_title"
-                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-         <LinearLayout
-             android:id="@+id/action_layout"
-             android:layout_alignParentRight="true"
-             android:orientation="horizontal"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content">
-             <de.hdodenhof.circleimageview.CircleImageView
-                 android:layout_alignParentRight="true"
-                 android:layout_marginRight="20dp"
-                 android:id="@+id/show_notifications"
-                 android:layout_width="30dp"
-                 android:layout_height="30dp"
-                 android:src="@drawable/notification_icon"
-                 />
-             <de.hdodenhof.circleimageview.CircleImageView
-                 android:layout_alignParentRight="true"
-                 android:layout_marginRight="20dp"
-                 android:id="@+id/videocall"
-                 android:layout_width="30dp"
-                 android:layout_height="30dp"
-                 android:src="@drawable/videocalling"
-                 />
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="10dp"
-                android:id="@+id/logout"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/logout"
-                />
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
 
-         </LinearLayout>
+            <LinearLayout
+                android:id="@+id/action_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/show_notifications"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/notification_icon" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/videocall"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/videocalling" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/logout"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/logout" />
+
+            </LinearLayout>
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 </LinearLayout>

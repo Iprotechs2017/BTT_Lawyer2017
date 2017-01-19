@@ -1,85 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:background="@color/background"
-    android:layout_height="match_parent">
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.CloseCaseActivity">
-<include layout="@layout/individual_login_toolbar" android:id="@+id/toolbar_layout"/>
-<RelativeLayout
-    android:layout_margin="10dp"
+    android:background="@color/background">
 
-    android:layout_below="@+id/toolbar_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <LinearLayout
-        android:orientation="vertical"
-        android:id="@+id/accept_layout"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RadioButton
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        tools:context="com.VideoCalling.sample.groupchatwebrtc.activities.CloseCaseActivity">
 
-            android:textSize="20dp"
-            android:text="Accept"
-            android:id="@+id/accept_radio"
-            android:buttonTint="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+        <include
+            android:id="@+id/toolbar_layout"
+            layout="@layout/individual_login_toolbar" />
 
-        </RadioButton>
-<TextView
-    android:layout_marginTop="5dp"
-    android:textColor="@color/black"
-    android:text="This indicates that the immigrant application is granted"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
-
-    </LinearLayout>
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/accept_layout"
-        android:orientation="vertical"
-        android:id="@+id/reject_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RadioButton
-
-            android:textSize="20dp"
-            android:text="Reject"
-            android:id="@+id/reject_radio"
-            android:layout_width="wrap_content"
-            android:buttonTint="@color/black"
-            android:layout_height="wrap_content">
-
-        </RadioButton>
-        <TextView
-            android:layout_marginTop="5dp"
-            android:textColor="@color/black"
-            android:text="This indicates that the immigrant application is rejected"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar_layout"
+            android:layout_margin="10dp">
 
-    <Button
-    android:id="@+id/confirm_case"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_below="@+id/reject_layout"
-        android:text="Confirm"
-        android:textColor="@color/white"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            <TextView
 
-</RelativeLayout>
+                android:id="@+id/immigrant_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:text="Venkat Immigration case status form"
+                android:textColor="@color/black" />
+
+            <LinearLayout
+                android:id="@+id/accept_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/immigrant_name"
+                android:layout_marginTop="3dp"
+                android:orientation="vertical">
+
+                <RadioButton
+
+                    android:id="@+id/accept_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/black"
+                    android:text="Accept"
+                    android:textSize="20dp">
+
+                </RadioButton>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="This indicates that the immigrant application is granted"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/reject_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/accept_layout"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <RadioButton
+
+                    android:id="@+id/reject_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/black"
+                    android:text="Reject"
+                    android:textSize="20dp">
+
+                </RadioButton>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="This indicates that the immigrant application is rejected"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/confirm_case"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/reject_layout"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="30dp"
+                android:text="Confirm"
+                android:textColor="@color/white" />
+
+        </RelativeLayout>
 
 
-</RelativeLayout>
+    </RelativeLayout>
 </ScrollView>

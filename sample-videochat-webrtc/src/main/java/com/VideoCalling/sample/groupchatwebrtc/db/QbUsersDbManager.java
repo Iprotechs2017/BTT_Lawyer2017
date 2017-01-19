@@ -111,11 +111,15 @@ public static ArrayList opponentsNames=new ArrayList();
         if (needRemoveOldData) {
 
         }
-       // clearDB();
+        clearDB();
         for (QBUser qbUser : allUsers) {
             saveUser(qbUser);
         }
         Log.d(TAG, "saveAllUsers");
+    }
+    public void clear()
+    {
+        clearDB();
     }
 
     public void saveUser(QBUser qbUser) {

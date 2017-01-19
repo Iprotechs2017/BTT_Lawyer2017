@@ -42,6 +42,11 @@
     <color name="immigrant_theam_color">#6C4099</color>
     <color name="solicor_theam_color">#BC283F</color>
 
+    <color name="immigrant_notifi_color">#7e51ad</color>
+    <color name="barrister_notifi_color">#099653</color>
+    <color name="solicitor_notifi_color">#cc3b51</color>
+
+
     <color name="login_button_bg">#3251AD</color>
     <color name="registration_link">#B3AEA7</color>
     <color name="text_color_outgoing_opponents_names_audio_call">#1f1f1f</color>

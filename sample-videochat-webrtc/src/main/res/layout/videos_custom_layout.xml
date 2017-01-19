@@ -3,7 +3,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+    android:id="@+id/parent"
     android:background="@color/background"
     android:orientation="vertical">
 
@@ -37,9 +37,11 @@
 
                 <TextView
                     android:id="@+id/videoName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-
+                    android:maxLength="120"
+                    android:ellipsize="end"
+                    android:singleLine="true"
                     android:layout_marginTop="5dp"
                     android:text="video1"
                     android:textColor="@color/black"
@@ -52,6 +54,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
+
                     android:ellipsize="end"
                     android:maxLength="20"
                     android:singleLine="true"
@@ -72,10 +75,11 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginRight="25dp"
+                    android:layout_marginRight="5dp"
                     android:src="@drawable/download_gray" />
 
                 <ImageView
+                    android:visibility="gone"
                     android:id="@+id/share_video"
                     android:layout_width="32dp"
                     android:layout_height="32dp"

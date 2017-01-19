@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.OpponentsActivity;
 import com.quickblox.chat.QBChatService;
 import com.VideoCalling.sample.groupchatwebrtc.R;
@@ -33,7 +34,9 @@ import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by tereha on 24.05.16.
@@ -202,6 +205,12 @@ public abstract class BaseConversationFragment extends Fragment implements CallA
                     handUpVideoCall.setEnabled(false);
                     handUpVideoCall.setActivated(false);
                 //OpponentsActivity.connection = "normal";
+                    Calendar c = Calendar.getInstance();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                String formattedDate = df.format(c.getTime());
+                DashBoardActivity.service="yes";
+                Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
+                DashBoardActivity.endtime=formattedDate;
                 OpponentsActivity.connection="not";
                 conversationFragmentCallbackListener.onHangUpCurrentSession();
                     Log.d(TAG, "Call is stopped");

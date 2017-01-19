@@ -1,8 +1,12 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -63,6 +67,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,6 +78,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -85,6 +93,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
     ProgressDialog progressDialog;
     Dialog progress;
     long totalSize = 0;
+    WebSocketClient mWebSocketClient;
     ProgressBar progressBar;
     ArrayList<Integer> opponentsList =new ArrayList<Integer>();
     FileAdapter fileAdapter;
@@ -98,6 +107,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
     SharedPreferences.Editor editor;
     SharedPreferences QbPrefs;
     ArrayList paths = new ArrayList();
+    TextView info;
     private TextView txtPercentage;
     private QBUser currentUser;
     private String filePath = null;
@@ -113,8 +123,10 @@ public class ClientAfterLoginActivity extends BaseActivity {
         progressDialog.setCancelable(false);
         QbPrefs=getSharedPreferences("sol_qb_id", MODE_PRIVATE);
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+        info= (TextView) findViewById(R.id.info);
         progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
         progress.setContentView(R.layout.file_uplode_progress_dialog);
+        connectWebSocket();
         progress.setCancelable(false);
         startLoadUsers();
         progressBar = (ProgressBar) progress.findViewById(R.id.progressBar);
@@ -138,7 +150,23 @@ public class ClientAfterLoginActivity extends BaseActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ClientAfterLoginActivity.this.finish();
+                if (selectedFiles.size() > 0) {
+                    new AlertDialog.Builder(ClientAfterLoginActivity.this)
+                            .setMessage("Upload the selected files")
+                            .setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                submit.performClick();
+
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ClientAfterLoginActivity.this.finish();
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
+                    }
             }
         });
         toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
@@ -273,12 +301,45 @@ public class ClientAfterLoginActivity extends BaseActivity {
                     if (selectedFiles.contains(filePath.split("/")[filePath.split("/").length - 1])) {
                         Toast.makeText(ClientAfterLoginActivity.this, "File Already Selected", Toast.LENGTH_SHORT).show();
                     } else {
-                        paths.add(filePath);
-                        selectedFiles.add(filePath.split("/")[filePath.split("/").length - 1]);
-                        fileAdapter = new FileAdapter(this, selectedFiles);
-                        selected_files.setAdapter(fileAdapter);
-                        fileAdapter.notifyDataSetChanged();
-                    }
+                        String fileType=filePath.toString().substring(filePath.toString().lastIndexOf(".")+1);
+                        if(fileType.equalsIgnoreCase("xlsx")
+                                ||fileType.equalsIgnoreCase("xls")
+                                || fileType.equalsIgnoreCase("docx")
+                                || fileType.equalsIgnoreCase("doc")
+                                || fileType.equalsIgnoreCase("pdf")
+                                || fileType.equalsIgnoreCase("pptx")
+                                || fileType.equalsIgnoreCase("ppt")
+                                || fileType.equalsIgnoreCase("png")
+                                || fileType.equalsIgnoreCase("jpg")
+                                || fileType.equalsIgnoreCase("jpeg")
+                                ) {
+                            File file = new File(filePath);
+                            Float dat = (Float.parseFloat(file.length() + "") / (1024)) / 1000;
+                          //  Toast.makeText(ClientAfterLoginActivity.this, dat+"ss", Toast.LENGTH_SHORT).show();
+                            if (dat > 5) {
+                                Toast.makeText(ClientAfterLoginActivity.this, "File size shouldn't be more than 5MB ...", Toast.LENGTH_SHORT).show();
+                            } else {
+                                paths.add(filePath);
+                                selectedFiles.add(filePath.split("/")[filePath.split("/").length - 1]);
+                                fileAdapter = new FileAdapter(this, selectedFiles);
+                                selected_files.setAdapter(fileAdapter);
+                                fileAdapter.notifyDataSetChanged();
+                                if(selectedFiles.size()>0)
+                                {
+                                    info.setVisibility(View.GONE);
+                                }
+                                else
+                                {
+                                    info.setVisibility(View.VISIBLE);
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            Toast.makeText(ClientAfterLoginActivity.this, "selected file is not acceptable...", Toast.LENGTH_SHORT).show();
+                        }
+                                            }
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(ClientAfterLoginActivity.this, "cancelled", Toast.LENGTH_SHORT).show();
@@ -295,13 +356,24 @@ public class ClientAfterLoginActivity extends BaseActivity {
         fileUplode(filePath);
     }
 
+    @Override
+    protected void onDestroy() {
+        DashBoardActivity.onResume="yes";
+        super.onDestroy();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        DashBoardActivity.onResume="yes";
+        super.onBackPressed();
+    }
+
     public void fileUplode(String filePath) {
         String ex = paths.get(0).toString().split("/")[filePath.split("/").length - 1].toString();
         Log.e("ex", ex.replaceAll("\\s+", "").split(".").length + "--" + ex);
        Log.e("paths",paths.toString());
-        String type=paths.get(0).toString().substring(paths.get(0).toString().lastIndexOf("."));
-        Log.e("type",type);
-       // type=type.substring(type.indexOf("."));
+        String type=paths.get(0).toString().substring(paths.get(0).toString().lastIndexOf(".")+1);
        Log.e("type",type);
         String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" + ex.replaceAll("\\s+", "").split("\\.")[0] + "/type/" +type + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
         Log.e("urlServer", urlServer);
@@ -316,6 +388,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                         }
                     });
             File sourceFile = new File(paths.get(0).toString());
+
             entity.addPart("uploadFile", new FileBody(sourceFile));
             //Log.e("filePath","filePath - "+filePath);
             postRequest.setEntity(entity);
@@ -356,6 +429,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -466,8 +540,6 @@ public class ClientAfterLoginActivity extends BaseActivity {
                         selected_files.setAdapter(fileAdapter);
                         fileAdapter.notifyDataSetChanged();
                         if (selectedFiles.size() > 0 && paths.size() > 0) {
-
-
                             new LoginAsync().execute();
                         } else {
                             progressDialog.dismiss();
@@ -477,6 +549,9 @@ public class ClientAfterLoginActivity extends BaseActivity {
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
                                           //  new LogoutClass().clearSesson(ClientAfterLoginActivity.this);
+                                            String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getString("name",null);
+                                            mWebSocketClient.send(data);
+                                            DashBoardActivity.onResume="yes";
                                             ClientAfterLoginActivity.this.finish();
                                         }
                                     })
@@ -628,6 +703,15 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             fileAdapter = new FileAdapter(ClientAfterLoginActivity.this, selectedFiles);
                             selected_files.setAdapter(fileAdapter);
                             fileAdapter.notifyDataSetChanged();
+                            if(selectedFiles.size()>0)
+                            {
+                                info.setVisibility(View.GONE);
+                            }
+                            else
+                            {
+                                info.setVisibility(View.VISIBLE);
+                            }
+
                         }
                     });
                 }
@@ -795,5 +879,53 @@ private void startCall(boolean isVideoCall) {
     private void startPermissionsActivity(boolean checkOnlyAudio) {
         PermissionsActivity.startActivity(this, checkOnlyAudio, Consts.PERMISSIONS);
     }
+    private void connectWebSocket() {
+        URI uri;
+        try {
+            uri = new URI("ws://183.82.113.165:8085");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
 
+        mWebSocketClient = new WebSocketClient(uri) {
+            @Override
+            public void onOpen(ServerHandshake serverHandshake) {
+                Log.e("Websocket", "Opened");
+                int userId=prefs.getInt("userId",-1);
+                String data=userId+"-splspli-"+"reg";
+                mWebSocketClient.send(data);
+            }
+
+            @Override
+            public void onMessage(String s)
+            {
+                final String message = s;
+                Log.e("message",message);
+                createNotification(message);
+            }
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            public void createNotification(String message) {
+                try {
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+            @Override
+            public void onClose(int i, String s, boolean b) {
+                Log.i("Websocket", "Closed " + s);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.i("Websocket", "Error " + e.getMessage());
+            }
+        };
+        mWebSocketClient.connect();
+    }
 }
