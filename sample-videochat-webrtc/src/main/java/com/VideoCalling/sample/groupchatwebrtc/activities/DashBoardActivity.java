@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -87,8 +88,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     Dialog showMessage;
     SharedPreferences prefs;
     ArrayList msgs = new ArrayList();
-    int NOTIFICATION_ID=1;
-    public static String onResume="no";
+    int NOTIFICATION_ID = 1;
+    public static String onResume = "no";
     ArrayList notificationSenderNames = new ArrayList();
     ArrayList notificationSentDates = new ArrayList();
     ArrayList videocallerName = new ArrayList();
@@ -98,6 +99,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static HashMap<Integer, JSONObject> immigrantProfiles = new HashMap<Integer, JSONObject>();
     WebSocketClient mWebSocketClient;
     ArrayList ImmigrantNames = new ArrayList();
+    public static HashMap ImgMapping=new HashMap();
     RelativeLayout header1, header;
     TextView userName, notification_limit;
     public static ArrayList<VideoLogsModel> videoLogs = new ArrayList<VideoLogsModel>();
@@ -106,6 +108,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList ImmigrantIds = new ArrayList();
     RecyclerViewAdapter recyclerViewAdapter;
     VideocallAdapter videoCallAdapter;
+    public static String docRelode = "no";
+    public static String logsRelode = "no";
+    public static String notifRelode = "no";
     ViewPager mViewPager;
     //This is our tablayout
     private TabLayout tabLayout;
@@ -138,10 +143,15 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     com.github.clans.fab.FloatingActionMenu floating_parent;
     Dialog notification_dialog;
     SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
         editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         progressDialog = new ProgressDialog(this);
@@ -191,11 +201,10 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                             String data1 = Integer.parseInt(solicitor.get("id").toString()) + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
                             mWebSocketClient.send(data1);
                         }
-                        String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
-                        mWebSocketClient.send(data);
                         Toast.makeText(DashBoardActivity.this, "Message has sent Succesfully...", Toast.LENGTH_SHORT).show();
                         notification_edit_txt.setText("");
                         notification_dialog.dismiss();
+                        new DownloadFilesTask().execute();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -219,10 +228,11 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
                 //toolbar.setTitle(item + " Dashboard");
-                selectedPersonName = item;
+                selectedPersonName = item.toString();
                 notification_to_name.setText(item.toString());
                 msgs.clear();
                 editor.putInt("selected", position);
+                editor.putString("selectedName", selectedPersonName);
                 editor.commit();
 
                 notificationSenderNames.clear();
@@ -387,25 +397,17 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        videoLogs.clear();
+
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        Log.e("onResume",onResume);
-        if (DashBoardActivity.onResume.equalsIgnoreCase("yes")) {
-            msgs.clear();
-            notificationSenderNames.clear();
-            videoLogs.clear();
-            videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
-            LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
-            callsList.setLayoutManager(recylerViewLayoutManager);
-            callsList.setHasFixedSize(true);
-            callsList.setAdapter(videoCallAdapter);
-            notificationSentDates.clear();
-            recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
-            notificationsList.setHasFixedSize(true);
-            notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-            notificationsList.setAdapter(recyclerViewAdapter);
-            new DownloadFilesTask().execute();
-            new VideoCallLogs().execute();
+        Log.e("onResume", onResume);
+        if (docRelode.equalsIgnoreCase("yes")) {
             Bundle bundle = new Bundle();
             bundle.putString("yes", "no");
             bundle.putString("userId", "0");
@@ -415,8 +417,10 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.replace(R.id.frameParent, uplodedDocs);
             transaction.commit();
-
+            docRelode = "no";
         }
+        new VideoCallLogs().execute();
+
     }
 
     private TextWatcher textWatcher = new TextWatcher() {
@@ -425,7 +429,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             //after text changed
             //     Log.e("count",notification_edit_txt.length()+"--");
-          //  notification_edit_txt.setVisibility(View.VISIBLE);
+            //  notification_edit_txt.setVisibility(View.VISIBLE);
             notification_limit.setText(notification_edit_txt.length() + "/" + "100");
         }
 
@@ -582,10 +586,11 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             if (ImmigrantNames.size() > 0) {
                 spinner.setItems(ImmigrantNames);
                 spinner.setSelectedIndex(prefs.getInt("selected", 0));
-                selectedImmigrantId=Integer.parseInt(ImmigrantIds.get(prefs.getInt("selected",0)).toString());
+                selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(prefs.getInt("selected", 0)).toString());
+                selectedPersonName=ImmigrantNames.get(prefs.getInt("selected", 0)).toString();
 
             }
-
+            new DownloadFilesTask().execute();
         }
     }
 
@@ -613,6 +618,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     final JSONObject jsonObject = jsonArray.getJSONObject(i);
                     userTypeDetailss.put(jsonObject.getInt("id"), jsonObject.getString("name"));
                     if (jsonObject.getInt("userType") == 0) {
+                        ImgMapping.put(jsonObject.getString("name").toString(),jsonObject.getInt("id"));
                         immigrantProfiles.put(jsonObject.getInt("id"), jsonObject);
                         if (ImmigrantIds.size() == 0) {
                             selectedImmigrantId = jsonObject.getInt("id");
@@ -648,7 +654,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     public void run() {
 
 
-                        new DownloadFilesTask().execute();
+
                     }
                 });
             } catch (Exception e) {
@@ -737,24 +743,43 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             Log.e("-----video logs", resultJson);
             if (resultJson != null) {
                 try {
+                    videoLogs.clear();
                     JSONArray jsonArray = new JSONArray(resultJson);
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        VideoLogsModel videoLogsModel = new VideoLogsModel(
-                                jsonObject.getInt("id"),
-                                jsonObject.getInt("callFrom"),
-                                solicitor.get("name").toString(),
-                                jsonObject.getString("startTime"),
-                                jsonObject.getString("day"),
-                                userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
-                                userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
-                                jsonObject.getInt("callTo1"),
-                                jsonObject.getInt("callTo2"),
-                                jsonObject.getString("endTime"),
-                                jsonObject.getString("duration")
-                        );
-                        Log.e("data <--->", videoLogsModel.getCallFromName());
-                        videoLogs.add(videoLogsModel);
+                        if (jsonObject.getString("duration").split(":")[0].equalsIgnoreCase("12")) {
+                            VideoLogsModel videoLogsModel = new VideoLogsModel(
+                                    jsonObject.getInt("id"),
+                                    jsonObject.getInt("callFrom"),
+                                    solicitor.get("name").toString(),
+                                    jsonObject.getString("startTime"),
+                                    jsonObject.getString("day"),
+                                    userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
+                                    userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
+                                    jsonObject.getInt("callTo1"),
+                                    jsonObject.getInt("callTo2"),
+                                    jsonObject.getString("endTime"),
+                                    "00:" + jsonObject.getString("duration").split(":")[1].toString() + ":" + jsonObject.getString("duration").split(":")[2].toString()
+                            );
+                            videoLogs.add(videoLogsModel);
+                        } else {
+                            VideoLogsModel videoLogsModel = new VideoLogsModel(
+                                    jsonObject.getInt("id"),
+                                    jsonObject.getInt("callFrom"),
+                                    solicitor.get("name").toString(),
+                                    jsonObject.getString("startTime"),
+                                    jsonObject.getString("day"),
+                                    userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
+                                    userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
+                                    jsonObject.getInt("callTo1"),
+                                    jsonObject.getInt("callTo2"),
+                                    jsonObject.getString("endTime"),
+                                    jsonObject.getString("duration")
+                            );
+                            videoLogs.add(videoLogsModel);
+                        }
+
+
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -771,11 +796,11 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            progressDialog.dismiss();
+                  /*          progressDialog.dismiss();
                             recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
                             notificationsList.setHasFixedSize(true);
                             notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-                            notificationsList.setAdapter(recyclerViewAdapter);
+                            notificationsList.setAdapter(recyclerViewAdapter);*/
                         }
                     });
                 } catch (Exception e) {
@@ -848,7 +873,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -1065,6 +1090,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             return videoLogs.size();
         }
     }
+
     private void connectWebSocket() {
         URI uri;
         try {
@@ -1078,25 +1104,25 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 Log.e("Websocket", "Opened");
-                int userId=prefs.getInt("userId",-1);
-                String data=userId+"-splspli-"+"reg";
+                int userId = prefs.getInt("userId", -1);
+                String data = userId + "-splspli-" + "reg";
                 mWebSocketClient.send(data);
             }
 
             @Override
-            public void onMessage(String s)
-            {
+            public void onMessage(String s) {
                 final String message = s;
-                Log.e("message",message);
+                Log.e("message", message);
                 createNotification(message);
             }
+
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void createNotification(String message) {
                 try {
                     // Log.e("data", message);
                     String[] split = message.split("-splspli-");
                     //  Log.e("datata", split[3].toString() + "<--->" + split[2].toString());
-                    if(split[2].toString().indexOf("documents...")<0) {
+                    if (split[2].toString().indexOf("documents...") < 0) {
                         Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
                         PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                         Notification noti = new Notification.Builder(DashBoardActivity.this)
@@ -1112,10 +1138,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         noti.defaults = Notification.DEFAULT_ALL;
                         notificationManager.notify(NOTIFICATION_ID++, noti);
                         //Log.e("datata", split[3].toString() + ":" + split[2].toString());
-                    }
-                    else
-                    {
-                        Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id",split[0].toString());
+                    } else {
+                        Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[0].toString());
 
                         PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                         Notification noti = new Notification.Builder(DashBoardActivity.this)
@@ -1132,15 +1156,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         notificationManager.notify(NOTIFICATION_ID++, noti);
 
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
-
             }
+
             @Override
             public void onClose(int i, String s, boolean b) {
                 Log.i("Websocket", "Closed " + s);

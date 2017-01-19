@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.utils.CloseCaseStatus;
@@ -56,7 +57,7 @@ public class CloseCaseActivity extends AppCompatActivity {
         reject_radio= (RadioButton) findViewById(R.id.reject_radio);
         immigrant=DashBoardActivity.immigrantProfiles.get(DashBoardActivity.selectedImmigrantId);
         try {
-            immigrant_name.setText(immigrant.getString("name")+" Immigration case status form");
+            immigrant_name.setText(immigrant.getString("name")+" Immigration Case Status Form");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -64,9 +65,13 @@ public class CloseCaseActivity extends AppCompatActivity {
             if(immigrant.getInt("status")==1)
             {
                 confirm_case.setEnabled(false);
+           /*     accept_radio.setChecked(true);
+                accept_radio.setEnabled(false);*/
             }
             else if(immigrant.getInt("status")==2)
             {
+                /*reject_radio.setChecked(true);
+                reject_radio.setEnabled(false);*/
                 confirm_case.setEnabled(false);
             }
 
@@ -156,30 +161,36 @@ public class CloseCaseActivity extends AppCompatActivity {
         confirm_case.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+if(accept_radio.isChecked()||reject_radio.isChecked())
+{
+
+    new CloseCaseStatus(CloseCaseActivity.this, immigrant, CloseCaseActivity.this);
+}
+                else
+{
+    Toast.makeText(CloseCaseActivity.this, "select case status accept or reject...", Toast.LENGTH_SHORT).show();
 
 
-                new CloseCaseStatus(CloseCaseActivity.this,immigrant,CloseCaseActivity.this);
+}
+
             }
         });
 
-
-        if (prefs.getInt("userType", -1) == 0)
-        {
+        if (prefs.getInt("userType", -1) == 0) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
-            changeTheam(R.color.immigrant_theam_color);
+            changeTheam(R.color.immigrant_notifi_color);
             confirm_case.setBackgroundColor((getResources().getColor(R.color.immigrant_theam_color)));
-        }
-        else if(prefs.getInt("userType", -1) == 1)
-        {
+
+        } else if (prefs.getInt("userType", -1) == 1) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
-            confirm_case.setBackgroundColor((getResources().getColor(R.color.solicor_theam_color)));
+            changeTheam(R.color.solicitor_notifi_color);
             changeTheam(R.color.solicor_theam_color);
-        }
-        else if(prefs.getInt("userType", -1) == 2)
-        {
+
+        } else if (prefs.getInt("userType", -1) == 2) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
-            changeTheam(R.color.barrister_theam_color);
+            changeTheam(R.color.barrister_notifi_color);
             confirm_case.setBackgroundColor((getResources().getColor(R.color.barrister_theam_color)));
+
         }
 
 

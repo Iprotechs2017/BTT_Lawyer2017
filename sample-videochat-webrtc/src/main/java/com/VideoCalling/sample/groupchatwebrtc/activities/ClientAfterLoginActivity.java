@@ -144,6 +144,17 @@ public class ClientAfterLoginActivity extends BaseActivity {
         toolbar.setTitle("Upload Documents");
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
+        if (prefs.getInt("userType", -1) == 0) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+            changeTheam(R.color.immigrant_notifi_color);
+        } else if (prefs.getInt("userType", -1) == 1) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
+            changeTheam(R.color.solicitor_notifi_color);
+        } else if (prefs.getInt("userType", -1) == 2) {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
+            changeTheam(R.color.barrister_notifi_color);
+        }
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
@@ -155,7 +166,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             .setMessage("Upload the selected files")
                             .setPositiveButton("Upload", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                submit.performClick();
+                                    submit.performClick();
 
                                 }
                             })
@@ -166,11 +177,14 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             })
                             .setCancelable(false)
                             .show();
-                    }
+                } else {
+                    ClientAfterLoginActivity.this.finish();
+                }
+
             }
         });
-        toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
-        changeTheam(R.color.immigrant_theam_color);
+        //toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
+      //  changeTheam(R.color.immigrant_theam_color);
         /*ImageView show_notifications = (ImageView) findViewById(R.id.show_notifications);
         show_notifications.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -552,6 +566,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                                             String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getString("name",null);
                                             mWebSocketClient.send(data);
                                             DashBoardActivity.onResume="yes";
+                                            DashBoardActivity.docRelode="yes";
                                             ClientAfterLoginActivity.this.finish();
                                         }
                                     })

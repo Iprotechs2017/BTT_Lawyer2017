@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -102,6 +103,10 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
         if (ContextCompat.checkSelfPermission(LoginActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) + ContextCompat
                 .checkSelfPermission(LoginActivity.this,
@@ -180,7 +185,7 @@ public class LoginActivity extends BaseActivity {
       /* */
     }
     public void chekCaseStaus(int status,JSONObject responseObject) throws JSONException {
-    /*    if(status==0)
+        if(status==0)
         {
             editor.putInt("userId", responseObject.getInt("id"));
             editor.putString("name", responseObject.getString("name"));
@@ -212,24 +217,7 @@ public class LoginActivity extends BaseActivity {
             displayUserCaseStatus("Your case has rejected");
             stopService(new Intent(this, NotificationService.class));
             startService(new Intent(this, NotificationService.class));
-        }*/
-        editor.putInt("userId", responseObject.getInt("id"));
-        editor.putString("name", responseObject.getString("name"));
-        editor.putString("phoneNumber", responseObject.getString("phoneNumber"));
-        editor.putInt("userType", responseObject.getInt("userType"));
-        editor.putString("email", responseObject.getString("email"));
-        editor.commit();
-
-        //       displayUserCaseStatus("Your case is in pending status");
-        stopService(new Intent(this, NotificationService.class));
-        startService(new Intent(this, NotificationService.class));
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                startSignUpNewUser(createUserWithEnteredData());
-            }
-        });
+        }
 
 
     }
@@ -319,6 +307,33 @@ public class LoginActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_login, menu);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     @Override

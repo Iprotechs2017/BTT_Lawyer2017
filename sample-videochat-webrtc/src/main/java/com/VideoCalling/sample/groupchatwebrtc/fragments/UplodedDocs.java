@@ -75,6 +75,10 @@ ProgressDialog progressDialog;
         userId1=Integer.parseInt(getArguments().getString("userId"));
         View view= inflater.inflate(R.layout.docs_custom_tabs_layout, container, false);
         progressDialog=new ProgressDialog(getActivity());
+        if(limitornot.equalsIgnoreCase("full")) {
+            progressDialog.setCancelable(false);
+        }
+
         recycler_view= (RecyclerView) view.findViewById(R.id.recycler_view);
         prefs = getActivity().getSharedPreferences("loginDetails", getActivity().MODE_PRIVATE);
         if (prefs.getInt("userType", -1) == 0)
@@ -210,7 +214,7 @@ if(userId1==0)
 
 
             super.onPreExecute();
-            progressDialog.show();
+
             progressDialog.setMessage("loading...");
             progressDialog.show();
         }

@@ -29,6 +29,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
+                android:layout_centerHorizontal="true"
+                android:textStyle="bold"
                 android:text="Venkat Immigration case status form"
                 android:textColor="@color/black" />
 
@@ -37,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/immigrant_name"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
                 <RadioButton
@@ -52,6 +54,7 @@
                 </RadioButton>
 
                 <TextView
+                android:paddingLeft="30dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -80,6 +83,7 @@
                 </RadioButton>
 
                 <TextView
+                    android:paddingLeft="30dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"

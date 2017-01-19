@@ -177,20 +177,41 @@ public class VideoCallsActivity extends AppCompatActivity {
                     for (int i=0;i<=jsonArray.length()-1;i++)
                     {
                         JSONObject jsonObject=jsonArray.getJSONObject(i);
-                        VideoLogsModel videoLogsModel=new VideoLogsModel(
-                                jsonObject.getInt("id"),
-                                jsonObject.getInt("callFrom"),
-                                DashBoardActivity.solicitor.get("name").toString(),
-                                jsonObject.getString("startTime"),
-                                jsonObject.getString("day"),
-                                DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
-                                DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
-                                jsonObject.getInt("callTo1"),
-                                jsonObject.getInt("callTo2"),
-                                jsonObject.getString("endTime"),
-                                jsonObject.getString("duration")
-                        );
-                        videoLogs.add(videoLogsModel);
+
+                        if(jsonObject.getString("duration").split(":")[0].equalsIgnoreCase("12")) {
+                            VideoLogsModel videoLogsModel = new VideoLogsModel(
+                                    jsonObject.getInt("id"),
+                                    jsonObject.getInt("callFrom"),
+                                    DashBoardActivity.solicitor.get("name").toString(),
+                                    jsonObject.getString("startTime"),
+                                    jsonObject.getString("day"),
+                                    DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
+                                    DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
+                                    jsonObject.getInt("callTo1"),
+                                    jsonObject.getInt("callTo2"),
+                                    jsonObject.getString("endTime"),
+                                    "00:"+jsonObject.getString("duration").split(":")[1].toString()+":"+jsonObject.getString("duration").split(":")[2].toString()
+                            );
+                            videoLogs.add(videoLogsModel);
+                        }
+                        else
+                        {
+                            VideoLogsModel videoLogsModel = new VideoLogsModel(
+                                    jsonObject.getInt("id"),
+                                    jsonObject.getInt("callFrom"),
+                                    DashBoardActivity.solicitor.get("name").toString(),
+                                    jsonObject.getString("startTime"),
+                                    jsonObject.getString("day"),
+                                    DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo1")).toString(),
+                                    DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("callTo2")).toString(),
+                                    jsonObject.getInt("callTo1"),
+                                    jsonObject.getInt("callTo2"),
+                                    jsonObject.getString("endTime"),
+                                    jsonObject.getString("duration")
+                            );
+                            videoLogs.add(videoLogsModel);
+                        }
+
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -231,7 +252,7 @@ public class VideoCallsActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     progressDialog.dismiss();
-                    Toast.makeText(VideoCallsActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VideoCallsActivity.this, "Video call logs not available...", Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -106,6 +107,10 @@ String TAG="response";
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         if(getIntent().getStringExtra("type")!=null)
         {
@@ -116,6 +121,16 @@ Log.e("regType",regType+"--");
         new  getSolaciter().execute();
         new getBarrister().execute();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
     public void initViews()
     {
 
@@ -427,12 +442,12 @@ runOnUiThread(new Runnable() {
 
                 } else {
 
-                    editor.putInt("userId", jsonObject.getInt("id"));
+      /*              editor.putInt("userId", jsonObject.getInt("id"));
                     editor.putString("name", jsonObject.getString("name"));
                     editor.putString("phoneNumber", jsonObject.getString("phoneNumber"));
                     editor.putInt("userType", jsonObject.getInt("userType"));
                     editor.putString("email", jsonObject.getString("email"));
-                    editor.commit();
+                    editor.commit();*/
                 }
                 runOnUiThread(new Runnable() {
                     @Override

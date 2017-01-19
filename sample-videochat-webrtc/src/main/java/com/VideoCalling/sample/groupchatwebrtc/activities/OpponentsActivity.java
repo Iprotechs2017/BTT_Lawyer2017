@@ -233,6 +233,10 @@ public void callTo(String callto)
     protected void onResume()
     {
         super.onResume();
+        if(DashBoardActivity.service.equalsIgnoreCase("yes"))
+        {
+            new InsertVideoLogs().execute();
+        }
         if(DashBoardActivity.service.equalsIgnoreCase("no")) {
 
             selectedArray.clear();
@@ -271,10 +275,7 @@ public void callTo(String callto)
     protected void onStart()
     {
         super.onStart();
-        if(DashBoardActivity.service.equalsIgnoreCase("yes"))
-        {
-            new InsertVideoLogs().execute();
-        }
+
 
     }
 
@@ -364,6 +365,7 @@ public void callTo(String callto)
                 startActivity(new Intent(OpponentsActivity.this, NotificationActivity.class));
             }
         });
+        show_notifications.setVisibility(View.GONE);
         bar_reg = (RelativeLayout) findViewById(R.id.bar_reg_lay);
         Log.e("yesss", prefs.getInt("userType", 0) + "");
         if (prefs.getInt("userType", 0) == 1) {
@@ -390,21 +392,18 @@ public void callTo(String callto)
                 OpponentsActivity.this.finish();
             }
         });
-        if (prefs.getInt("userType", -1) == 0)
-        {
+
+        if (prefs.getInt("userType", -1) == 0) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
-            changeTheam(R.color.immigrant_theam_color);
-        }
-        else if(prefs.getInt("userType", -1) == 1)
-        {
+            changeTheam(R.color.immigrant_notifi_color);
+        } else if (prefs.getInt("userType", -1) == 1) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
-            changeTheam(R.color.solicor_theam_color);
-        }
-        else if(prefs.getInt("userType", -1) == 2)
-        {
+            changeTheam(R.color.solicitor_notifi_color);
+        } else if (prefs.getInt("userType", -1) == 2) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
-            changeTheam(R.color.barrister_theam_color);
+            changeTheam(R.color.barrister_notifi_color);
         }
+
 
         screen_title.setText("Immigrants List");
         bar_registration = (Button) findViewById(R.id.bar_registration);
@@ -474,7 +473,7 @@ public void callTo(String callto)
                                     connection = "normal";
                                     callto="sol";
                                     type="single";
-                                    DashBoardActivity.callTo2=DashBoardActivity.callTo1;
+
                                     try {
                                         callTo(callto);
                                     }
@@ -682,9 +681,6 @@ public void callTo(String callto)
         invalidateOptionsMenu();
     }
 
-
-
-
     public void postAPICall(final Context context) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", userTypeDetails.get("id").toString());
@@ -692,7 +688,7 @@ public void callTo(String callto)
         HttpDeleteWithBody request = new HttpDeleteWithBody("http://35.163.24.72:8080/VedioApp/service/user/");
         request.addHeader("Content-Type", "application/json; charset=UTF-8");
         request.addHeader("Accept", "application/json");
-       request.setEntity(new StringEntity(jsonObject.toString()));
+        request.setEntity(new StringEntity(jsonObject.toString()));
         HttpClient httpClient = new MyHttpClient(context);
         HttpResponse response = httpClient.execute(request);
         Log.e("response",response.getStatusLine().getStatusCode()+"--");
