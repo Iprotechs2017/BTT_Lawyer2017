@@ -12,6 +12,8 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -126,6 +128,7 @@ public class fileDownload {
 
             if(downloaded.equalsIgnoreCase("downloaded"))
             {
+               UplodedDocs.refreshDocs();
 
                 /*new AlertDialog.Builder(context)
                         .setMessage("File Downloaded Successfully...")

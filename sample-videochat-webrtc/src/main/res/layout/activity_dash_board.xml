@@ -11,13 +11,29 @@
         android:id="@+id/toolbar1"
         layout="@layout/individual_login_toolbar" />
 
+    <RelativeLayout
+        android:layout_below="@+id/toolbar1"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:id="@+id/spinnerParent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp"
+        android:background="@color/img_drop_down">
 
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/spinner"
+            ms_background_color="@color/img_drop_down"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp" />
+    </RelativeLayout>
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar1"
+        android:layout_below="@+id/spinnerParent"
         android:scrollbars="none">
 
         <RelativeLayout
@@ -87,20 +103,7 @@
                             android:textSize="15dp"
                             android:visibility="gone" />
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="2dp"
-                            android:layout_marginRight="2dp"
-                            android:background="@color/img_drop_down">
 
-                            <com.jaredrummler.materialspinner.MaterialSpinner
-                                android:id="@+id/spinner"
-                                ms_background_color="@color/img_drop_down"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_margin="5dp" />
-                        </RelativeLayout>
 
                         <ImageView
                             android:id="@+id/show_more_uploaded_docs"
@@ -108,7 +111,7 @@
                             android:layout_height="20dp"
                             android:layout_alignParentRight="true"
                             android:layout_marginRight="10dp"
-                            android:layout_marginTop="5dp"
+                            android:layout_marginTop="0dp"
                             android:src="@drawable/show"
                             android:visibility="gone" />
                     </RelativeLayout>
@@ -132,7 +135,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp">
+                        android:layout_marginTop="0dp">
 
                         <RelativeLayout
                             android:id="@+id/documents_label_layout"

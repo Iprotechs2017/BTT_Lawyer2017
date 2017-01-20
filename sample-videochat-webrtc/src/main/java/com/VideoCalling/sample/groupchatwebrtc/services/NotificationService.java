@@ -108,7 +108,7 @@ public  void showNotification(String data)
        else
        {
            Intent intent = new Intent(NotificationService.this, ShowmoreDocumentsActivity.class);
-           intent.putExtra("id",split[0].toString());
+           intent.putExtra("id",split[3].toString());
            PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
            Notification noti = new Notification.Builder(NotificationService.this)
                    .setSmallIcon(R.drawable.logo)

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.utils.QBRTCSessionUtils;
@@ -97,9 +98,16 @@ public class OpponentsFromCallAdapter extends RecyclerView.Adapter<OpponentsFrom
         holder.opponentsName.setText(user.getFullName());
 
         holder.setUserId(userID);
-        QBRTCTypes.QBRTCConnectionState state = session.getPeerChannel(userID).getState();
-        Log.d(TAG, "state ordinal= " + state.ordinal());
-      //  holder.setStatus(context.getResources().getString(QBRTCSessionUtils.getStatusDescriptionResource(state)));
+        try {
+            QBRTCTypes.QBRTCConnectionState state = session.getPeerChannel(userID).getState();
+
+            Log.d(TAG, "state ordinal= " + state.ordinal());
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(context, "Unable to establish call try again", Toast.LENGTH_SHORT).show();
+        }
+      // /  holder.setStatus(context.getResources().getString(QBRTCSessionUtils.getStatusDescriptionResource(state)));
         if (position == (opponents.size() - 1)) {
             adapterListener.OnBindLastViewHolder(holder, position);
         }

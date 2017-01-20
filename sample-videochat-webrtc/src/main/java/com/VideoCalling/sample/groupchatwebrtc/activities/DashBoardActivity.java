@@ -1,5 +1,4 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
-
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.Notification;
@@ -45,19 +44,26 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.VideoCalling.sample.groupchatwebrtc.App;
 import com.VideoCalling.sample.groupchatwebrtc.R;
 
 import com.VideoCalling.sample.groupchatwebrtc.adapters.TabsAdaptor;
+import com.VideoCalling.sample.groupchatwebrtc.db.QbUsersDbManager;
 import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
 import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
+import com.VideoCalling.sample.groupchatwebrtc.util.QBResRequestExecutor;
+import com.VideoCalling.sample.groupchatwebrtc.utils.Consts;
 import com.VideoCalling.sample.groupchatwebrtc.utils.SendNotitcation;
 import com.VideoCalling.sample.groupchatwebrtc.utils.VideoLogsModel;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mancj.slideup.SlideUp;
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -80,13 +86,13 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
 public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     RecyclerView callsList, notificationsList;
     com.github.clans.fab.FloatingActionButton newNotification;
     ProgressDialog progressDialog;
     Dialog showMessage;
     SharedPreferences prefs;
+    protected QBResRequestExecutor requestExecutor;
     ArrayList msgs = new ArrayList();
     int NOTIFICATION_ID = 1;
     public static String onResume = "no";
@@ -143,7 +149,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     com.github.clans.fab.FloatingActionMenu floating_parent;
     Dialog notification_dialog;
     SharedPreferences.Editor editor;
-
+    private QbUsersDbManager dbManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,11 +158,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
+        requestExecutor = App.getInstance().getQbResRequestExecutor();
         editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         progressDialog = new ProgressDialog(this);
         notification_dialog = new Dialog(this);
         notification_dialog.setCancelable(false);
+        dbManager = QbUsersDbManager.getInstance(getApplicationContext());
         notification_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         notification_dialog.setContentView(R.layout.notification_pop_up);
         callf = (FloatingActionButton) findViewById(R.id.call);
@@ -173,6 +181,10 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         sendNotification = (ImageView) notification_dialog.findViewById(R.id.sendNotification);
         header1 = (RelativeLayout) notification_dialog.findViewById(R.id.header1);
         header = (RelativeLayout) notification_dialog.findViewById(R.id.header);
+        if (prefs.getInt("userType", -1)!= 1) {
+
+            startLoadUsers();
+        }
         connectWebSocket();
         view_msg = (TextView) notification_dialog.findViewById(R.id.view_msg);
         userName = (TextView) notification_dialog.findViewById(R.id.userName);
@@ -187,10 +199,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         notificationObject.put("sentDate", new SimpleDateFormat("yyyy-MM-ddHH:mm:ss"));
                         notificationObject.put("sentFor", selectedImmigrantId);
                         Log.e("notificationObject", notificationObject.toString());
-
                         notificationObject.put("sentTo", selectedImmigrantId);
-                        slideUp.hideImmediately();
-                        new SendNotitcation(DashBoardActivity.this, notificationObject);
                         String message = notification_edit_txt.getText().toString();
                         if (prefs.getInt("userType", -1) == 1) {
                             String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
@@ -202,6 +211,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                             mWebSocketClient.send(data1);
                         }
                         Toast.makeText(DashBoardActivity.this, "Message has sent Succesfully...", Toast.LENGTH_SHORT).show();
+                        new SendNotitcation(DashBoardActivity.this, notificationObject);
+
                         notification_edit_txt.setText("");
                         notification_dialog.dismiss();
                         new DownloadFilesTask().execute();
@@ -234,19 +245,17 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 editor.putInt("selected", position);
                 editor.putString("selectedName", selectedPersonName);
                 editor.commit();
-
                 notificationSenderNames.clear();
-                videoLogs.clear();
-                videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
+                /* videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
                 LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
                 callsList.setLayoutManager(recylerViewLayoutManager);
                 callsList.setHasFixedSize(true);
-                callsList.setAdapter(videoCallAdapter);
-                notificationSentDates.clear();
+                callsList.setAdapter(videoCallAdapter);*/
+              /*  notificationSentDates.clear();
                 recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
                 notificationsList.setHasFixedSize(true);
                 notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-                notificationsList.setAdapter(recyclerViewAdapter);
+                notificationsList.setAdapter(recyclerViewAdapter);*/
                 selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(position).toString());
                 new DownloadFilesTask().execute();
                 new VideoCallLogs().execute();
@@ -419,7 +428,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             transaction.commit();
             docRelode = "no";
         }
-        new VideoCallLogs().execute();
+     //   new VideoCallLogs().execute();
 
     }
 
@@ -582,6 +591,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 transaction.replace(R.id.frameParent, uplodedDocs);
                 transaction.commit();
                 new VideoCallLogs().execute();
+                new DownloadFilesTask().execute();
             }
             if (ImmigrantNames.size() > 0) {
                 spinner.setItems(ImmigrantNames);
@@ -590,7 +600,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 selectedPersonName=ImmigrantNames.get(prefs.getInt("selected", 0)).toString();
 
             }
-            new DownloadFilesTask().execute();
+
         }
     }
 
@@ -707,7 +717,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
             try {
                 if (prefs.getInt("userType", -1) != 0) {
-                    getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id").toString()) + "/callTo/" + selectedImmigrantId, DashBoardActivity.this);
+                    getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id")+"") + "/callTo/" + selectedImmigrantId, DashBoardActivity.this);
                 } else {
                     getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id").toString()) + "/callTo/" + prefs.getInt("userId", -1), DashBoardActivity.this);
                 }
@@ -740,7 +750,6 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             while ((line = reader.readLine()) != null) {
                 resultJson += line;
             }
-            Log.e("-----video logs", resultJson);
             if (resultJson != null) {
                 try {
                     videoLogs.clear();
@@ -784,11 +793,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
-                            LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
-                            callsList.setLayoutManager(recylerViewLayoutManager);
-                            callsList.setHasFixedSize(true);
-                            callsList.setAdapter(videoCallAdapter);
+refreshVideoLogs();
 
                         }
                     });
@@ -808,6 +813,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            videoLogs.clear();
+                            refreshVideoLogs();
                             progressDialog.dismiss();
 
                         }
@@ -818,6 +825,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        videoLogs.clear();
+                        refreshVideoLogs();
                         progressDialog.dismiss();
                         Toast.makeText(context, "Unable to get valid data from server try again...", Toast.LENGTH_SHORT).show();
                     }
@@ -827,6 +836,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    videoLogs.clear();
+                    refreshVideoLogs();
                     progressDialog.dismiss();
                     Toast.makeText(DashBoardActivity.this, "Video calls data not available...", Toast.LENGTH_SHORT).show();
                 }
@@ -835,6 +846,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    videoLogs.clear();
+                    refreshVideoLogs();
+
                     progressDialog.dismiss();
                     Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
                 }
@@ -843,7 +857,20 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         //Log.e("result", resultJson);
     }
+public void refreshVideoLogs()
+{
+    try {
+        videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
+        LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
+        callsList.setLayoutManager(recylerViewLayoutManager);
+        callsList.setHasFixedSize(true);
+        callsList.setAdapter(videoCallAdapter);
+    }
+    catch (Exception e)
+    {
 
+    }
+    }
     public void postAPICall(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         Log.e("strurl", strurl);
@@ -865,15 +892,12 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             Log.e("notifications", resultJson);
             if (resultJson != null) {
                 try {
-                    msgs.clear();
-                    notificationSenderNames.clear();
-                    notificationSentDates.clear();
+                    clearNotification();
                     JSONArray jsonArray = new JSONArray(resultJson);
                     if (jsonArray.length() == 0) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                // Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -887,15 +911,11 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                     if (resultJson != null) {
 
                     }
-                    //  Log.e("data -->", sentDates.size() + "--" + senderNames.size() + "--" + msgs.size() + "--");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             progressDialog.dismiss();
-                            recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
-                            notificationsList.setHasFixedSize(true);
-                            notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
-                            notificationsList.setAdapter(recyclerViewAdapter);
+                            refreshNotifications();
                         }
                     });
                 } catch (Exception e) {
@@ -905,6 +925,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        clearNotification();
+                        refreshNotifications();
                         Toast.makeText(context, "Unable to get valid data from server try again...", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -913,6 +935,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    clearNotification();
+                    refreshNotifications();
                     Toast.makeText(DashBoardActivity.this, "Notifications not available...", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -921,6 +945,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                 @Override
                 public void run() {
                     progressDialog.dismiss();
+                    clearNotification();
+                    refreshNotifications();
                     Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -928,7 +954,19 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         //Log.e("result", resultJson);
     }
-
+public void clearNotification()
+{
+    msgs.clear();
+    notificationSenderNames.clear();
+    notificationSentDates.clear();
+}
+    public  void refreshNotifications()
+    {
+        recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+        notificationsList.setHasFixedSize(true);
+        notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
+        notificationsList.setAdapter(recyclerViewAdapter);
+    }
     class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
         ArrayList msgs, senderNames, sentDates;
@@ -1065,29 +1103,34 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            if (videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name())) {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
-            } else {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name() + "&" + videoLogs.get(position).getCallTo2Name());
-            }
-            holder.callDate.setText(videoLogs.get(position).getDay().toString());
-            holder.share_and_down.setVisibility(View.GONE);
-            holder.callerName.setVisibility(View.GONE);
-            holder.callerName.setTypeface(typeface);
-            holder.callDate.setTypeface(typeface);
-            holder.videoName.setTypeface(typeface);
-            holder.parent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(DashBoardActivity.this, IndividualVideocallActivity.class).putExtra("position", position));
+            if(videoLogs.size()>0) {
+                if (videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name())) {
+                    holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
+                } else {
+                    holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name() + "&" + videoLogs.get(position).getCallTo2Name());
                 }
-            });
+                holder.callDate.setText(videoLogs.get(position).getDay().toString());
+                holder.share_and_down.setVisibility(View.GONE);
+                holder.callerName.setVisibility(View.GONE);
+                holder.callerName.setTypeface(typeface);
+                holder.callDate.setTypeface(typeface);
+                holder.videoName.setTypeface(typeface);
+                holder.parent.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(DashBoardActivity.this, IndividualVideocallActivity.class).putExtra("position", position));
+                    }
+                });
+            }
         }
 
         @Override
         public int getItemCount() {
-
-            return videoLogs.size();
+            int size=0;
+            if(videoLogs.size()>0) {
+                size=3;
+            }
+            return size;
         }
     }
 
@@ -1139,8 +1182,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         notificationManager.notify(NOTIFICATION_ID++, noti);
                         //Log.e("datata", split[3].toString() + ":" + split[2].toString());
                     } else {
-                        Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[0].toString());
-
+                        Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[3].toString());
                         PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                         Notification noti = new Notification.Builder(DashBoardActivity.this)
                                 .setSmallIcon(R.drawable.logo)
@@ -1175,4 +1217,19 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         };
         mWebSocketClient.connect();
     }
-}
+    private void startLoadUsers() {
+        requestExecutor.loadUsersByTag(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
+            @Override
+            public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                dbManager.clear();
+                dbManager.saveAllUsers(result, true);
+                //initUsersList();
+            }
+
+            @Override
+            public void onError(QBResponseException responseException) {
+                startLoadUsers();
+            }
+        });
+    }
+  }

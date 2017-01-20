@@ -3,6 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/sign_up_bg">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
     <RelativeLayout
         android:id="@+id/radio_par"
         android:layout_width="match_parent"
@@ -155,6 +161,8 @@
             android:textSize="16dip"
             android:layout_marginTop="10dp"/>
     </LinearLayout>
+            </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>
 
 

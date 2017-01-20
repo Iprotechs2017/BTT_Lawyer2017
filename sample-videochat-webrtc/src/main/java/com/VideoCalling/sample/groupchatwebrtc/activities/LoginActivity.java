@@ -173,11 +173,22 @@ public class LoginActivity extends BaseActivity {
             public void onClick(View v) {
                 email = userNameEditText.getText().toString();
                 pass = chatRoomNameEditText.getText().toString();
-                if (new NetworkCheck().isOnline(LoginActivity.this)) {
-                    new LoginAsync().execute();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
+                if(!isEnteredUserNameValid()) {
+                   // Toast.makeText(LoginActivity.this, "Enter valid emailId...", Toast.LENGTH_SHORT).show();
                 }
+                else if(pass.trim().length()==0)
+                {
+                    Toast.makeText(LoginActivity.this, "Enter password...", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    if (new NetworkCheck().isOnline(LoginActivity.this)) {
+                        new LoginAsync().execute();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Please check your internet or Wifi connections...!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
 
             }
         });
@@ -207,14 +218,14 @@ public class LoginActivity extends BaseActivity {
         }
         else if(status==1)
         {
-            displayUserCaseStatus("Your case has approved");
+            displayUserCaseStatus("Your case has approved,please contact solicitor.");
             stopService(new Intent(this, NotificationService.class));
             startService(new Intent(this, NotificationService.class));
 
         }
         else if(status==2)
         {
-            displayUserCaseStatus("Your case has rejected");
+            displayUserCaseStatus("Your case has rejected,please contact solicitor.");
             stopService(new Intent(this, NotificationService.class));
             startService(new Intent(this, NotificationService.class));
         }

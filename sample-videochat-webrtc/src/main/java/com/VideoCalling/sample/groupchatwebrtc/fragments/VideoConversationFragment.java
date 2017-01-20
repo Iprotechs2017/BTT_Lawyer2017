@@ -1091,8 +1091,6 @@ if(OpponentsActivity.callType.equalsIgnoreCase("imm"))
         Log.e(TAG, "startCall()");
         ArrayList<Integer> opponentsList = CollectionsUtils.getIdsSelectedOpponents(opponentsAdapter1.getSelectedItems());
         opponentsList.add(OpponentsActivity.onlineUser);
-        DashBoardActivity.callTo1=Integer.parseInt(opponentsList.get(0)+"");
-        DashBoardActivity.callTo2=Integer.parseInt(opponentsList.get(1)+"");
         QBRTCTypes.QBConferenceType conferenceType = isVideoCall
                 ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
                 : QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/parent"
     android:background="@color/background"
     android:orientation="vertical">
 
@@ -39,10 +39,10 @@
                     android:id="@+id/videoName"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:maxLength="120"
-                    android:ellipsize="end"
-                    android:singleLine="true"
                     android:layout_marginTop="5dp"
+                    android:ellipsize="end"
+                    android:maxLength="120"
+                    android:singleLine="true"
                     android:text="video1"
                     android:textColor="@color/black"
                     android:textSize="15dp" />
@@ -79,12 +79,12 @@
                     android:src="@drawable/download_gray" />
 
                 <ImageView
-                    android:visibility="gone"
                     android:id="@+id/share_video"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/gray_share" />
+                    android:src="@drawable/gray_share"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -92,18 +92,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-
                 android:layout_below="@+id/share_and_down"
                 android:layout_marginTop="5dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/callDate"
-
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="0dp"
                     android:layout_marginTop="5dp"
+
                     android:text="20-11-2016"
                     android:textColor="@color/date_color"
                     android:textSize="10dp"

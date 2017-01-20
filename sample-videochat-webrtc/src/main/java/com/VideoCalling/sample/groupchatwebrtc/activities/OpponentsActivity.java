@@ -200,12 +200,12 @@ public class OpponentsActivity extends BaseActivity {
         public static void hideBarrister()
         {
             bar_call.setVisibility(View.INVISIBLE);
-            bar_remove.setVisibility(View.INVISIBLE);
+         //   bar_remove.setVisibility(View.INVISIBLE);
         }
         public static void showBarrister()
     {
         bar_call.setVisibility(View.VISIBLE);
-        bar_remove.setVisibility(View.VISIBLE);
+     //   bar_remove.setVisibility(View.VISIBLE);
     }
         private void scribeFromPushes() {
         googlePlayServicesHelper.registerInGcmInBackground(Consts.GCM_SENDER_ID);
@@ -229,6 +229,17 @@ public void callTo(String callto)
 
     }
 }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences pref = getSharedPreferences("loginDetails", MODE_PRIVATE);
+        if (pref.getInt("userType", -1) != 1) {
+
+            OpponentsActivity.this.finish();
+        }
+    }
+
     @Override
     protected void onResume()
     {

@@ -258,6 +258,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
         selected_files.setAdapter(fileAdapter);
         fileAdapter.notifyDataSetChanged();
     }
+
     public void changeTheam(int color)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -379,16 +380,35 @@ public class ClientAfterLoginActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+       // super.onBackPressed();
+        if (selectedFiles.size() > 0) {
+            new AlertDialog.Builder(ClientAfterLoginActivity.this)
+                    .setMessage("Upload the selected files")
+                    .setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            submit.performClick();
+
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            ClientAfterLoginActivity.this.finish();
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+        } else {
+            ClientAfterLoginActivity.this.finish();
+        }
+
         DashBoardActivity.onResume="yes";
-        super.onBackPressed();
     }
 
     public void fileUplode(String filePath) {
         String ex = paths.get(0).toString().split("/")[filePath.split("/").length - 1].toString();
         Log.e("ex", ex.replaceAll("\\s+", "").split(".").length + "--" + ex);
-       Log.e("paths",paths.toString());
+        Log.e("paths",paths.toString());
         String type=paths.get(0).toString().substring(paths.get(0).toString().lastIndexOf(".")+1);
-       Log.e("type",type);
         String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" + ex.replaceAll("\\s+", "").split("\\.")[0] + "/type/" +type + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
         Log.e("urlServer", urlServer);
         try {
@@ -557,14 +577,15 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             new LoginAsync().execute();
                         } else {
                             progressDialog.dismiss();
+                            String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getInt("userId",-1);
+                            mWebSocketClient.send(data);
                             //Toast.makeText(ClientAfterLoginActivity.this, "All files are uploded successfully...!", Toast.LENGTH_SHORT).show();
                             new AlertDialog.Builder(ClientAfterLoginActivity.this)
                                     .setMessage("All files are uploded successfully")
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
                                           //  new LogoutClass().clearSesson(ClientAfterLoginActivity.this);
-                                            String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getString("name",null);
-                                            mWebSocketClient.send(data);
+
                                             DashBoardActivity.onResume="yes";
                                             DashBoardActivity.docRelode="yes";
                                             ClientAfterLoginActivity.this.finish();

@@ -40,7 +40,6 @@ public class CloseCaseActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
         immigrant_name= (TextView) findViewById(R.id.immigrant_name);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_w));
@@ -58,6 +57,14 @@ public class CloseCaseActivity extends AppCompatActivity {
         immigrant=DashBoardActivity.immigrantProfiles.get(DashBoardActivity.selectedImmigrantId);
         try {
             immigrant_name.setText(immigrant.getString("name")+" Immigration Case Status Form");
+            if(immigrant.getInt("status")==1)
+            {
+                Toast.makeText(CloseCaseActivity.this, immigrant.getString("name")+" Immigration Case Accepted", Toast.LENGTH_SHORT).show();
+            }
+            else if(immigrant.getInt("status")==2)
+            {
+                Toast.makeText(CloseCaseActivity.this,immigrant.getString("name")+" Immigration Case Rejected", Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -65,14 +72,19 @@ public class CloseCaseActivity extends AppCompatActivity {
             if(immigrant.getInt("status")==1)
             {
                 confirm_case.setEnabled(false);
-           /*     accept_radio.setChecked(true);
+                reject_layout.setVisibility(View.GONE);
+                accept_radio.setChecked(true);
+                confirm_case.setVisibility(View.GONE);
+           /*
                 accept_radio.setEnabled(false);*/
             }
             else if(immigrant.getInt("status")==2)
             {
-                /*reject_radio.setChecked(true);
-                reject_radio.setEnabled(false);*/
+                accept_layout.setVisibility(View.GONE);
+                reject_radio.setChecked(true);
+                confirm_case.setVisibility(View.GONE);
                 confirm_case.setEnabled(false);
+
             }
 
         } catch (JSONException e) {
@@ -161,17 +173,31 @@ public class CloseCaseActivity extends AppCompatActivity {
         confirm_case.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-if(accept_radio.isChecked()||reject_radio.isChecked())
-{
+                try {
+                    if(immigrant.getInt("status")==0)
+    {
+        if (accept_radio.isChecked() || reject_radio.isChecked()) {
 
-    new CloseCaseStatus(CloseCaseActivity.this, immigrant, CloseCaseActivity.this);
-}
-                else
-{
-    Toast.makeText(CloseCaseActivity.this, "select case status accept or reject...", Toast.LENGTH_SHORT).show();
+            new CloseCaseStatus(CloseCaseActivity.this, immigrant, CloseCaseActivity.this);
+        } else {
+            Toast.makeText(CloseCaseActivity.this, "select case status accept or reject...", Toast.LENGTH_SHORT).show();
 
 
-}
+        }
+
+    }
+                    else if(immigrant.getInt("status")==1)
+                    {
+                        Toast.makeText(CloseCaseActivity.this, immigrant.getString("name")+" Immigration Case Accepted", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(immigrant.getInt("status")==2)
+                    {
+                        Toast.makeText(CloseCaseActivity.this,immigrant.getString("name")+" Immigration Case Rejected", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         });

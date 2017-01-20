@@ -42,24 +42,27 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by Harishma Velagala on 01-01-2017.
  */
 public class UplodedDocs  extends Fragment {
 
-    RecyclerView recycler_view;
+    public static RecyclerView recycler_view;
     ArrayList uploaded_doc_names=new ArrayList();
     ArrayList uploaded_doc_dates=new ArrayList();
     ArrayList uploaded_doc_sender=new ArrayList();
-    VideocallAdapter   documentsAdapter;
+    public static VideocallAdapter   documentsAdapter;
     SharedPreferences prefs;
     int userId;
     VideocallAdapter videoCallAdapter;
     ArrayList<DocumentsDetailsWithIds> DocumentsDetailsWithIdsArraylist=new ArrayList<DocumentsDetailsWithIds>();
-    ArrayList<DocumentDetails> DocumentDetailsArray=new ArrayList<DocumentDetails>();
+    public  ArrayList<DocumentDetails> DocumentDetailsArray=new ArrayList<DocumentDetails>();
     int documentId;
     int userId1;
     ArrayList videocallerName = new ArrayList();
@@ -107,6 +110,7 @@ if(userId1==0)
         View view1;
         ViewHolder viewHolder1;
         ArrayList<DocumentDetails> documentsList;
+        File file;
         public VideocallAdapter(Context context1,ArrayList<DocumentDetails> documentsList)
         {
             this.documentsList=documentsList;
@@ -136,7 +140,7 @@ if(userId1==0)
         @Override
         public VideocallAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
 
-            view1 = LayoutInflater.from(context).inflate(R.layout.videos_custom_layout,parent,false);
+            view1 = LayoutInflater.from(context).inflate(R.layout.videos_custom_layout, parent, false);
 
             viewHolder1 = new ViewHolder(view1);
 
@@ -147,24 +151,86 @@ if(userId1==0)
         public void onBindViewHolder(ViewHolder holder, final int position){
             final DocumentDetails documentDetails = documentsList.get(position);
             String docName = documentDetails.getName().toString();
-            holder.contactImage.setImageResource(R.drawable.pdf_icon);
+            if(documentDetails.getDocType().equalsIgnoreCase("xlsx")||documentDetails.getDocType().equalsIgnoreCase("xls")||documentDetails.getDocType().equalsIgnoreCase(".xlsx")||documentDetails.getDocType().equalsIgnoreCase(".xls"))
+            {
+                holder.contactImage.setImageResource(R.drawable.icon_xl);
+
+            }
+            else if(documentDetails.getDocType().equalsIgnoreCase("docx")||documentDetails.getDocType().equalsIgnoreCase("doc")||documentDetails.getDocType().equalsIgnoreCase(".docx")||documentDetails.getDocType().equalsIgnoreCase(".doc"))
+            {
+                holder.contactImage.setImageResource(R.drawable.doc_icon);
+
+            }
+            else if(documentDetails.getDocType().equalsIgnoreCase("pdf")||documentDetails.getDocType().equalsIgnoreCase(".pdf"))
+            {
+                holder.contactImage.setImageResource(R.drawable.pdf_icon);
+
+            }
+            else if(documentDetails.getDocType().equalsIgnoreCase("png")||documentDetails.getDocType().equalsIgnoreCase("jpg")||documentDetails.getDocType().equalsIgnoreCase("jpeg")||documentDetails.getDocType().equalsIgnoreCase(".png")||documentDetails.getDocType().equalsIgnoreCase(".jpg")||documentDetails.getDocType().equalsIgnoreCase(".jpeg"))
+            {
+                holder.contactImage.setImageResource(R.drawable.icon_img);
+
+            }
+            else
+            {
+                holder.contactImage.setImageResource(R.drawable.docs);
+            }
+
             holder.callerName.setText(documentDetails.getUploadedTo() + "");
             holder.videoName.setText(documentDetails.getName().toString());
             holder.callDate.setText(documentDetails.getUploadedDate().toString());
             holder.callerName.setTypeface(typeface);
             holder.videoName.setTypeface(typeface);
             holder.callDate.setTypeface(typeface);
-            holder.share_video.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new ShareFile(getActivity(), DocumentsDetailsWithIdsArraylist, position);
+            file = new File(Environment.getExternalStorageDirectory() + "/BTTLawyer/" + documentDetails.getName().toString()+ "." + documentDetails.getDocType().toString().replace(".",""));
+            if (file.exists()) {
+                try {
+                    holder.download_video.setImageResource(R.drawable.view_gray);
                 }
-            });
+                catch (Exception e)
+                {
+
+                }
+            }
+            else
+            {
+                holder.download_video.setImageResource(R.drawable.download_gray);
+            }
+                    holder.share_video.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new ShareFile(getActivity(), DocumentsDetailsWithIdsArraylist, position);
+                        }
+                    });
             holder.download_video.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //Toast.makeText(getActivity(), "Ok", Toast.LENGTH_SHORT).show();
-                    new fileDownload(getActivity(),DocumentDetailsArray,position);
+                    File file = new File(Environment.getExternalStorageDirectory() + "/BTTLawyer/" + documentDetails.getName().toString()+ "." + documentDetails.getDocType().toString().replace(".",""));
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (file.exists()) {
+                        try {
+                            Uri uri_path = Uri.fromFile(file);
+                            String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
+                                    (MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath()));
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setType(mimeType);
+                            intent.setDataAndType(uri_path, mimeType);
+                            context.startActivity(intent);
+                        } catch (Exception e) {
+                            Toast.makeText(context, documentDetails.getDocType().toString() + " file supported app not installed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        new fileDownload(getActivity(),DocumentDetailsArray,position);
+
+                    }
                 }
             });
             holder.parent.setOnClickListener(new View.OnClickListener() {
@@ -273,6 +339,8 @@ if(userId1==0)
 
                 JSONArray jsonArray = new JSONArray(resultJson);
                 if (jsonArray.length() > 0) {
+                    String date;
+                    DocumentDetailsArray.clear();
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -283,6 +351,9 @@ if(userId1==0)
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+//                        SimpleDateFormat sdfOutput = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss a");
+//                        String dateStr2 = sdfOutput.format(jsonObject.getString("sharedDate").replace("T"," "));
+//                        Log.e("dateStr2",dateStr2);
                         DocumentsDetailsWithIds documentsDetailsWithIds = new DocumentsDetailsWithIds(jsonObject.getInt("id"), jsonObject.getInt("documentId"), jsonObject.getInt("sharedBy"), jsonObject.getInt("docOwner"), jsonObject.getInt("sharedTo"), jsonObject.getString("sharedDate"));
                         DocumentsDetailsWithIdsArraylist.add(documentsDetailsWithIds);
 
@@ -299,6 +370,7 @@ if(userId1==0)
                                 recycler_view.setLayoutManager(recylerViewLayoutManager);
                                 recycler_view.setHasFixedSize(true);
                                 recycler_view.setAdapter(documentsAdapter);
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -350,6 +422,10 @@ if(userId1==0)
         //    Log.e("resultJson", resultJson);
         }
     }
+    public static void refreshDocs()
+    {
+        UplodedDocs.documentsAdapter.notifyDataSetChanged();
+    }
     public void getDocumentDetailsById(String strurl, String jsonString, final Context context) throws Exception
     {
 
@@ -383,7 +459,26 @@ if(userId1==0)
             {*/
 
             JSONObject jsonObject=new JSONObject(resultJson);
-            DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),jsonObject.getString("uploadedDate"), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
+            SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat _12HourSDF= new SimpleDateFormat("hh:mm:ss a");
+            Date _24HourDt = _24HourSDF.parse(jsonObject.getString("uploadedDate").split("T")[1]);
+            Log.e("date",  _12HourSDF.format(_24HourDt));
+            //------
+            SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date date = null;
+            try
+            {
+                date = form.parse(jsonObject.getString("uploadedDate").split("T")[0].toString());
+            }
+            catch (ParseException e)
+            {
+
+                e.printStackTrace();
+            }
+            SimpleDateFormat postFormater = new SimpleDateFormat("MMMM dd, yyyy");
+            String newDateStr = postFormater.format(date);
+          // String date=jsonObject.getString("sharedDate").split("T")[0]+" "+jsonObject.getString("sharedDate").split("T")[1];
+            DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),newDateStr+" "+_12HourSDF.format(_24HourDt), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
             DocumentDetailsArray.add(documentsDetailsWithIds);
             //  }
 
