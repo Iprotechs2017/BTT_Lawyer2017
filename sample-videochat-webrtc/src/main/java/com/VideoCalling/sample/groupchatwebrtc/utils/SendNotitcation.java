@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 
 import org.apache.http.HttpResponse;
@@ -64,6 +65,7 @@ this.jsonObject=jsonObject;
              if(result==201)
             {
                 Toast.makeText(context, "Notification sent succesfully...", Toast.LENGTH_SHORT).show();
+                DashBoardActivity.sendNotification();
             }
 
             else if (result== 500) {

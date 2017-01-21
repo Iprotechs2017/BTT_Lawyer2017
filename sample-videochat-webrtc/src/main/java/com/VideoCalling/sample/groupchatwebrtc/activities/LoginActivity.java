@@ -144,6 +144,7 @@ public class LoginActivity extends BaseActivity {
             }*/
         }
         setContentView(R.layout.activity_sign_in);
+        getWindow().setBackgroundDrawableResource(R.drawable.sign_up_bg) ;
      //  startService(new Intent(LoginActivity.this, APIServices.class));
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();

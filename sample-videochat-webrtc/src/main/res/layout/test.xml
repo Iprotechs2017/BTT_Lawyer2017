@@ -2,44 +2,11 @@
 <RelativeLayout
     android:id="@+id/slideView"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_marginTop="350dp"
-    android:layout_marginRight="5dp"
-    android:layout_marginLeft="5dp"
-    android:background="@color/grey_transparent_20"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+
     android:layout_height="wrap_content">
-    <android.support.v7.widget.CardView
-        android:elevation="3dp"
+    />
 
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <RelativeLayout
-            android:background="@color/white"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <RelativeLayout
-                android:background="@color/grey_transparent_20"
-                android:layout_width="match_parent"
-                android:layout_height="40dp">
-                <TextView
 
-                    android:layout_centerVertical="true"
-                    android:text="Slide"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-                <ImageView
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/download"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-            </RelativeLayout>
-
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
 </RelativeLayout>

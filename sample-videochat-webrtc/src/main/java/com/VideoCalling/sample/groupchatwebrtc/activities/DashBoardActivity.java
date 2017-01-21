@@ -63,7 +63,9 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mancj.slideup.SlideUp;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+import com.readystatesoftware.viewbadger.BadgeView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -82,6 +84,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -91,7 +94,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     com.github.clans.fab.FloatingActionButton newNotification;
     ProgressDialog progressDialog;
     Dialog showMessage;
-    SharedPreferences prefs;
+    public static SharedPreferences prefs;
     protected QBResRequestExecutor requestExecutor;
     ArrayList msgs = new ArrayList();
     int NOTIFICATION_ID = 1;
@@ -103,7 +106,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList videocallDate = new ArrayList();
     public static HashMap userTypeDetailss = new HashMap();
     public static HashMap<Integer, JSONObject> immigrantProfiles = new HashMap<Integer, JSONObject>();
-    WebSocketClient mWebSocketClient;
+   public static WebSocketClient mWebSocketClient;
     ArrayList ImmigrantNames = new ArrayList();
     public static HashMap ImgMapping=new HashMap();
     RelativeLayout header1, header;
@@ -129,7 +132,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     Typeface typeface;
     RelativeLayout rel;
     View slideView;
-    EditText notification_edit_txt;
+    public static EditText notification_edit_txt;
     SlideUp slideUp;
     ImageView sendNotification, close_window, close_window_send_notification;
     com.github.clans.fab.FloatingActionButton callf;
@@ -147,7 +150,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static String startTime, endtime;
     JSONObject notificationObject = new JSONObject();
     com.github.clans.fab.FloatingActionMenu floating_parent;
-    Dialog notification_dialog;
+    public static Dialog notification_dialog;
     SharedPreferences.Editor editor;
     private QbUsersDbManager dbManager;
     @Override
@@ -200,7 +203,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         notificationObject.put("sentFor", selectedImmigrantId);
                         Log.e("notificationObject", notificationObject.toString());
                         notificationObject.put("sentTo", selectedImmigrantId);
-                        String message = notification_edit_txt.getText().toString();
+                 /*       String message = notification_edit_txt.getText().toString();
                         if (prefs.getInt("userType", -1) == 1) {
                             String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
                             mWebSocketClient.send(data);
@@ -210,11 +213,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                             String data1 = Integer.parseInt(solicitor.get("id").toString()) + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
                             mWebSocketClient.send(data1);
                         }
-                        Toast.makeText(DashBoardActivity.this, "Message has sent Succesfully...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DashBoardActivity.this, "Message has sent Succesfully...", Toast.LENGTH_SHORT).show();*/
                         new SendNotitcation(DashBoardActivity.this, notificationObject);
 
-                        notification_edit_txt.setText("");
-                        notification_dialog.dismiss();
                         new DownloadFilesTask().execute();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -404,11 +405,28 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 //            selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(prefs.getInt("selected", 0)).toString());
         }
     }
+public static void sendNotification()
+{
+    String message = notification_edit_txt.getText().toString();
+    if (prefs.getInt("userType", -1) == 1) {
+        String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
+        mWebSocketClient.send(data);
+    } else if (prefs.getInt("userType", -1) == 2) {
+        String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
+        mWebSocketClient.send(data);
+        String data1 = Integer.parseInt(solicitor.get("id").toString()) + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
+        mWebSocketClient.send(data1);
+    }
+    notification_edit_txt.setText("");
+    notification_dialog.dismiss();
 
+}
     @Override
     protected void onDestroy() {
         super.onDestroy();
         videoLogs.clear();
+        editor.putInt("dashBoard",0);
+        editor.apply();
 
     }
 
@@ -416,19 +434,6 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     protected void onStart() {
         super.onStart();
         Log.e("onResume", onResume);
-        if (docRelode.equalsIgnoreCase("yes")) {
-            Bundle bundle = new Bundle();
-            bundle.putString("yes", "no");
-            bundle.putString("userId", "0");
-            UplodedDocs uplodedDocs = new UplodedDocs();
-            uplodedDocs.setArguments(bundle);
-            FragmentManager manager = getSupportFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.replace(R.id.frameParent, uplodedDocs);
-            transaction.commit();
-            docRelode = "no";
-        }
-     //   new VideoCallLogs().execute();
 
     }
 
@@ -752,6 +757,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             }
             if (resultJson != null) {
                 try {
+                    onResume="no";
                     videoLogs.clear();
                     JSONArray jsonArray = new JSONArray(resultJson);
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
@@ -860,6 +866,7 @@ refreshVideoLogs();
 public void refreshVideoLogs()
 {
     try {
+        Collections.reverse(videoLogs);
         videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
         callsList.setLayoutManager(recylerViewLayoutManager);
@@ -1149,14 +1156,24 @@ public void clearNotification()
                 Log.e("Websocket", "Opened");
                 int userId = prefs.getInt("userId", -1);
                 String data = userId + "-splspli-" + "reg";
-                mWebSocketClient.send(data);
+                try {
+                    mWebSocketClient.send(data);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
             }
 
             @Override
             public void onMessage(String s) {
                 final String message = s;
-                Log.e("message", message);
+                Log.e("message---->", message);
                 createNotification(message);
+
+
             }
 
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -1166,22 +1183,26 @@ public void clearNotification()
                     String[] split = message.split("-splspli-");
                     //  Log.e("datata", split[3].toString() + "<--->" + split[2].toString());
                     if (split[2].toString().indexOf("documents...") < 0) {
-                        Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
-                        PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
-                        Notification noti = new Notification.Builder(DashBoardActivity.this)
-                                .setSmallIcon(R.drawable.logo)
-                                .setContentTitle("BTT Lawyer")
-                                .setContentText(split[3].toString() + ":" + split[2].toString())
-                                .setContentIntent(pIntent)
-                                .build();
-                        // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+                        if(split[2].toString().trim().length()>0) {
+                            Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
+                            PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
+                            Notification noti = new Notification.Builder(DashBoardActivity.this)
+                                    .setSmallIcon(R.drawable.logo)
+                                    .setContentTitle("BTT Lawyer")
+                                    .setContentText(split[3].toString() + ":" + split[2].toString())
+                                    .setContentIntent(pIntent)
+                                    .build();
+                            // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
 
-                        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                        noti.flags |= Notification.FLAG_AUTO_CANCEL;
-                        noti.defaults = Notification.DEFAULT_ALL;
-                        notificationManager.notify(NOTIFICATION_ID++, noti);
-                        //Log.e("datata", split[3].toString() + ":" + split[2].toString());
+                            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            noti.flags |= Notification.FLAG_AUTO_CANCEL;
+                            noti.defaults = Notification.DEFAULT_ALL;
+                            notificationManager.notify(NOTIFICATION_ID++, noti);
+                            //Log.e("datata", split[3].toString() + ":" + split[2].toString());
+                            new DownloadFilesTask().execute();
+                        }
                     } else {
+
                         Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[3].toString());
                         PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                         Notification noti = new Notification.Builder(DashBoardActivity.this)
@@ -1206,12 +1227,18 @@ public void clearNotification()
             }
 
             @Override
-            public void onClose(int i, String s, boolean b) {
+            public void onClose(int i, String s, boolean b)
+
+            {
+                connectWebSocket();
                 Log.i("Websocket", "Closed " + s);
             }
 
             @Override
             public void onError(Exception e) {
+
+                connectWebSocket();
+
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };
@@ -1221,7 +1248,7 @@ public void clearNotification()
         requestExecutor.loadUsersByTag(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
             @Override
             public void onSuccess(ArrayList<QBUser> result, Bundle params) {
-                dbManager.clear();
+
                 dbManager.saveAllUsers(result, true);
                 //initUsersList();
             }
@@ -1231,5 +1258,37 @@ public void clearNotification()
                 startLoadUsers();
             }
         });
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        editor.putInt("dashBoard",0);
+        editor.apply();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        editor.putInt("dashBoard",1);
+        editor.apply();
+
+        if (docRelode.equalsIgnoreCase("yes")) {
+            Bundle bundle = new Bundle();
+            bundle.putString("yes", "no");
+            bundle.putString("userId", "0");
+            UplodedDocs uplodedDocs = new UplodedDocs();
+            uplodedDocs.setArguments(bundle);
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.replace(R.id.frameParent, uplodedDocs);
+            transaction.commit();
+            docRelode = "no";
+        }
+        if(onResume.equalsIgnoreCase("yes")) {
+            new VideoCallLogs().execute();
+        }
     }
   }

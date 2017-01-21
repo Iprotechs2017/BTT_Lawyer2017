@@ -49,6 +49,7 @@ public class QBResRequestExecutor {
 
     public void signInUser(final QBUser currentQbUser, final QBEntityCallback<QBUser> callback) {
         QBUsers.signIn(currentQbUser).performAsync(callback);
+
     }
 
     public void deleteCurrentUser(int currentQbUserID, QBEntityCallback<Void> callback) {
@@ -56,6 +57,18 @@ public class QBResRequestExecutor {
     }
 
     public void loadUsersByTag(final String tag, final QBEntityCallback<ArrayList<QBUser>> callback) {
+        restoreOrCreateSession(new QBEntityCallbackImpl<QBSession>() {
+            @Override
+            public void onSuccess(QBSession result, Bundle params) {
+                QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+                List<String> tags = new LinkedList<>();
+                tags.add(tag);
+
+                QBUsers.getUsersByTags(tags, requestBuilder).performAsync(callback);
+            }
+        });
+    }
+    public void getUserByLogin(final String tag, final QBEntityCallback<ArrayList<QBUser>> callback) {
         restoreOrCreateSession(new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession result, Bundle params) {

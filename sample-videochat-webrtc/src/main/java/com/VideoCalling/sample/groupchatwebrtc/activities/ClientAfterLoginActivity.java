@@ -408,8 +408,10 @@ public class ClientAfterLoginActivity extends BaseActivity {
         String ex = paths.get(0).toString().split("/")[filePath.split("/").length - 1].toString();
         Log.e("ex", ex.replaceAll("\\s+", "").split(".").length + "--" + ex);
         Log.e("paths",paths.toString());
+        ex=ex.replaceAll("\\s+", "");
         String type=paths.get(0).toString().substring(paths.get(0).toString().lastIndexOf(".")+1);
-        String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" + ex.replaceAll("\\s+", "").split("\\.")[0] + "/type/" +type + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
+        String urlServer = "http://35.163.24.72:8080/VedioApp/service/uploadfile/upload/name/" +ex.substring(0,ex.lastIndexOf("."))
++ "/type/" +type + "/uploadedby/" + prefs.getInt("userId", -1) + "/uploadedto/" + solaciterId;
         Log.e("urlServer", urlServer);
         try {
 

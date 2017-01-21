@@ -50,6 +50,7 @@
         <activity
             android:name=".activities.LoginActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.OpponentsActivity"
@@ -105,9 +106,11 @@
 
         <activity
             android:name=".activities.SignupActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.SignIn"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ClientAfterLoginActivity"
@@ -140,15 +143,25 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".activities.DashBoardActivity" />
-        <activity android:name=".activities.VideoCallsActivity" />
-        <activity android:name=".activities.UploadedDocumentsActivity" />
-        <activity android:name=".activities.ShowmoreDocumentsActivity" />
-        <activity android:name=".activities.CloseCaseActivity" />
+        <activity android:name=".activities.DashBoardActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".activities.VideoCallsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".activities.UploadedDocumentsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".activities.ShowmoreDocumentsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".activities.CloseCaseActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:theme="@style/MyDialogTheme"
             android:name=".activities.IndividualVideocallActivity">
-
+            android:screenOrientation="portrait"
         </activity>
     </application>
 

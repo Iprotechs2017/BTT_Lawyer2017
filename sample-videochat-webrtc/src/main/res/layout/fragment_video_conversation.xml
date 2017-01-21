@@ -12,20 +12,21 @@
         android:layout_above="@+id/grid_opponents"
         />
 
-    <!--<com.quickblox.videochat.webrtc.view.QBRTCSurfaceView
+    <com.quickblox.videochat.webrtc.view.QBRTCSurfaceView
         android:id="@+id/local_video_view"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_marginTop="@dimen/action_bar_height"
         android:layout_marginLeft="@dimen/margin_small"
-         />-->
+         />
 
 <com.quickblox.videochat.webrtc.view.QBRTCSurfaceView
     android:layout_alignParentRight="true"
     android:id="@+id/hiden_local_view"
     android:layout_width="130dp"
-    android:visibility="visible"
+
+    android:visibility="gone"
     android:layout_height="130dp" />
     <include layout="@layout/view_outgoing_screen" />
 

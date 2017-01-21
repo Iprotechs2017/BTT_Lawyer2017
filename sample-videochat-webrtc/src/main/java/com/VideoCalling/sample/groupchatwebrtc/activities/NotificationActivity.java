@@ -1,10 +1,14 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,6 +45,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +54,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +82,7 @@ public class NotificationActivity extends AppCompatActivity {
     ImageView close_window_send_notification;
     Dialog notification_dialog;
     de.hdodenhof.circleimageview.CircleImageView call, notification, logout;
+    WebSocketClient mWebSocketClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +103,7 @@ public class NotificationActivity extends AppCompatActivity {
         time_stamp.setVisibility(View.VISIBLE);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Notifications");
+        connectWebSocket();
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -272,6 +282,7 @@ public class NotificationActivity extends AppCompatActivity {
                 resultJson += line;
             }
             try {
+                msgs.clear(); senderNames.clear(); sentDates.clear();
                 JSONArray jsonArray = new JSONArray(resultJson);
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
                     JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
@@ -284,10 +295,9 @@ public class NotificationActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         progressDialog.dismiss();
-
-
                         recyclerViewAdapter = new RecyclerViewAdapter(NotificationActivity.this, msgs, senderNames, sentDates);
-
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(NotificationActivity.this));
                         recyclerView.setAdapter(recyclerViewAdapter);
                     }
                 });
@@ -449,5 +459,76 @@ public class NotificationActivity extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(getResources().getColor(color));
         }
+    }
+    private void connectWebSocket() {
+        URI uri;
+        try {
+            uri = new URI("ws://183.82.113.165:8085");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        mWebSocketClient = new WebSocketClient(uri) {
+            @Override
+            public void onOpen(ServerHandshake serverHandshake) {
+                Log.e("Websocket", "Opened");
+                int userId = prefs.getInt("userId", -1);
+                String data = userId + "-splspli-" + "reg";
+                try {
+                    mWebSocketClient.send(data);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onMessage(String s) {
+                final String message = s;
+                Log.e(" full data message---->", message);
+                createNotification(message);
+
+
+            }
+
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            public void createNotification(String message) {
+                try {
+                    // Log.e("data", message);
+                    String[] split = message.split("-splspli-");
+                    if (split[2].toString().indexOf("documents...") < 0) {
+                        new DownloadFilesTask().execute();
+                    } else {
+
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onClose(int i, String s, boolean b)
+
+            {
+                connectWebSocket();
+                Log.i("Websocket", "Closed " + s);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+                connectWebSocket();
+
+                Log.i("Websocket", "Error " + e.getMessage());
+            }
+        };
+        mWebSocketClient.connect();
     }
 }

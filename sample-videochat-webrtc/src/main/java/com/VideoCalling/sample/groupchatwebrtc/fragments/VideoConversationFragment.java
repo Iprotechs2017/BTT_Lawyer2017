@@ -300,7 +300,7 @@ ProgressDialog progressDialog;
         opponentViewHolders = new SparseArray<>(opponents.size());
         mMediaRecorder = new MediaRecorder();
 
-        localVideoView = (QBRTCSurfaceView) view.findViewById(R.id.hiden_local_view);
+        localVideoView = (QBRTCSurfaceView) view.findViewById(R.id.local_video_view);
        /*hiden_local_view= (QBRTCSurfaceView) view.findViewById(R.id.hiden_local_view);
         holder = localVideoView.getHolder();
         holder.addCallback(this);
@@ -946,6 +946,7 @@ ProgressDialog progressDialog;
             DashBoardActivity.service = "yes";
             Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
             DashBoardActivity.endtime = formattedDate;
+            DashBoardActivity.onResume="yes";
         }
         setStatusForOpponent(userId, getString(R.string.text_status_hang_up));
         Log.e(TAG, "onReceiveHangUpFromUser userId= " + userId);
@@ -969,7 +970,7 @@ ProgressDialog progressDialog;
             @Override
             public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                 //      hideProgressDialog();
-                dbManager.clear();
+
                 dbManager.saveAllUsers(result, true);
                 proceedInitUsersList();
 

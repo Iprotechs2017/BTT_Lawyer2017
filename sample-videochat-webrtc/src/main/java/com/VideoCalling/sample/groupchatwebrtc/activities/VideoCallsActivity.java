@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -170,8 +171,10 @@ public class VideoCallsActivity extends AppCompatActivity {
                 resultJson += line;
             }
             Log.e("-----video logs", resultJson);
+            Log.e("userTypeDetailss",userTypeDetailss.toString());
             if (resultJson != null) {
                 try {
+
                     JSONArray jsonArray=new JSONArray(resultJson);
                     videoLogs.clear();
                     for (int i=0;i<=jsonArray.length()-1;i++)
@@ -216,6 +219,7 @@ public class VideoCallsActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Collections.reverse(videoLogs);
                             videoCallAdapter = new VideocallAdapter(VideoCallsActivity.this, videoLogs);
                             LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(VideoCallsActivity.this);
                             callsList.setLayoutManager(recylerViewLayoutManager);
@@ -313,11 +317,11 @@ public class VideoCallsActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, final int position) {
             if(videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name()))
             {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "_" + videoLogs.get(position).getCallTo2Name());
+                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
             }
             else
             {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "_" + videoLogs.get(position).getCallTo2Name()+"_"+videoLogs.get(position).getCallTo2Name());
+                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name()+"&"+videoLogs.get(position).getCallTo2Name());
             }
             holder.callDate.setText(videoLogs.get(position).getDay().toString());
             holder.share_and_down.setVisibility(View.GONE);

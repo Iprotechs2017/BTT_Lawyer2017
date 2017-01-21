@@ -211,6 +211,7 @@ public abstract class BaseConversationFragment extends Fragment implements CallA
                 DashBoardActivity.service="yes";
                 Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
                 DashBoardActivity.endtime=formattedDate;
+                DashBoardActivity.onResume="yes";
                 OpponentsActivity.connection="not";
                 conversationFragmentCallbackListener.onHangUpCurrentSession();
                     Log.d(TAG, "Call is stopped");

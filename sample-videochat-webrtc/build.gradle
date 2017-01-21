@@ -79,7 +79,6 @@ allprojects {
 }
 
 dependencies {
-
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:$rootProject.qbSdkVersion"
     compile(project(":sample-core"))
     compile "com.android.support:recyclerview-v7:${rootProject.recyclerviewV7Version}"
@@ -101,7 +100,7 @@ dependencies {
     compile 'com.github.mancj:SlideUp-Android:1.0-beta'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.github.clans:fab:1.6.4'
-
+    compile files('libs/android-viewbadger.jar')
 }
 
 apply from: "../artifacts.gradle"

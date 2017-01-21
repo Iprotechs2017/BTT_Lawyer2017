@@ -316,6 +316,27 @@ public void callTo(String callto)
             @Override
             public void onSuccess(ArrayList<QBUser> result, Bundle params) {
                 hideProgressDialog();
+                currentOpponentsList1 = result;
+                Log.e("result", result.toString());
+                dbManager.saveAllUsers(result, true);
+                initUsersList();
+            }
+
+            @Override
+            public void onError(QBResponseException responseException) {
+                hideProgressDialog();
+                showErrorSnackbar(R.string.loading_users_error, responseException, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startLoadUsers();
+                    }
+                });
+            }
+        });
+        requestExecutor.getUserByLogin(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
+            @Override
+            public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                hideProgressDialog();
                 currentOpponentsList1=result;
                 Log.e("result", result.toString());
                 dbManager.saveAllUsers(result, true);
@@ -535,7 +556,6 @@ public void callTo(String callto)
             }
         });
     }
-
     private boolean isCurrentOpponentsListActual(ArrayList<QBUser> actualCurrentOpponentsList) {
         boolean equalActual = actualCurrentOpponentsList.retainAll(currentOpponentsList);
         boolean equalCurrent = currentOpponentsList.retainAll(actualCurrentOpponentsList);
@@ -1223,6 +1243,7 @@ Log.e("resultJson",resultJson);
 
 
             }
+            DashBoardActivity.onResume="yes";
             Log.e("resultJson", resultJson);
         }
         else if (response.getStatusLine().getStatusCode()==500)

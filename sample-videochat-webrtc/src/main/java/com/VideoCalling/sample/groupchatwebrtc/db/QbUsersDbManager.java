@@ -109,9 +109,9 @@ public static ArrayList opponentsNames=new ArrayList();
 
     public void saveAllUsers(ArrayList<QBUser> allUsers, boolean needRemoveOldData) {
         if (needRemoveOldData) {
-
+            clearDB();
         }
-        clearDB();
+
         for (QBUser qbUser : allUsers) {
             saveUser(qbUser);
         }
