@@ -165,6 +165,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
         notification_dialog = new Dialog(this);
         notification_dialog.setCancelable(false);
         dbManager = QbUsersDbManager.getInstance(getApplicationContext());

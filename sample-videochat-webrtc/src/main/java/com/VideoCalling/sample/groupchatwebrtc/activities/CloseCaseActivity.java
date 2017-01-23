@@ -59,10 +59,12 @@ public class CloseCaseActivity extends AppCompatActivity {
             immigrant_name.setText(immigrant.getString("name")+" Immigration Case Status Form");
             if(immigrant.getInt("status")==1)
             {
+                accept_radio.setText("Accepted");
                 Toast.makeText(CloseCaseActivity.this, immigrant.getString("name")+" Immigration Case Accepted", Toast.LENGTH_SHORT).show();
             }
             else if(immigrant.getInt("status")==2)
             {
+                reject_radio.setText("Rejected");
                 Toast.makeText(CloseCaseActivity.this,immigrant.getString("name")+" Immigration Case Rejected", Toast.LENGTH_SHORT).show();
             }
         } catch (JSONException e) {
@@ -98,13 +100,7 @@ public class CloseCaseActivity extends AppCompatActivity {
                 }
                 accept_radio.setChecked(true);
                 updatedStatus = 1;
-                try {
-                    immigrant.put("status", updatedStatus);
-                    Log.e("immigrant", immigrant.toString());
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -116,13 +112,7 @@ public class CloseCaseActivity extends AppCompatActivity {
                 }
                 accept_radio.setChecked(true);
                 updatedStatus = 1;
-                try {
-                    immigrant.put("status", updatedStatus);
-                    Log.e("immigrant", immigrant.toString());
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -135,14 +125,6 @@ public class CloseCaseActivity extends AppCompatActivity {
                 }
                 reject_radio.setChecked(true);
                 updatedStatus=2;
-                try {
-                    immigrant.put("status", updatedStatus);
-                    Log.e("immigrant", immigrant.toString());
-
-                } catch (JSONException e) {
-
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -156,14 +138,7 @@ public class CloseCaseActivity extends AppCompatActivity {
                 }
                 reject_radio.setChecked(true);
                 updatedStatus=2;
-                try {
-                    immigrant.put("status", updatedStatus);
-                    Log.e("immigrant", immigrant.toString());
 
-                } catch (JSONException e) {
-
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -177,7 +152,14 @@ public class CloseCaseActivity extends AppCompatActivity {
                     if(immigrant.getInt("status")==0)
     {
         if (accept_radio.isChecked() || reject_radio.isChecked()) {
+            try {
+                immigrant.put("status", updatedStatus);
+                Log.e("immigrant", immigrant.toString());
 
+            } catch (JSONException e) {
+
+                e.printStackTrace();
+            }
             new CloseCaseStatus(CloseCaseActivity.this, immigrant, CloseCaseActivity.this);
         } else {
             Toast.makeText(CloseCaseActivity.this, "select case status accept or reject...", Toast.LENGTH_SHORT).show();
@@ -210,8 +192,7 @@ public class CloseCaseActivity extends AppCompatActivity {
         } else if (prefs.getInt("userType", -1) == 1) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.solicor_theam_color));
             changeTheam(R.color.solicitor_notifi_color);
-            changeTheam(R.color.solicor_theam_color);
-
+            confirm_case.setBackgroundColor((getResources().getColor(R.color.solicor_theam_color)));
         } else if (prefs.getInt("userType", -1) == 2) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.barrister_theam_color));
             changeTheam(R.color.barrister_notifi_color);
@@ -230,4 +211,9 @@ public class CloseCaseActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        immigrant=null;
+    }
 }
