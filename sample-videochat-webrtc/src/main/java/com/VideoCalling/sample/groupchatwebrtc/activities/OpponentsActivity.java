@@ -76,7 +76,6 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -248,6 +247,10 @@ public void callTo(String callto)
         {
             new InsertVideoLogs().execute();
         }
+        /*if(DashBoardActivity.service.equalsIgnoreCase("yes"))
+        {
+            new InsertVideoLogs().execute();
+        }
         if(DashBoardActivity.service.equalsIgnoreCase("no")) {
 
             selectedArray.clear();
@@ -259,7 +262,7 @@ public void callTo(String callto)
             new getDetailsById().execute();
             new LoginAsyncGetAll().execute();
             startLoadUsers();
-        }
+        }*/
     }
     @Override
     protected void onNewIntent(Intent intent)

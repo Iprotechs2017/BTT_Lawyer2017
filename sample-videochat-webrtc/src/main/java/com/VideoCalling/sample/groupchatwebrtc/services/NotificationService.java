@@ -75,7 +75,7 @@ public class NotificationService extends Service {
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public  void showNotification(String data)
 {
-    Log.e("data-server",data);
+    Log.e("data-server", data);
     String [] split=data.split("-splspli-");
    if(split[1].toString().equalsIgnoreCase("call")) {
        Log.e("data-server-in", data);
@@ -90,6 +90,7 @@ public  void showNotification(String data)
    {
        if(split[2].toString().indexOf("documents...")<0) {
            Intent intent = new Intent(NotificationService.this, NotificationActivity.class);
+           intent.putExtra("id",split[4].toString());
            PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
            Notification noti = new Notification.Builder(NotificationService.this)
                    .setSmallIcon(R.drawable.logo)
@@ -129,8 +130,16 @@ public  void showNotification(String data)
     /** Called when The service is no longer used and is being destroyed */
     @Override
     public void onDestroy() {
-        startService(new Intent(NotificationService.this,NotificationService.class));
-    }
+        SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+
+        if(prefs.getString("service","").equalsIgnoreCase("start")) {
+            startService(new Intent(NotificationService.this, NotificationService.class));
+        }
+        else
+        {
+            mWebSocketClient.close();
+        }
+        }
     private void connectWebSocket() {
         pref = getSharedPreferences("loginDetails", MODE_PRIVATE);
         URI uri;
@@ -167,17 +176,25 @@ public  void showNotification(String data)
 
             @Override
             public void onClose(int i, String s, boolean b) {
-                startService(new Intent(NotificationService.this,NotificationService.class));
-
+               SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+                if(prefs.getString("service","").equalsIgnoreCase("start")) {
+                    startService(new Intent(NotificationService.this, NotificationService.class));
+                }
                // Log.i("Websocket", "Closed " + s);
             }
 
             @Override
             public void onError(Exception e) {
-                startService(new Intent(NotificationService.this,NotificationService.class));
-                //Log.i("Websocket", "Error " + e.getMessage());
+                SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+
+                if(prefs.getString("service","").equalsIgnoreCase("start")) {
+
+                    startService(new Intent(NotificationService.this, NotificationService.class));
+                    //Log.i("Websocket", "Error " + e.getMessage());
+                }
             }
         };
         mWebSocketClient.connect();
     }
+
 }

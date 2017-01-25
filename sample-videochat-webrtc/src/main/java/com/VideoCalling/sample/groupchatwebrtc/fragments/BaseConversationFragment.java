@@ -205,6 +205,7 @@ public abstract class BaseConversationFragment extends Fragment implements CallA
                     handUpVideoCall.setEnabled(false);
                     handUpVideoCall.setActivated(false);
                 //OpponentsActivity.connection = "normal";
+
                     Calendar c = Calendar.getInstance();
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 String formattedDate = df.format(c.getTime());

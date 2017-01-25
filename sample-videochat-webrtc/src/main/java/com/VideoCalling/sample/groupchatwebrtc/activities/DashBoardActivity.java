@@ -1,4 +1,5 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
+
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.Notification;
@@ -50,6 +51,7 @@ import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.adapters.TabsAdaptor;
 import com.VideoCalling.sample.groupchatwebrtc.db.QbUsersDbManager;
 import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
+import com.VideoCalling.sample.groupchatwebrtc.services.NotificationService;
 import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
@@ -89,6 +91,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
 public class DashBoardActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     RecyclerView callsList, notificationsList;
     com.github.clans.fab.FloatingActionButton newNotification;
@@ -106,9 +109,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList videocallDate = new ArrayList();
     public static HashMap userTypeDetailss = new HashMap();
     public static HashMap<Integer, JSONObject> immigrantProfiles = new HashMap<Integer, JSONObject>();
-   public static WebSocketClient mWebSocketClient;
+    public static WebSocketClient mWebSocketClient;
     ArrayList ImmigrantNames = new ArrayList();
-    public static HashMap ImgMapping=new HashMap();
+    public static HashMap ImgMapping = new HashMap();
     RelativeLayout header1, header;
     TextView userName, notification_limit;
     public static ArrayList<VideoLogsModel> videoLogs = new ArrayList<VideoLogsModel>();
@@ -153,11 +156,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static Dialog notification_dialog;
     SharedPreferences.Editor editor;
     private QbUsersDbManager dbManager;
+    int back=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
-        if(getCurrentFocus()!=null) {
+        if (getCurrentFocus() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
@@ -185,10 +190,13 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         sendNotification = (ImageView) notification_dialog.findViewById(R.id.sendNotification);
         header1 = (RelativeLayout) notification_dialog.findViewById(R.id.header1);
         header = (RelativeLayout) notification_dialog.findViewById(R.id.header);
-        if (prefs.getInt("userType", -1)!= 1) {
+        if (prefs.getInt("userType", -1) != 1) {
 
             startLoadUsers();
         }
+        editor.putString("service", "stop");
+        editor.apply();
+        stopService(new Intent(this, NotificationService.class));
         connectWebSocket();
         view_msg = (TextView) notification_dialog.findViewById(R.id.view_msg);
         userName = (TextView) notification_dialog.findViewById(R.id.userName);
@@ -406,37 +414,35 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 //            selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(prefs.getInt("selected", 0)).toString());
         }
     }
-public static void sendNotification()
-{
-    String message = notification_edit_txt.getText().toString();
-    if (prefs.getInt("userType", -1) == 1) {
-        String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
-        mWebSocketClient.send(data);
-    } else if (prefs.getInt("userType", -1) == 2) {
-        String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
-        mWebSocketClient.send(data);
-        String data1 = Integer.parseInt(solicitor.get("id").toString()) + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null);
-        mWebSocketClient.send(data1);
-    }
-    notification_edit_txt.setText("");
-    notification_dialog.dismiss();
 
-}
+    public static void sendNotification() {
+        String message = notification_edit_txt.getText().toString();
+        if (prefs.getInt("userType", -1) == 1) {
+            String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null)+ "-splspli-" + selectedImmigrantId;
+            mWebSocketClient.send(data);
+        } else if (prefs.getInt("userType", -1) == 2) {
+            String data = selectedImmigrantId + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null)+ "-splspli-" + selectedImmigrantId;
+            mWebSocketClient.send(data);
+            String data1 = Integer.parseInt(solicitor.get("id").toString()) + "-splspli-" + "notification" + "-splspli-" + message + "-splspli-" + prefs.getString("name", null)+ "-splspli-" + selectedImmigrantId;
+            mWebSocketClient.send(data1);
+        }
+        notification_edit_txt.setText("");
+        notification_dialog.dismiss();
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         videoLogs.clear();
-        editor.putInt("dashBoard",0);
+        editor.putString("service", "start");
+        editor.putInt("dashBoard", 0);
         editor.apply();
+        mWebSocketClient.close();
+        startService(new Intent(this, NotificationService.class));
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.e("onResume", onResume);
-
-    }
 
     private TextWatcher textWatcher = new TextWatcher() {
 
@@ -603,7 +609,7 @@ public static void sendNotification()
                 spinner.setItems(ImmigrantNames);
                 spinner.setSelectedIndex(prefs.getInt("selected", 0));
                 selectedImmigrantId = Integer.parseInt(ImmigrantIds.get(prefs.getInt("selected", 0)).toString());
-                selectedPersonName=ImmigrantNames.get(prefs.getInt("selected", 0)).toString();
+                selectedPersonName = ImmigrantNames.get(prefs.getInt("selected", 0)).toString();
 
             }
 
@@ -634,7 +640,7 @@ public static void sendNotification()
                     final JSONObject jsonObject = jsonArray.getJSONObject(i);
                     userTypeDetailss.put(jsonObject.getInt("id"), jsonObject.getString("name"));
                     if (jsonObject.getInt("userType") == 0) {
-                        ImgMapping.put(jsonObject.getString("name").toString(),jsonObject.getInt("id"));
+                        ImgMapping.put(jsonObject.getString("name").toString(), jsonObject.getInt("id"));
                         immigrantProfiles.put(jsonObject.getInt("id"), jsonObject);
                         if (ImmigrantIds.size() == 0) {
                             selectedImmigrantId = jsonObject.getInt("id");
@@ -668,7 +674,6 @@ public static void sendNotification()
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
 
 
                     }
@@ -723,7 +728,7 @@ public static void sendNotification()
 
             try {
                 if (prefs.getInt("userType", -1) != 0) {
-                    getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id")+"") + "/callTo/" + selectedImmigrantId, DashBoardActivity.this);
+                    getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id") + "") + "/callTo/" + selectedImmigrantId, DashBoardActivity.this);
                 } else {
                     getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id").toString()) + "/callTo/" + prefs.getInt("userId", -1), DashBoardActivity.this);
                 }
@@ -735,6 +740,8 @@ public static void sendNotification()
 
 
         protected void onPostExecute(Long result) {
+            onResume = "no";
+
         }
     }
 
@@ -758,11 +765,20 @@ public static void sendNotification()
             }
             if (resultJson != null) {
                 try {
-                    onResume="no";
                     videoLogs.clear();
+                    String name;
                     JSONArray jsonArray = new JSONArray(resultJson);
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
+                       /* if(jsonObject.getInt("callFrom")==prefs.getInt("userId",-1))
+                        {
+                            name="Me";
+
+                        }
+                        else
+                        {
+                            name=solicitor.get("name").toString();
+                        }*/
                         if (jsonObject.getString("duration").split(":")[0].equalsIgnoreCase("12")) {
                             VideoLogsModel videoLogsModel = new VideoLogsModel(
                                     jsonObject.getInt("id"),
@@ -800,7 +816,7 @@ public static void sendNotification()
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-refreshVideoLogs();
+                            refreshVideoLogs();
 
                         }
                     });
@@ -808,8 +824,8 @@ refreshVideoLogs();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                  /*          progressDialog.dismiss();
-                            recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+                            progressDialog.dismiss();
+                     /*       recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
                             notificationsList.setHasFixedSize(true);
                             notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
                             notificationsList.setAdapter(recyclerViewAdapter);*/
@@ -846,7 +862,9 @@ refreshVideoLogs();
                     videoLogs.clear();
                     refreshVideoLogs();
                     progressDialog.dismiss();
+if(!onResume.equalsIgnoreCase("yes")){
                     Toast.makeText(DashBoardActivity.this, "Video calls data not available...", Toast.LENGTH_SHORT).show();
+                }
                 }
             });
         } else if (response.getStatusLine().getStatusCode() == 500) {
@@ -864,21 +882,20 @@ refreshVideoLogs();
 
         //Log.e("result", resultJson);
     }
-public void refreshVideoLogs()
-{
-    try {
-        Collections.reverse(videoLogs);
-        videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
-        LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
-        callsList.setLayoutManager(recylerViewLayoutManager);
-        callsList.setHasFixedSize(true);
-        callsList.setAdapter(videoCallAdapter);
-    }
-    catch (Exception e)
-    {
 
+    public void refreshVideoLogs() {
+        try {
+            Collections.reverse(videoLogs);
+            videoCallAdapter = new VideocallAdapter(DashBoardActivity.this, videoLogs);
+            LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(DashBoardActivity.this);
+            callsList.setLayoutManager(recylerViewLayoutManager);
+            callsList.setHasFixedSize(true);
+            callsList.setAdapter(videoCallAdapter);
+        } catch (Exception e) {
+
+        }
     }
-    }
+
     public void postAPICall(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         Log.e("strurl", strurl);
@@ -913,8 +930,14 @@ public void refreshVideoLogs()
                         JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
                         msgs.add(jsonObject.getString("notification"));
                         //   senderNames.add(OpponentsActivity.OpponentNames.get(OpponentsActivity.OpponentIds.indexOf(jsonObject.getString("sentBy"))));
-                        notificationSenderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
-                        notificationSentDates.add(jsonObject.getString("sentDate"));
+                      /* if(Integer.parseInt(jsonObject.getString("sentBy"))==prefs.getInt("userId", -1)) {
+                           notificationSenderNames.add("Me");
+                       }
+                        else
+                       {*/
+                           notificationSenderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
+                       //}
+                           notificationSentDates.add(jsonObject.getString("sentDate"));
                     }
                     if (resultJson != null) {
 
@@ -962,19 +985,20 @@ public void refreshVideoLogs()
 
         //Log.e("result", resultJson);
     }
-public void clearNotification()
-{
-    msgs.clear();
-    notificationSenderNames.clear();
-    notificationSentDates.clear();
-}
-    public  void refreshNotifications()
-    {
+
+    public void clearNotification() {
+        msgs.clear();
+        notificationSenderNames.clear();
+        notificationSentDates.clear();
+    }
+
+    public void refreshNotifications() {
         recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
         notificationsList.setHasFixedSize(true);
         notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
         notificationsList.setAdapter(recyclerViewAdapter);
     }
+
     class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
         ArrayList msgs, senderNames, sentDates;
@@ -1111,7 +1135,7 @@ public void clearNotification()
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            if(videoLogs.size()>0) {
+            if (videoLogs.size() > 0&& videoLogs.size()>position) {
                 if (videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name())) {
                     holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
                 } else {
@@ -1134,9 +1158,17 @@ public void clearNotification()
 
         @Override
         public int getItemCount() {
-            int size=0;
-            if(videoLogs.size()>0) {
-                size=3;
+            int size = 0;
+            if (videoLogs.size() < 3&&videoLogs.size() != 0) {
+                size = videoLogs.size();
+            }
+            else if(videoLogs.size() > 3)
+            {
+                size = 3;
+            }
+            else if(videoLogs.size() == 0)
+            {
+                size = 0;
             }
             return size;
         }
@@ -1159,13 +1191,9 @@ public void clearNotification()
                 String data = userId + "-splspli-" + "reg";
                 try {
                     mWebSocketClient.send(data);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
 
             @Override
@@ -1184,7 +1212,7 @@ public void clearNotification()
                     String[] split = message.split("-splspli-");
                     //  Log.e("datata", split[3].toString() + "<--->" + split[2].toString());
                     if (split[2].toString().indexOf("documents...") < 0) {
-                        if(split[2].toString().trim().length()>0) {
+                        if (split[2].toString().trim().length() > 0) {
                             Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
                             PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                             Notification noti = new Notification.Builder(DashBoardActivity.this)
@@ -1231,20 +1259,25 @@ public void clearNotification()
             public void onClose(int i, String s, boolean b)
 
             {
-                connectWebSocket();
+                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
+
+                    connectWebSocket();
+                }
                 Log.i("Websocket", "Closed " + s);
             }
 
             @Override
             public void onError(Exception e) {
+                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
 
-                connectWebSocket();
-
+                    connectWebSocket();
+                }
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };
         mWebSocketClient.connect();
     }
+
     private void startLoadUsers() {
         requestExecutor.loadUsersByTag(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
             @Override
@@ -1265,17 +1298,24 @@ public void clearNotification()
     @Override
     protected void onPause() {
         super.onPause();
-        editor.putInt("dashBoard",0);
-        editor.apply();
+       //
 
+        editor.putString("service","start");
+        editor.putInt("dashBoard", 0);
+        editor.apply();
+        mWebSocketClient.close();
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        editor.putInt("dashBoard",1);
+        Log.e("on resume","resume");
+        editor.putInt("dashBoard", 1);
+        editor.putString("service", "stop");
         editor.apply();
-
+        stopService(new Intent(this, NotificationService.class));
+        connectWebSocket();
         if (docRelode.equalsIgnoreCase("yes")) {
             Bundle bundle = new Bundle();
             bundle.putString("yes", "no");
@@ -1288,8 +1328,10 @@ public void clearNotification()
             transaction.commit();
             docRelode = "no";
         }
-        if(onResume.equalsIgnoreCase("yes")) {
-            new VideoCallLogs().execute();
+        if (onResume.equalsIgnoreCase("yes")) {
+
+            new DownloadFilesTask().execute();
         }
+        new VideoCallLogs().execute();
     }
-  }
+}

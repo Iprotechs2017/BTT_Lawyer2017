@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
+import com.VideoCalling.sample.groupchatwebrtc.services.NotificationService;
 import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
@@ -83,10 +84,21 @@ public class NotificationActivity extends AppCompatActivity {
     Dialog notification_dialog;
     de.hdodenhof.circleimageview.CircleImageView call, notification, logout;
     WebSocketClient mWebSocketClient;
+    int userId;
+int back=0;
+    SharedPreferences.Editor editor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+     if(getIntent().getStringExtra("id")!=null)
+     {
+         userId=Integer.parseInt(getIntent().getStringExtra("id"));
+     }
+        else
+     {
+         userId=DashBoardActivity.selectedImmigrantId;
+     }
         notification_dialog = new Dialog(this);
         notification_dialog.setCancelable(false);
         notification_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -101,6 +113,7 @@ public class NotificationActivity extends AppCompatActivity {
         view_msg.setVisibility(View.VISIBLE);
         userName.setVisibility(View.VISIBLE);
         time_stamp.setVisibility(View.VISIBLE);
+int back=0;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Notifications");
         connectWebSocket();
@@ -129,6 +142,11 @@ public class NotificationActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("loading...");
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+        editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();
+        editor.putString("service", "stop");
+        editor.apply();
+        connectWebSocket();
+        stopService(new Intent(this, NotificationService.class));
         if (prefs.getInt("userType", -1) == 0) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.immigrant_theam_color));
             changeTheam(R.color.immigrant_notifi_color);
@@ -288,7 +306,15 @@ public class NotificationActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
                     msgs.add(jsonObject.getString("notification"));
                     //   senderNames.add(OpponentsActivity.OpponentNames.get(OpponentsActivity.OpponentIds.indexOf(jsonObject.getString("sentBy"))));
-                    senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
+                    /*if(Integer.parseInt(jsonObject.getString("sentBy"))==prefs.getInt("userId", -1)) {
+                        senderNames.add("You");
+                    }
+                    else
+                    {*/
+                        senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
+                    //}
+
+                 //   senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
                     sentDates.add(jsonObject.getString("sentDate"));
                 }
                 runOnUiThread(new Runnable() {
@@ -325,15 +351,53 @@ public class NotificationActivity extends AppCompatActivity {
         //Log.e("result", resultJson);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        back=1;
+        editor.putString("service", "stop");
+        editor.apply();
+        stopService(new Intent(this, NotificationService.class));
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        editor.putString("service", "stop");
+        editor.apply();
+        stopService(new Intent(this, NotificationService.class));
+        connectWebSocket();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+   /*     if(back==0) {
+            editor.putString("service", "start");
+            editor.apply();
+            mWebSocketClient.close();
+            startService(new Intent(this, NotificationService.class));
+        }*/
+        }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+   /*     editor.putString("service", "start");
+        editor.apply();
+        mWebSocketClient.close();
+        startService(new Intent(this, NotificationService.class));*/
+        DashBoardActivity.onResume="yes";
+    }
+
     private class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
         ProgressDialog progressDialog;
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
         }
-
         protected Long doInBackground(URL... urls) {
             Long aLong = Long.valueOf(1);
 
@@ -344,7 +408,7 @@ public class NotificationActivity extends AppCompatActivity {
                     //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
                     postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1), NotificationActivity.this);
                 } else {
-                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + DashBoardActivity.selectedImmigrantId, NotificationActivity.this);
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" +userId, NotificationActivity.this);
                 }
 
             } catch (Exception e) {
@@ -498,6 +562,7 @@ public class NotificationActivity extends AppCompatActivity {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void createNotification(String message) {
                 try {
+                    connectWebSocket();
                     // Log.e("data", message);
                     String[] split = message.split("-splspli-");
                     if (split[2].toString().indexOf("documents...") < 0) {
@@ -517,15 +582,19 @@ public class NotificationActivity extends AppCompatActivity {
             public void onClose(int i, String s, boolean b)
 
             {
-                connectWebSocket();
-                Log.i("Websocket", "Closed " + s);
+                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
+
+                    connectWebSocket();
+                    Log.i("Websocket", "Closed " + s);
+                }
             }
 
             @Override
             public void onError(Exception e) {
+                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
 
-                connectWebSocket();
-
+                    connectWebSocket();
+                }
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };

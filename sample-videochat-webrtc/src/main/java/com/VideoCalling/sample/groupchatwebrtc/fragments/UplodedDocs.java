@@ -1,5 +1,4 @@
 package com.VideoCalling.sample.groupchatwebrtc.fragments;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -78,6 +77,8 @@ ProgressDialog progressDialog;
         userId1=Integer.parseInt(getArguments().getString("userId"));
         View view= inflater.inflate(R.layout.docs_custom_tabs_layout, container, false);
         progressDialog=new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
+
         if(limitornot.equalsIgnoreCase("full")) {
             progressDialog.setCancelable(false);
         }
@@ -381,6 +382,7 @@ if(userId1==0)
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            progressDialog.dismiss();
                             Toast.makeText(context, "data not available...", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -393,6 +395,7 @@ if(userId1==0)
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressDialog.dismiss();
                         Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -404,6 +407,7 @@ if(userId1==0)
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    progressDialog.dismiss();
                     Toast.makeText(getActivity(), "Documents not available...", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -413,6 +417,7 @@ if(userId1==0)
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressDialog.dismiss();
                         Toast.makeText(context, "server is busy try again...!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -478,8 +483,19 @@ if(userId1==0)
             SimpleDateFormat postFormater = new SimpleDateFormat("MMMM dd, yyyy");
             String newDateStr = postFormater.format(date);
           // String date=jsonObject.getString("sharedDate").split("T")[0]+" "+jsonObject.getString("sharedDate").split("T")[1];
-            DocumentDetails documentsDetailsWithIds=new DocumentDetails(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("docType"),newDateStr+" "+_12HourSDF.format(_24HourDt), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
+         /*   if(jsonObject.getInt("uploadedTo")==prefs.getInt("userId",-1)) {
+                DocumentDetails documentsDetailsWithIds = new DocumentDetails(jsonObject.getInt("id"), jsonObject.getString("name"), jsonObject.getString("docType"), newDateStr + " " + _12HourSDF.format(_24HourDt), "You");
+                DocumentDetailsArray.add(documentsDetailsWithIds);
+            }
+            else
+            {
+                DocumentDetails documentsDetailsWithIds = new DocumentDetails(jsonObject.getInt("id"), jsonObject.getString("name"), jsonObject.getString("docType"), newDateStr + " " + _12HourSDF.format(_24HourDt), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
+                DocumentDetailsArray.add(documentsDetailsWithIds);
+            }*/
+            DocumentDetails documentsDetailsWithIds = new DocumentDetails(jsonObject.getInt("id"), jsonObject.getString("name"), jsonObject.getString("docType"), newDateStr + " " + _12HourSDF.format(_24HourDt), DashBoardActivity.userTypeDetailss.get(jsonObject.getInt("uploadedTo")).toString());
             DocumentDetailsArray.add(documentsDetailsWithIds);
+
+
             //  }
 
         } catch (Exception e)
@@ -488,6 +504,7 @@ if(userId1==0)
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    progressDialog.dismiss();
                     Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -499,6 +516,7 @@ if(userId1==0)
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressDialog.dismiss();
                         Toast.makeText(context, "server is busy try again...!", Toast.LENGTH_SHORT).show();
                     }
                 });

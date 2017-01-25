@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -174,13 +175,21 @@ public class VideoCallsActivity extends AppCompatActivity {
             Log.e("userTypeDetailss",userTypeDetailss.toString());
             if (resultJson != null) {
                 try {
-
+String name;
                     JSONArray jsonArray=new JSONArray(resultJson);
                     videoLogs.clear();
                     for (int i=0;i<=jsonArray.length()-1;i++)
                     {
                         JSONObject jsonObject=jsonArray.getJSONObject(i);
+                       /* if(jsonObject.getInt("callFrom")==prefs.getInt("userId",-1))
+                        {
+                            name="Me";
 
+                        }
+                        else
+                        {
+                            name=DashBoardActivity.solicitor.get("name").toString();
+                        }*/
                         if(jsonObject.getString("duration").split(":")[0].equalsIgnoreCase("12")) {
                             VideoLogsModel videoLogsModel = new VideoLogsModel(
                                     jsonObject.getInt("id"),
@@ -291,10 +300,11 @@ public class VideoCallsActivity extends AppCompatActivity {
 
             public TextView callerName, videoName, callDate;
             LinearLayout share_and_down,parent;
+           ImageView ic_img;
             public ViewHolder(View v) {
 
                 super(v);
-
+                ic_img= (ImageView) v.findViewById(R.id.ic_img);
                 callerName = (TextView) v.findViewById(R.id.callerName);
                 videoName = (TextView) v.findViewById(R.id.videoName);
                 callDate = (TextView) v.findViewById(R.id.callDate);
@@ -315,13 +325,12 @@ public class VideoCallsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            if(videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name()))
-            {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
-            }
-            else
-            {
-                holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name()+"&"+videoLogs.get(position).getCallTo2Name());
+            if (videoLogs.size() > 0&& videoLogs.size()>position) {
+                if (videoLogs.get(position).getCallTo2Name().equalsIgnoreCase(videoLogs.get(position).getCallTo1Name())) {
+                    holder.videoName.setText(videoLogs.get(position).getCallFromName() + "&" + videoLogs.get(position).getCallTo2Name());
+                } else {
+                    holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name() + "&" + videoLogs.get(position).getCallTo2Name());
+                }
             }
             holder.callDate.setText(videoLogs.get(position).getDay().toString());
             holder.share_and_down.setVisibility(View.GONE);
@@ -339,8 +348,21 @@ public class VideoCallsActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
+            int size = 0;
+            if (videoLogs.size() < 3&&videoLogs.size() != 0) {
+                size = videoLogs.size();
+            }
+            else if(videoLogs.size() > 3)
+            {
+                size = 3;
+            }
+            else if(videoLogs.size() == 0)
+            {
+                size = 0;
+            }
+            return size;
 
-            return videoLogs.size();
+
         }
     }
 }

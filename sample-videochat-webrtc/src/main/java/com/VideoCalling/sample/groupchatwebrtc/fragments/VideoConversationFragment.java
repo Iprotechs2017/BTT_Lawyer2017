@@ -433,12 +433,13 @@ ProgressDialog progressDialog;
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mMediaRecorder.reset();
+
+      /*  mMediaRecorder.reset();
         mMediaRecorder.release();
 
 
         // once the objects have been released they can't be reused
-        mMediaRecorder= null;
+        mMediaRecorder= null;*/
 
     }
 
@@ -935,19 +936,7 @@ ProgressDialog progressDialog;
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession session, Integer userId) {
         Log.e("callaccepted","onReceiveHangUpFromUser");
-        if (OpponentsActivity.connection.equalsIgnoreCase("reconnect"))
-        {
 
-        }
-        else {
-            Calendar c = Calendar.getInstance();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
-            DashBoardActivity.service = "yes";
-            Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
-            DashBoardActivity.endtime = formattedDate;
-            DashBoardActivity.onResume="yes";
-        }
         setStatusForOpponent(userId, getString(R.string.text_status_hang_up));
         Log.e(TAG, "onReceiveHangUpFromUser userId= " + userId);
         if (!isPeerToPeerCall) {
@@ -1139,12 +1128,17 @@ if(OpponentsActivity.callType.equalsIgnoreCase("imm"))
         MenuItem item = menu.findItem(R.id.invite);
         if (prefs.getInt("userType", -1) == 1) {
             item.setVisible(true);
+            if(DashBoardActivity.callTo1!=DashBoardActivity.callTo2)
+            {
+                item.setVisible(false);
+
+            }
+
         }
         else
         {
             item.setVisible(false);
         }
-
         super.onCreateOptionsMenu(menu, inflater);
 
     }

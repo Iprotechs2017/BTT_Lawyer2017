@@ -75,7 +75,9 @@ import org.webrtc.VideoCapturerAndroid;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -900,6 +902,23 @@ public class CallActivity extends BaseActivity implements QBRTCClientSessionCall
     @Override
        protected void onDestroy() {
         super.onDestroy();
+        if (OpponentsActivity.connection.equalsIgnoreCase("reconnect"))
+        {
+
+        }
+        else {
+            SharedPreferences  prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
+
+           if(prefs.getInt("userType",-1)==1) {
+    Calendar c = Calendar.getInstance();
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    String formattedDate = df.format(c.getTime());
+    DashBoardActivity.service = "yes";
+    Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
+    DashBoardActivity.endtime = formattedDate;
+    DashBoardActivity.onResume = "yes";
+           }
+           }
        /* try {
       if(OpponentsActivity.connection.equalsIgnoreCase("reconnect")) {
 

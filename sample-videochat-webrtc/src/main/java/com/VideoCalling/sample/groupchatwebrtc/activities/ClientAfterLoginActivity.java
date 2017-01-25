@@ -126,7 +126,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
         info= (TextView) findViewById(R.id.info);
         progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
         progress.setContentView(R.layout.file_uplode_progress_dialog);
-        connectWebSocket();
+
         progress.setCancelable(false);
         startLoadUsers();
         progressBar = (ProgressBar) progress.findViewById(R.id.progressBar);
@@ -579,8 +579,10 @@ public class ClientAfterLoginActivity extends BaseActivity {
                             new LoginAsync().execute();
                         } else {
                             progressDialog.dismiss();
+                            connectWebSocket();
                             String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getInt("userId",-1);
                             mWebSocketClient.send(data);
+                            mWebSocketClient.close();
                             //Toast.makeText(ClientAfterLoginActivity.this, "All files are uploded successfully...!", Toast.LENGTH_SHORT).show();
                             new AlertDialog.Builder(ClientAfterLoginActivity.this)
                                     .setMessage("All files are uploded successfully")
