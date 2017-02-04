@@ -36,7 +36,6 @@ android {
         }
     }
 
-
     buildTypes {
         debug {
             resValue "string", "versionName", "QuickBlox WebRTC\nBuild version " + defaultConfig.getVersionName()
@@ -61,6 +60,20 @@ android {
     lintOptions {
         abortOnError false
     }
+    packagingOptions {
+
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+
+    }
 }
 repositories {
     maven { url 'http://yanzm.github.io/MaterialTabHost/repository' }
@@ -70,6 +83,7 @@ buildscript {
         jcenter()
     }
 }
+
 allprojects {
     repositories {
 
@@ -100,7 +114,8 @@ dependencies {
     compile 'com.github.mancj:SlideUp-Android:1.0-beta'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.github.clans:fab:1.6.4'
+    compile 'com.snappydb:snappydb-lib:0.5.2'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile files('libs/android-viewbadger.jar')
 }
-
 apply from: "../artifacts.gradle"

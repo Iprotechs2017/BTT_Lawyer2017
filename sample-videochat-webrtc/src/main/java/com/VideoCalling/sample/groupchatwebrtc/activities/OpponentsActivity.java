@@ -55,6 +55,7 @@ import com.VideoCalling.sample.groupchatwebrtc.utils.PushNotificationSender;
 import com.VideoCalling.sample.groupchatwebrtc.utils.UserType;
 import com.VideoCalling.sample.groupchatwebrtc.utils.WebRtcSessionManager;
 import com.crashlytics.android.Crashlytics;
+import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.sample.core.utils.SharedPrefsHelper;
@@ -76,6 +77,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,14 +104,14 @@ public class OpponentsActivity extends BaseActivity {
     private static final long ON_ITEM_CLICK_DELAY = TimeUnit.SECONDS.toMillis(10);
     Toolbar toolbar;
     Long timeStamp;
-    WebSocketClient mWebSocketClient;
+    public static WebSocketClient mWebSocketClient;
     de.hdodenhof.circleimageview.CircleImageView reload;
     String videoPath = null;
-    int NOTIFICATION_ID=1;
+    int NOTIFICATION_ID = 1;
     Dialog requestDialog;
-    public static List selectedArray=new ArrayList();
+    public static List selectedArray = new ArrayList();
     RelativeLayout bar_reg;
-    ArrayList<Integer> opponentsList=new ArrayList<Integer>();
+    ArrayList<Integer> opponentsList = new ArrayList<Integer>();
     public static HashMap userTypeDetails;
     public static ArrayList OpponentNames = new ArrayList();
     public static ArrayList OpponentIds = new ArrayList();
@@ -119,18 +121,18 @@ public class OpponentsActivity extends BaseActivity {
     public static ArrayList<QBUser> currentOpponentsList;
     private ArrayList<QBUser> currentOpponentsList1;
     private ArrayList<QBUser> OpponentsList;
-    public static ArrayList callTo=new ArrayList();
+    public static ArrayList callTo = new ArrayList();
     public static String callType;
     public static int onlineUser;
     EditText msgEdt;
-    Button send,close;
-    String message=null;
+    Button send, close;
+    String message = null;
     protected QBResRequestExecutor requestExecutor;
     private QbUsersDbManager dbManager;
     public static ArrayList<Integer> selected = new ArrayList<Integer>();
     public static ArrayList<UserType> userType = new ArrayList<UserType>();
     SharedPreferences qb;
-    String callto="";
+    String callto = "";
     public static String connection = "normal";
     String deleteBarister = "http://api.androidhive.info/volley/person_object.json";
     private boolean isRunForCall;
@@ -145,13 +147,13 @@ public class OpponentsActivity extends BaseActivity {
     ImageView back;
     private static final String TAG = "MainActivity";
     LinearLayout bar_after_login;
-        HashMap baristerQB=new HashMap();
+    HashMap baristerQB = new HashMap();
     public static de.hdodenhof.circleimageview.CircleImageView bar_remove;
     public static ImageView bar_call;
-    String type="";
+    String type = "";
 
-    RelativeLayout  bar_reg_lay,parent;
-    public static String  baristerName,baristerId;
+    RelativeLayout bar_reg_lay, parent;
+    public static String baristerName, baristerId;
 
 
     public static void start(Context context, boolean isRunForCall) {
@@ -164,29 +166,29 @@ public class OpponentsActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        connectWebSocket();
+        createSession();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_opponents);
-        parent= (RelativeLayout) findViewById(R.id.parent);
+        parent = (RelativeLayout) findViewById(R.id.parent);
         if (prefs.getInt("userType", -1) == 0) {
-        parent.setVisibility(View.GONE);
-        }
-        else
-        {
+            parent.setVisibility(View.GONE);
+        } else {
             parent.setVisibility(View.VISIBLE);
         }
-            requestExecutor = App.getInstance().getQbResRequestExecutor();
-        userTypeDetails=new HashMap();
+        requestExecutor = App.getInstance().getQbResRequestExecutor();
+        userTypeDetails = new HashMap();
         qb = getSharedPreferences("QB", MODE_PRIVATE);
-        connectWebSocket();
+
         initFields();
         initDefaultActionBar();
         initUi();
         if (isRunForCall && webRtcSessionManager.getCurrentSession() != null) {
 
-                CallActivity.start(OpponentsActivity.this, true);
+            CallActivity.start(OpponentsActivity.this, true);
         }
-       // scribeFromPushes();
+        // scribeFromPushes();
         checker = new PermissionsChecker(getApplicationContext());
         bar_after_login = (LinearLayout) findViewById(R.id.bar_after_login);
         bar_name = (TextView) findViewById(R.id.bar_name);
@@ -196,38 +198,55 @@ public class OpponentsActivity extends BaseActivity {
             startLoadUsers();
         }
     }
-        public static void hideBarrister()
-        {
-            bar_call.setVisibility(View.INVISIBLE);
-         //   bar_remove.setVisibility(View.INVISIBLE);
-        }
-        public static void showBarrister()
-    {
+
+    public static void hideBarrister() {
+        bar_call.setVisibility(View.INVISIBLE);
+        //   bar_remove.setVisibility(View.INVISIBLE);
+    }
+
+    public static void showBarrister() {
         bar_call.setVisibility(View.VISIBLE);
-     //   bar_remove.setVisibility(View.VISIBLE);
+        //   bar_remove.setVisibility(View.VISIBLE);
     }
-        private void scribeFromPushes() {
+
+    private void scribeFromPushes() {
         googlePlayServicesHelper.registerInGcmInBackground(Consts.GCM_SENDER_ID);
-        }
-public void callTo(String callto)
-{
-
-    if (callto.equalsIgnoreCase("sol")) {
-        startCall(true);
-        startPermissionsActivity(false);
-    } else if (callto.equalsIgnoreCase("bar")) {
-        Log.e("error", "error");
-        //callTo
-        if (baristerQB.get("id").toString() != null) {
-            callBarister(Integer.parseInt(baristerQB.get("id").toString()), baristerQB.get("name").toString());
-        }
-        else
-        {
-            Toast.makeText(this, "Barrister not registered...", Toast.LENGTH_SHORT).show();
-        }
-
     }
-}
+
+    private void createSession() {
+        App.getInstance().getQbResRequestExecutor().createSession(new QBEntityCallback<QBSession>() {
+            @Override
+            public void onSuccess(QBSession qbSession, Bundle params) {
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+                showSnackbarError(null, R.string.splash_create_session_error, e, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        createSession();
+                    }
+                });
+            }
+        });
+    }
+
+    public void callTo(String callto) {
+
+        if (callto.equalsIgnoreCase("sol")) {
+            startCall(true);
+            startPermissionsActivity(false);
+        } else if (callto.equalsIgnoreCase("bar")) {
+            Log.e("error", "error");
+            //callTo
+            if (baristerQB.get("id").toString() != null) {
+                callBarister(Integer.parseInt(baristerQB.get("id").toString()), baristerQB.get("name").toString());
+            } else {
+                Toast.makeText(this, "Barrister not registered...", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -240,13 +259,12 @@ public void callTo(String callto)
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
-        if(DashBoardActivity.service.equalsIgnoreCase("yes"))
-        {
+        if (DashBoardActivity.service.equalsIgnoreCase("yes")) {
             new InsertVideoLogs().execute();
         }
+        connectWebSocket();
         /*if(DashBoardActivity.service.equalsIgnoreCase("yes"))
         {
             new InsertVideoLogs().execute();
@@ -264,9 +282,9 @@ public void callTo(String callto)
             startLoadUsers();
         }*/
     }
+
     @Override
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent.getExtras() != null) {
             isRunForCall = intent.getExtras().getBoolean(Consts.EXTRA_IS_STARTED_FOR_CALL);
@@ -277,17 +295,15 @@ public void callTo(String callto)
     }
 
     @Override
-    protected void onDestroy()
-    {
-        DashBoardActivity.onResume="yes";
+    protected void onDestroy() {
+        DashBoardActivity.onResume = "yes";
         super.onDestroy();
         hideProgressDialog();
 
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
 
 
@@ -336,27 +352,7 @@ public void callTo(String callto)
                 });
             }
         });
-        requestExecutor.getUserByLogin(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
-            @Override
-            public void onSuccess(ArrayList<QBUser> result, Bundle params) {
-                hideProgressDialog();
-                currentOpponentsList1=result;
-                Log.e("result", result.toString());
-                dbManager.saveAllUsers(result, true);
-                initUsersList();
-            }
 
-            @Override
-            public void onError(QBResponseException responseException) {
-                hideProgressDialog();
-                showErrorSnackbar(R.string.loading_users_error, responseException, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startLoadUsers();
-                    }
-                });
-            }
-        });
     }
 
     private void initUi() {
@@ -365,8 +361,8 @@ public void callTo(String callto)
         makeCall = (ImageView) findViewById(R.id.videocall);
 
         show_notifications = (ImageView) findViewById(R.id.show_notifications);
-        bar_call= (ImageView) findViewById(R.id.bar_call);
-        reload= (CircleImageView) findViewById(R.id.reload);
+        bar_call = (ImageView) findViewById(R.id.bar_call);
+        reload = (CircleImageView) findViewById(R.id.reload);
         reload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -379,17 +375,15 @@ public void callTo(String callto)
             @Override
             public void onClick(View v) {
                 connection = "normal";
-                callto="bar";
+                callto = "bar";
                 try {
                     callTo(callto);
-                    DashBoardActivity.callTo1=Integer.parseInt(userTypeDetails.get("id").toString());
-                    DashBoardActivity.callTo2=Integer.parseInt(userTypeDetails.get("id").toString());
-                    String data=userTypeDetails.get("id").toString()+"-splspli-"+"call";
+                    DashBoardActivity.callTo1 = Integer.parseInt(userTypeDetails.get("id").toString());
+                    DashBoardActivity.callTo2 = Integer.parseInt(userTypeDetails.get("id").toString());
+                    String data = userTypeDetails.get("id").toString() + "-splspli-" + "call";
                     mWebSocketClient.send(data);
 
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -404,22 +398,22 @@ public void callTo(String callto)
         bar_reg = (RelativeLayout) findViewById(R.id.bar_reg_lay);
         Log.e("yesss", prefs.getInt("userType", 0) + "");
         if (prefs.getInt("userType", 0) == 1) {
-           bar_reg.setVisibility(View.VISIBLE);
+            bar_reg.setVisibility(View.VISIBLE);
             makeCall.setVisibility(View.VISIBLE);
         } else {
             show_notifications.setVisibility(View.GONE);
-          bar_reg.setVisibility(View.GONE);
+            bar_reg.setVisibility(View.GONE);
             makeCall.setVisibility(View.GONE);
         }
         bar_reg_lay = (RelativeLayout) findViewById(R.id.req_doc_parent);
         if (prefs.getInt("userType", 0) == 2) {
-           bar_reg_lay.setVisibility(View.VISIBLE);
+            bar_reg_lay.setVisibility(View.VISIBLE);
         } else {
             bar_reg_lay.setVisibility(View.GONE);
         }
         screen_title = (TextView) findViewById(R.id.screen_title);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        back= (ImageView) findViewById(R.id.back);
+        back = (ImageView) findViewById(R.id.back);
         back.setVisibility(View.VISIBLE);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -447,7 +441,7 @@ public void callTo(String callto)
         notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                notificationDialog( Integer.parseInt(userTypeDetails.get("id").toString()));
+                notificationDialog(Integer.parseInt(userTypeDetails.get("id").toString()));
             }
         });
         bar_registration.setOnClickListener(new View.OnClickListener() {
@@ -482,54 +476,61 @@ public void callTo(String callto)
         makeCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(selectedArray.size()>0) {
-                    new AlertDialog.Builder(OpponentsActivity.this)
-                            .setMessage("Add barrister in the call?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    connection = "normal";
-                                    callto="sol";
-                                    type="group";
-                                    DashBoardActivity.callTo2=Integer.parseInt(userTypeDetails.get("id").toString());
+                if (selectedArray.size() > 0) {
+                    if(baristerQB.size()>0) {
+                        new AlertDialog.Builder(OpponentsActivity.this)
+                                .setMessage("Add barrister in the call?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        connection = "normal";
+                                        callto = "sol";
+                                        type = "group";
+                                        DashBoardActivity.callTo2 = Integer.parseInt(userTypeDetails.get("id").toString());
+                                        String data = DashBoardActivity.callTo2 + "-splspli-" + "call";
+                                        mWebSocketClient.send(data);
 
-                                    try {
-                                        callTo(callto);
+                                        try {
+                                            callTo(callto);
+                                        } catch (Exception e) {
+                                        }
+                                        startService(new Intent(OpponentsActivity.this, MyService.class));
+                                        startCall(true);
+                                        startPermissionsActivity(false);
                                     }
-                                    catch (Exception e)
-                                    {
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        connection = "normal";
+                                        callto = "sol";
+                                        type = "single";
+
+                                        try {
+                                            callTo(callto);
+                                        } catch (Exception e) {
+
+                                        }
                                     }
-                                    startService(new Intent(OpponentsActivity.this, MyService.class));
-                                    startCall(true);
-                                    startPermissionsActivity(false);
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    connection = "normal";
-                                    callto="sol";
-                                    type="single";
+                                })
+                                .setCancelable(false)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
 
-                                    try {
-                                        callTo(callto);
-                                    }
-                                    catch (Exception e)
-                                    {
+                    }
+                    else
+                    {
+                        connection = "normal";
+                        callto = "sol";
+                        type = "single";
 
-                                    }
-                                }
-                            })
-                            .setCancelable(false)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
+                        try {
+                            callTo(callto);
+                        } catch (Exception e) {
 
-
-                }
-                else if(selected.size()>1)
-                {
+                        }
+                    }
+                } else if (selected.size() > 1) {
                     Toast.makeText(OpponentsActivity.this, "please select only one immigrant...", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(OpponentsActivity.this, "please select a immigrant to call...", Toast.LENGTH_SHORT).show();
                 }
 
@@ -559,6 +560,7 @@ public void callTo(String callto)
             }
         });
     }
+
     private boolean isCurrentOpponentsListActual(ArrayList<QBUser> actualCurrentOpponentsList) {
         boolean equalActual = actualCurrentOpponentsList.retainAll(currentOpponentsList);
         boolean equalCurrent = currentOpponentsList.retainAll(actualCurrentOpponentsList);
@@ -573,41 +575,59 @@ public void callTo(String callto)
                 return;
             }
         }
-           proceedInitUsersList();
+        proceedInitUsersList();
     }
-    public void changeTheam(int color)
-    {
+
+    public void changeTheam(int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(getResources().getColor(color));
         }
     }
+
     private void proceedInitUsersList() {
         currentOpponentsList = currentOpponentsList1;
-        Log.e("barister",currentOpponentsList.toString()+"--"+currentOpponentsList.size());
-        for(int i=0;i<=currentOpponentsList.size()-1;i++)
-        {
-            Log.e("yeee",currentOpponentsList.get(i).getFullName().toString()+"---"+(baristerName));
+        Log.e("barister", currentOpponentsList.toString() + "--" + currentOpponentsList.size());
+        for (int i = 0; i <= currentOpponentsList.size() - 1; i++) {
+            //Log.e("yeee",currentOpponentsList.get(i).getFullName().toString()+"---"+(baristerName));
 
-            if(currentOpponentsList.get(i).getFullName().toString().equalsIgnoreCase(baristerName))
-            {
-                baristerQB.put("id",currentOpponentsList.get(i).getId());
-                baristerQB.put("name",currentOpponentsList.get(i).getFullName());
+            if (currentOpponentsList.get(i).getFullName().toString().equalsIgnoreCase(baristerName)) {
+                baristerQB.put("id", currentOpponentsList.get(i).getId());
+                baristerQB.put("name", currentOpponentsList.get(i).getFullName());
                 currentOpponentsList.remove(i);
-                Log.e("baristerQB",baristerQB.toString());
+                // Log.e("baristerQB",baristerQB.toString());
+                    bar_call.setVisibility(View.VISIBLE);
             }
 
         }
-
-        for(int i=0;i<=currentOpponentsList.size()-1;i++)
-        {
-            if(currentOpponentsList.get(i).getFullName().toString().equalsIgnoreCase(prefs.getString("name",null)))
-            {
-                 currentOpponentsList.remove(i);
-                 Log.e("currentOpponenList--->",i+"-"+currentOpponentsList.toString()+"-"+currentOpponentsList.size());
+        for (int i = 0; i <= currentOpponentsList.size() - 1; i++) {
+            if (currentOpponentsList.get(i).getFullName().toString().equalsIgnoreCase(prefs.getString("name", null))) {
+                currentOpponentsList.remove(i);
+                //Log.e("currentOpponenList--->",i+"-"+currentOpponentsList.toString()+"-"+currentOpponentsList.size());
             }
 
+
+        }
+        Log.e("machednot",currentOpponentsList.toString()+"--"+prefs.getString("selectedName", ""));
+        QBUser qbUser1=null;
+        for (int i = 0; i <= currentOpponentsList.size() - 1; i++) {
+            if (prefs.getString("selectedName", "").equalsIgnoreCase(currentOpponentsList.get(i).getFullName().toString())) {
+                qbUser1=currentOpponentsList.get(i);
+                Log.e("mached",currentOpponentsList.get(i).toString());
+                //currentOpponentsList.remove(i);
+                } else {
+                Log.e("machednot2",prefs.getString("selectedName", null));
+                Log.e("machednot",currentOpponentsList.get(i).toString());
+            }
+
+
+        }
+
+            currentOpponentsList.clear();
+        if(qbUser1!=null)
+        {
+            currentOpponentsList.add(qbUser1);
         }
         opponentsAdapter = new OpponentsAdapter(this, currentOpponentsList, false);
         opponentsAdapter.setSelectedItemsCountsChangedListener(new OpponentsAdapter.SelectedItemsCountsChangedListener() {
@@ -617,9 +637,8 @@ public void callTo(String callto)
             }
         });
         opponentsListView.setAdapter(opponentsAdapter);
-        Log.e("loginQb",currentOpponentsList.toString());
-        if (prefs.getInt("userType", 0) == 0)
-        {
+        //Log.e("loginQb",currentOpponentsList.toString());
+        if (prefs.getInt("userType", 0) == 0) {
 
             finish();
 
@@ -629,14 +648,14 @@ public void callTo(String callto)
 
     @Override
     public void onBackPressed() {
-        DashBoardActivity.onResume="yes";
+        DashBoardActivity.onResume = "yes";
         super.onBackPressed();
 
     }
 
     private void startCall(boolean isVideoCall) {
 
-        callType="imm";
+        callType = "imm";
         if (opponentsAdapter.getSelectedItems().size() > Consts.MAX_OPPONENTS_COUNT) {
             Toaster.longToast(String.format(getString(R.string.error_max_opponents_count),
                     Consts.MAX_OPPONENTS_COUNT));
@@ -646,10 +665,10 @@ public void callTo(String callto)
         Log.d(TAG, "startCall()");
 
         opponentsList = CollectionsUtils.getIdsSelectedOpponents(opponentsAdapter.getSelectedItems());
-        if(type.equalsIgnoreCase("group")) {
+        if (type.equalsIgnoreCase("group")) {
             opponentsList.add(Integer.parseInt(baristerQB.get("id").toString()));
         }
-            onlineUser=Integer.parseInt(opponentsList.get(0).toString());
+        onlineUser = Integer.parseInt(opponentsList.get(0).toString());
         QBRTCTypes.QBConferenceType conferenceType = isVideoCall
                 ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
                 : QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
@@ -671,36 +690,36 @@ public void callTo(String callto)
 
     }
 
-    public void callBarister(int qbId,String qbName)
-{
-    callType="bar";
-    ArrayList<Integer> opponentsList =new ArrayList<Integer>();
-    opponentsList.add(qbId);
-    onlineUser=Integer.parseInt(opponentsList.get(0).toString());
-    QBRTCTypes.QBConferenceType conferenceType = true
-            ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
-            : QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
+    public void callBarister(int qbId, String qbName) {
+        callType = "bar";
+        ArrayList<Integer> opponentsList = new ArrayList<Integer>();
+        opponentsList.add(qbId);
+        onlineUser = Integer.parseInt(opponentsList.get(0).toString());
+        QBRTCTypes.QBConferenceType conferenceType = true
+                ? QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO
+                : QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO;
 
-    QBRTCClient qbrtcClient = QBRTCClient.getInstance(getApplicationContext());
-    QBRTCSession newQbRtcSession = null;
-    if (opponentsList.size() > 0) {
-        Log.e("oppenents", opponentsList.toString());
-        newQbRtcSession = qbrtcClient.createNewSessionWithOpponents(opponentsList, conferenceType);
-        WebRtcSessionManager.getInstance(this).setCurrentSession(newQbRtcSession);
+        QBRTCClient qbrtcClient = QBRTCClient.getInstance(getApplicationContext());
+        QBRTCSession newQbRtcSession = null;
+        if (opponentsList.size() > 0) {
+            Log.e("oppenents", opponentsList.toString());
+            newQbRtcSession = qbrtcClient.createNewSessionWithOpponents(opponentsList, conferenceType);
+            WebRtcSessionManager.getInstance(this).setCurrentSession(newQbRtcSession);
 
-        PushNotificationSender.sendPushMessage(opponentsList, qbName);
+            PushNotificationSender.sendPushMessage(opponentsList, qbName);
 
-        CallActivity.start(this, false);
+            CallActivity.start(this, false);
 
-    } else {
-        Toast.makeText(this, "Please select opponents to start call...", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Please select opponents to start call...", Toast.LENGTH_SHORT).show();
+        }
     }
-}
+
     private void initActionBarWithSelectedUsers(int countSelectedUsers) {
         setActionBarTitle(String.format(getString(
-                countSelectedUsers > 1
-                        ? R.string.tile_many_users_selected
-                        : R.string.title_one_user_selected),
+                        countSelectedUsers > 1
+                                ? R.string.tile_many_users_selected
+                                : R.string.title_one_user_selected),
                 countSelectedUsers));
     }
 
@@ -718,15 +737,15 @@ public void callTo(String callto)
     public void postAPICall(final Context context) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", userTypeDetails.get("id").toString());
-        Log.e("userType",userTypeDetails.get("id").toString());
+        Log.e("userType", userTypeDetails.get("id").toString());
         HttpDeleteWithBody request = new HttpDeleteWithBody("http://35.163.24.72:8080/VedioApp/service/user/");
         request.addHeader("Content-Type", "application/json; charset=UTF-8");
         request.addHeader("Accept", "application/json");
         request.setEntity(new StringEntity(jsonObject.toString()));
         HttpClient httpClient = new MyHttpClient(context);
         HttpResponse response = httpClient.execute(request);
-        Log.e("response",response.getStatusLine().getStatusCode()+"--");
-        if(response.getStatusLine().getStatusCode()==200) {
+        Log.e("response", response.getStatusLine().getStatusCode() + "--");
+        if (response.getStatusLine().getStatusCode() == 200) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -754,9 +773,7 @@ public void callTo(String callto)
                 e.printStackTrace();
             }
 
-        }
-        else if(response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -779,16 +796,15 @@ public void callTo(String callto)
         }
     }
 
-    public void  deleteBarister()
-    {
-        Log.e("connection","connection");
+    public void deleteBarister() {
+        Log.e("connection", "connection");
         URL url = null;
         try {
             url = new URL("http://35.163.24.72:8080/VedioApp/service/user/2");
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
             httpCon.setDoOutput(true);
             httpCon.setRequestProperty(
-                    "Content-Type", "application/json" );
+                    "Content-Type", "application/json");
             httpCon.setRequestMethod("DELETE");
             httpCon.connect();
         } catch (MalformedURLException e) {
@@ -800,6 +816,7 @@ public void callTo(String callto)
         }
 
     }
+
     private class LoginAsync1 extends AsyncTask<URL, Integer, Long> {
         ProgressDialog progressDialog;
 
@@ -814,8 +831,8 @@ public void callTo(String callto)
             Long aLong = Long.valueOf(1);
 
 
-                  //  postAPICall(OpponentsActivity.this);
-                    deleteBarister();
+            //  postAPICall(OpponentsActivity.this);
+            deleteBarister();
 
 
             return aLong;
@@ -826,6 +843,7 @@ public void callTo(String callto)
             progressDialog.dismiss();
         }
     }
+
     private class DownloadFilesTask extends AsyncTask<URL, Integer, String> {
         protected String doInBackground(URL... urls) {
             String count = null;
@@ -842,9 +860,10 @@ public void callTo(String callto)
         }
 
         protected void onPostExecute(String result) {
-startLoadUsers();
+            startLoadUsers();
         }
     }
+
     public void postAPICall(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         HttpGet httpPost = new HttpGet(strurl);
@@ -853,8 +872,8 @@ startLoadUsers();
         HttpResponse response = null;
         HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        Log.e("status code---->",response.getStatusLine().getStatusCode()+"");
-        if(response.getStatusLine().getStatusCode()==200) {
+        Log.e("status code---->", response.getStatusLine().getStatusCode() + "");
+        if (response.getStatusLine().getStatusCode() == 200) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -873,8 +892,8 @@ startLoadUsers();
                     OpponentNames.add(jsonObject.getString("name"));
                     OpponentIds.add(jsonObject.getInt("id"));
                 }
-                Log.e("OpponentNames",OpponentNames.toString());
-                Log.e("OpponentNames",OpponentIds.toString());
+                Log.e("OpponentNames", OpponentNames.toString());
+                Log.e("OpponentNames", OpponentIds.toString());
             } catch (Exception e) {
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
@@ -885,9 +904,7 @@ startLoadUsers();
                 });
 
             }
-        }
-        else if(response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -903,9 +920,7 @@ startLoadUsers();
                     Toast.makeText(context, "server busy try again...", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else
-        {
+        } else {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -916,6 +931,7 @@ startLoadUsers();
         }
 
     }
+
     public void postAPICall1(String strurl, final Context context) throws Exception {
         strurl = strurl.replace(" ", "%20");
         HttpGet httpPost = new HttpGet(strurl);
@@ -924,18 +940,17 @@ startLoadUsers();
         HttpResponse response = null;
         HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        if(response.getStatusLine().getStatusCode()==200)
-        {
-        InputStream in = response.getEntity().getContent();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
-        String resultJson = "";
-        while ((line = reader.readLine()) != null) {
-            resultJson += line;
-        }
+        if (response.getStatusLine().getStatusCode() == 200) {
+            InputStream in = response.getEntity().getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = null;
+            String resultJson = "";
+            while ((line = reader.readLine()) != null) {
+                resultJson += line;
+            }
 
             try {
-Log.e("resultJson",resultJson);
+                Log.e("resultJson", resultJson);
 
                 JSONArray jsonArray = new JSONArray(resultJson);
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
@@ -978,15 +993,14 @@ Log.e("resultJson",resultJson);
                         bar_after_login.setVisibility(View.VISIBLE);
                         bar_name.setText(userTypeDetails.get("name").toString());
                     } else {
-                        baristerName="";
+                        baristerName = "";
                         bar_name.setText(baristerName);
                         bar_registration.setVisibility(View.VISIBLE);
                         bar_after_login.setVisibility(View.GONE);
                     }
                 }
             });
-        }
-        else if(response.getStatusLine().getStatusCode()==500)
+        } else if (response.getStatusLine().getStatusCode() == 500)
 
         {
             runOnUiThread(new Runnable() {
@@ -995,8 +1009,7 @@ Log.e("resultJson",resultJson);
                     Toast.makeText(context, "server is busy please try again", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else
+        } else
 
         {
             runOnUiThread(new Runnable() {
@@ -1039,7 +1052,7 @@ Log.e("resultJson",resultJson);
                 type = "1";
             }
             String url = "http://35.163.24.72:8080/VedioApp/service/user/type/" + type;
-            Log.e("urlls",url);
+            Log.e("urlls", url);
             try {
                 postAPICall1(url, OpponentsActivity.this);
             } catch (Exception e) {
@@ -1061,35 +1074,33 @@ Log.e("resultJson",resultJson);
 
         }
     }
-    public void notificationDialog(final int userId)
-    {
-        Log.e("userId",userId+"--");
 
-        requestDialog=new Dialog(this);
+    public void notificationDialog(final int userId) {
+        Log.e("userId", userId + "--");
+
+        requestDialog = new Dialog(this);
         requestDialog.setCancelable(false);
         requestDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
         requestDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestDialog.setContentView(R.layout.send_notification);
-        msgEdt= (EditText) requestDialog.findViewById(R.id.message);
-        send= (Button) requestDialog.findViewById(R.id.send1);
-        close= (Button) requestDialog.findViewById(R.id.close);
+        msgEdt = (EditText) requestDialog.findViewById(R.id.message);
+        send = (Button) requestDialog.findViewById(R.id.send1);
+        close = (Button) requestDialog.findViewById(R.id.close);
 
         requestDialog.show();
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(msgEdt.getText().toString().trim().length()>0) {
+                if (msgEdt.getText().toString().trim().length() > 0) {
 
                     message = msgEdt.getText().toString();
-                    String data=userId+"-splspli-"+"notification"+"-splspli-"+msgEdt.getText().toString()+"-splspli-"+prefs.getString("name",null);
+                    String data = userId + "-splspli-" + "notification" + "-splspli-" + msgEdt.getText().toString() + "-splspli-" + prefs.getString("name", null);
                     mWebSocketClient.send(data);
                     msgEdt.setText("");
                     close.performClick();
                     Toast.makeText(OpponentsActivity.this, "Message has sent Succesfully...", Toast.LENGTH_SHORT).show();
                     new SendNotificationAcync().execute();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(OpponentsActivity.this, "Please Enter message...", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -1101,19 +1112,20 @@ Log.e("resultJson",resultJson);
             }
         });
     }
+
     public class InsertVideoLogs extends AsyncTask<URL, Integer, Long> {
         protected Long doInBackground(URL... urls) {
-            Long aLong= Long.valueOf(1);
-            JSONObject jsonObject=new JSONObject();
+            Long aLong = Long.valueOf(1);
+            JSONObject jsonObject = new JSONObject();
             SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
             try {
-                jsonObject.put("callFrom",DashBoardActivity.solicitor.get("id"));
-                jsonObject.put("startTime",DashBoardActivity.startTime);
+                jsonObject.put("callFrom", DashBoardActivity.solicitor.get("id"));
+                jsonObject.put("startTime", DashBoardActivity.startTime);
                 jsonObject.put("endTime", DashBoardActivity.endtime);
-                jsonObject.put("callTo1",DashBoardActivity.callTo1);
+                jsonObject.put("callTo1", DashBoardActivity.callTo1);
                 jsonObject.put("callTo2", DashBoardActivity.callTo2);
-                Log.e("jsonObject",jsonObject.toString());
-                } catch (JSONException e) {
+                Log.e("jsonObject", jsonObject.toString());
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
@@ -1128,21 +1140,20 @@ Log.e("resultJson",resultJson);
         protected void onPostExecute(Long result) {
 
 
-
-
         }
     }
+
     public class SendNotificationAcync extends AsyncTask<URL, Integer, Long> {
         protected Long doInBackground(URL... urls) {
-            Long aLong= Long.valueOf(1);
-            JSONObject jsonObject=new JSONObject();
+            Long aLong = Long.valueOf(1);
+            JSONObject jsonObject = new JSONObject();
             SharedPreferences prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
             try {
-                jsonObject.put("notification",message);
-                jsonObject.put("sentBy",prefs.getInt("userId", 0));
+                jsonObject.put("notification", message);
+                jsonObject.put("sentBy", prefs.getInt("userId", 0));
                 jsonObject.put("sentDate", DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
                 jsonObject.put("sentTo", Integer.parseInt(userTypeDetails.get("id").toString()));
-                Log.e("jsonObject",jsonObject.toString());
+                Log.e("jsonObject", jsonObject.toString());
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -1159,27 +1170,24 @@ Log.e("resultJson",resultJson);
         protected void onPostExecute(Long result) {
 
 
-
-
         }
     }
-    public void sendNotificationAPICall(String strurl, String jsonString, final Context context) throws Exception
-    {
+
+    public void sendNotificationAPICall(String strurl, String jsonString, final Context context) throws Exception {
 
         strurl = strurl.replace(" ", "%20");
 
         HttpPost httpPost = new HttpPost(strurl);
-        if (jsonString != null)
-        {
+        if (jsonString != null) {
             StringEntity entity = new StringEntity(jsonString);
             httpPost.setEntity(entity);
         }
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
         httpPost.setHeader("Accept", "application/json");
         HttpResponse response = null;
-        HttpClient httpClient = new MyHttpClient( context );
+        HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        if(response.getStatusLine().getStatusCode()==200) {
+        if (response.getStatusLine().getStatusCode() == 200) {
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -1195,42 +1203,37 @@ Log.e("resultJson",resultJson);
 
             }
             Log.e("resultJson", resultJson);
-        }
-        else if (response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else
-        {
+        } else {
 
         }
 
     }
-    public void insertVideoLog(String strurl, String jsonString, final Context context) throws Exception
-    {
-         strurl = strurl.replace(" ", "%20");
+
+    public void insertVideoLog(String strurl, String jsonString, final Context context) throws Exception {
+        strurl = strurl.replace(" ", "%20");
         HttpPost httpPost = new HttpPost(strurl);
-        if (jsonString != null)
-        {
+        if (jsonString != null) {
             StringEntity entity = new StringEntity(jsonString);
             httpPost.setEntity(entity);
         }
         httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
         httpPost.setHeader("Accept", "application/json");
         HttpResponse response = null;
-        HttpClient httpClient = new MyHttpClient( context );
+        HttpClient httpClient = new MyHttpClient(context);
         response = httpClient.execute(httpPost);
-        if(response.getStatusLine().getStatusCode()==200) {
-            DashBoardActivity.callTo1=0;
-            DashBoardActivity.callTo2=0;
-            DashBoardActivity.startTime="";
-            DashBoardActivity.endtime="";
-            DashBoardActivity.service="no";
+        if (response.getStatusLine().getStatusCode() == 200) {
+            DashBoardActivity.callTo1 = 0;
+            DashBoardActivity.callTo2 = 0;
+            DashBoardActivity.startTime = "";
+            DashBoardActivity.endtime = "";
+            DashBoardActivity.service = "no";
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = null;
@@ -1238,7 +1241,7 @@ Log.e("resultJson",resultJson);
             while ((line = reader.readLine()) != null) {
                 resultJson += line;
             }
-            Log.e("resultJson",resultJson.toString());
+            Log.e("resultJson", resultJson.toString());
             try {
                 JSONObject jsonObject = new JSONObject(resultJson);
             } catch (Exception e) {
@@ -1246,28 +1249,25 @@ Log.e("resultJson",resultJson);
 
 
             }
-            DashBoardActivity.onResume="yes";
+            DashBoardActivity.onResume = "yes";
             Log.e("resultJson", resultJson);
-        }
-        else if (response.getStatusLine().getStatusCode()==500)
-        {
+        } else if (response.getStatusLine().getStatusCode() == 500) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(context, "server is busy try again...", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else
-        {
+        } else {
 
         }
 
     }
+
     private void connectWebSocket() {
         URI uri;
         try {
-            uri = new URI("ws://183.82.113.165:8085");
+            uri = new URI("ws://183.82.113.165:8089");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
@@ -1276,19 +1276,19 @@ Log.e("resultJson",resultJson);
         mWebSocketClient = new WebSocketClient(uri) {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
-                Log.e("Websocket", "Opened");
-                int userId=prefs.getInt("userId",-1);
-                String data=userId+"-splspli-"+"reg";
+                Log.e("Websocket opponent", "Opened");
+                int userId = prefs.getInt("userId", -1);
+                String data = userId + "-splspli-" + "reg";
                 mWebSocketClient.send(data);
             }
 
             @Override
-            public void onMessage(String s)
-            {
+            public void onMessage(String s) {
                 final String message = s;
-                Log.e("message",message);
+                Log.e("message", message);
                 createNotification(message);
             }
+
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void createNotification(String message) {
                 try {
@@ -1310,22 +1310,23 @@ Log.e("resultJson",resultJson);
                     noti.defaults = Notification.DEFAULT_ALL;
                     notificationManager.notify(NOTIFICATION_ID++, noti);
                     //Log.e("datata", split[3].toString() + ":" + split[2].toString());
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
-
             }
+
             @Override
             public void onClose(int i, String s, boolean b) {
+
+                connectWebSocket();
                 Log.i("Websocket", "Closed " + s);
             }
 
             @Override
             public void onError(Exception e) {
+
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };

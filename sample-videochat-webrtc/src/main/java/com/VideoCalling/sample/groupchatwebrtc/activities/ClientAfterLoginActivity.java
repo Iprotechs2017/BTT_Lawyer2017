@@ -580,9 +580,7 @@ public class ClientAfterLoginActivity extends BaseActivity {
                         } else {
                             progressDialog.dismiss();
                             connectWebSocket();
-                            String data=DashBoardActivity.solicitor.get("id")+""+"-splspli-"+"notification"+"-splspli-"+prefs.getString("name","")+" shared the documents..."+"-splspli-"+prefs.getInt("userId",-1);
-                            mWebSocketClient.send(data);
-                            mWebSocketClient.close();
+
                             //Toast.makeText(ClientAfterLoginActivity.this, "All files are uploded successfully...!", Toast.LENGTH_SHORT).show();
                             new AlertDialog.Builder(ClientAfterLoginActivity.this)
                                     .setMessage("All files are uploded successfully")
@@ -922,7 +920,7 @@ private void startCall(boolean isVideoCall) {
     private void connectWebSocket() {
         URI uri;
         try {
-            uri = new URI("ws://183.82.113.165:8085");
+            uri = new URI("ws://183.82.113.165:8089");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
@@ -935,6 +933,10 @@ private void startCall(boolean isVideoCall) {
                 int userId=prefs.getInt("userId",-1);
                 String data=userId+"-splspli-"+"reg";
                 mWebSocketClient.send(data);
+                String data1 = DashBoardActivity.solicitor.get("id") + "" + "-splspli-" + "notification" + "-splspli-" + prefs.getString("name", "") + " shared the documents..." + "-splspli-" + prefs.getInt("userId", -1);
+                mWebSocketClient.send(data1);
+                mWebSocketClient.close();
+
             }
 
             @Override
@@ -958,12 +960,15 @@ private void startCall(boolean isVideoCall) {
             }
             @Override
             public void onClose(int i, String s, boolean b) {
+
+                //connectWebSocket();
                 Log.i("Websocket", "Closed " + s);
             }
 
             @Override
             public void onError(Exception e) {
                 Log.i("Websocket", "Error " + e.getMessage());
+                connectWebSocket();
             }
         };
         mWebSocketClient.connect();

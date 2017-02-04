@@ -18,10 +18,15 @@ import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.activities.CallActivity;
+import com.VideoCalling.sample.groupchatwebrtc.activities.LoginActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.NotificationActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.OpponentsActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.ShowmoreDocumentsActivity;
 import com.VideoCalling.sample.groupchatwebrtc.activities.SplashActivity;
+import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
+import com.VideoCalling.sample.groupchatwebrtc.utils.Consts;
+import com.quickblox.sample.core.utils.SharedPrefsHelper;
+import com.quickblox.users.model.QBUser;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -35,7 +40,7 @@ public class NotificationService extends Service {
 
     /** indicates how to behave if the service is killed */
     int mStartMode;
-    WebSocketClient mWebSocketClient;
+    public static WebSocketClient mWebSocketClient;
     /** interface for clients that bind */
     IBinder mBinder;
   SharedPreferences pref;
@@ -77,55 +82,75 @@ public  void showNotification(String data)
 {
     Log.e("data-server", data);
     String [] split=data.split("-splspli-");
-   if(split[1].toString().equalsIgnoreCase("call")) {
-       Log.e("data-server-in", data);
-       Intent myIntent = new Intent ( NotificationService.this, SplashActivity.class );
+    if(split.length!=6) {
+        if (split[1].toString().equalsIgnoreCase("call")) {
+            Log.e("data-server-in", data);
+            SharedPrefsHelper sharedPrefsHelper = null;
+            sharedPrefsHelper = SharedPrefsHelper.getInstance();
+            QBUser currentUser = sharedPrefsHelper.getQbUser();
+            currentUser.setPassword(Consts.DEFAULT_USER_PASSWORD);
+            CallService.start(this, currentUser);
+       /*Intent myIntent = new Intent ( NotificationService.this, CallActivity.class );
        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
        myIntent.putExtra("call", "yes");
-       startActivity(myIntent);
-     // CallActivity.start(NotificationService.this, true);
-      // startActivity(new Intent(NotificationService.this, OpponentsActivity.class));
-   }
+       startActivity(myIntent);*/
+            // CallActivity.start(NotificationService.this, true);
+            // startActivity(new Intent(NotificationService.this, OpponentsActivity.class));
+        } else {
+            if (split[2].toString().indexOf("documents...") < 0) {
+                Intent intent = new Intent(NotificationService.this, NotificationActivity.class);
+                intent.putExtra("id", split[4].toString());
+                PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
+                Notification noti = new Notification.Builder(NotificationService.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("BTT Lawyer")
+                        .setContentText(split[3].toString() + ":" + split[2].toString())
+                        .setContentIntent(pIntent)
+                        .build();
+                // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                noti.flags |= Notification.FLAG_AUTO_CANCEL;
+                noti.defaults = Notification.DEFAULT_ALL;
+                notificationManager.notify(NOTIFICATION_ID++, noti);
+                //Log.e("datata", split[3].toString() + ":" + split[2].toString());
+            } else {
+                Intent intent = new Intent(NotificationService.this, ShowmoreDocumentsActivity.class);
+                intent.putExtra("id", split[3].toString());
+                PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
+                Notification noti = new Notification.Builder(NotificationService.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("BTT Lawyer")
+                        .setContentText(split[2].toString())
+                        .setContentIntent(pIntent)
+                        .build();
+                // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                noti.flags |= Notification.FLAG_AUTO_CANCEL;
+                noti.defaults = Notification.DEFAULT_ALL;
+                notificationManager.notify(NOTIFICATION_ID++, noti);
+
+            }
+        }
+    }
     else
-   {
-       if(split[2].toString().indexOf("documents...")<0) {
-           Intent intent = new Intent(NotificationService.this, NotificationActivity.class);
-           intent.putExtra("id",split[4].toString());
-           PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
-           Notification noti = new Notification.Builder(NotificationService.this)
-                   .setSmallIcon(R.drawable.logo)
-                   .setContentTitle("BTT Lawyer")
-                   .setContentText(split[3].toString() + ":" + split[2].toString())
-                   .setContentIntent(pIntent)
-                   .build();
-           // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
+    {
+        new LogoutClass().clearSesson(NotificationService.this);
+        Intent intent = new Intent(NotificationService.this, LoginActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
+        Notification noti = new Notification.Builder(NotificationService.this)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle("BTT Lawyer")
+                .setContentText(split[3].toString() + ":" + split[2].toString())
+                .setContentIntent(pIntent)
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        noti.flags |= Notification.FLAG_AUTO_CANCEL;
+        noti.defaults = Notification.DEFAULT_ALL;
+        notificationManager.notify(NOTIFICATION_ID++, noti);
 
-           NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-           noti.flags |= Notification.FLAG_AUTO_CANCEL;
-           noti.defaults = Notification.DEFAULT_ALL;
-           notificationManager.notify(NOTIFICATION_ID++, noti);
-           //Log.e("datata", split[3].toString() + ":" + split[2].toString());
-       }
-       else
-       {
-           Intent intent = new Intent(NotificationService.this, ShowmoreDocumentsActivity.class);
-           intent.putExtra("id",split[3].toString());
-           PendingIntent pIntent = PendingIntent.getActivity(NotificationService.this, (int) System.currentTimeMillis(), intent, 0);
-           Notification noti = new Notification.Builder(NotificationService.this)
-                   .setSmallIcon(R.drawable.logo)
-                   .setContentTitle("BTT Lawyer")
-                   .setContentText(split[2].toString())
-                   .setContentIntent(pIntent)
-                   .build();
-           // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
-
-           NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-           noti.flags |= Notification.FLAG_AUTO_CANCEL;
-           noti.defaults = Notification.DEFAULT_ALL;
-           notificationManager.notify(NOTIFICATION_ID++, noti);
-
-       }
-   }
+    }
    }
     /** Called when The service is no longer used and is being destroyed */
     @Override
@@ -144,7 +169,7 @@ public  void showNotification(String data)
         pref = getSharedPreferences("loginDetails", MODE_PRIVATE);
         URI uri;
         try {
-            uri = new URI("ws://183.82.113.165:8085");
+            uri = new URI("ws://183.82.113.165:8089");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;

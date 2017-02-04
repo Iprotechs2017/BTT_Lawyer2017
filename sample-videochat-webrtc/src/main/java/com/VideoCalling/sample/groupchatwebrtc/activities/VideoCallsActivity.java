@@ -29,6 +29,9 @@ import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
 import com.VideoCalling.sample.groupchatwebrtc.utils.VideoLogsModel;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -63,10 +66,16 @@ public class VideoCallsActivity extends AppCompatActivity {
     de.hdodenhof.circleimageview.CircleImageView call,notification,logout;
     VideocallAdapter videoCallAdapter;
     Toolbar toolbar;
+    DB snappydb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_calls);
+        try {
+            snappydb = DBFactory.open(this);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
         progressDialog=new ProgressDialog(this);
         progressDialog.setMessage("loading...");
         progressDialog.setCancelable(true);
@@ -223,7 +232,14 @@ String name;
                             );
                             videoLogs.add(videoLogsModel);
                         }
-
+                        try
+                        {
+                            snappydb.getInt(jsonObject.getInt("id") + "");
+                        }
+                        catch (Exception e)
+                        {
+                            snappydb.putInt(jsonObject.getInt("id") + "", 0);
+                        }
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -298,14 +314,17 @@ String name;
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView callerName, videoName, callDate;
+            public TextView callerName, videoName, callDate,notification_status;
             LinearLayout share_and_down,parent;
            ImageView ic_img;
+            ImageView arrow;
+
             public ViewHolder(View v) {
 
                 super(v);
                 ic_img= (ImageView) v.findViewById(R.id.ic_img);
                 callerName = (TextView) v.findViewById(R.id.callerName);
+                notification_status= (TextView) v.findViewById(R.id.notification_status);
                 videoName = (TextView) v.findViewById(R.id.videoName);
                 callDate = (TextView) v.findViewById(R.id.callDate);
                 share_and_down= (LinearLayout) v.findViewById(R.id.share_and_down);
@@ -335,12 +354,32 @@ String name;
             holder.callDate.setText(videoLogs.get(position).getDay().toString());
             holder.share_and_down.setVisibility(View.GONE);
             holder.callerName.setVisibility(View.GONE);
+            try {
+                if(snappydb.getInt(videoLogs.get(position).getId()+"")==0)
+                {
+                    holder.notification_status.setVisibility(View.VISIBLE);
+
+                }
+                else
+                {
+                    holder.notification_status.setVisibility(View.GONE);
+                }
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
             holder.callerName.setTypeface(typeface);
             holder.callDate.setTypeface(typeface);
             holder.videoName.setTypeface(typeface);
             holder.parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    try {
+                        snappydb.putInt(videoLogs.get(position).getId()+"",1);
+                    } catch (SnappydbException e) {
+                        e.printStackTrace();
+                    }
+                    videoCallAdapter.notifyDataSetChanged();
+
                     startActivity(new Intent(VideoCallsActivity.this, IndividualVideocallActivity.class).putExtra("position", position));
                 }
             });

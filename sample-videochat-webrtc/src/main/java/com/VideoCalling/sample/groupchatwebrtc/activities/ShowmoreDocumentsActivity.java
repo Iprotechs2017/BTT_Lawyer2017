@@ -1,7 +1,12 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,6 +22,12 @@ import android.widget.RelativeLayout;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
 import com.VideoCalling.sample.groupchatwebrtc.fragments.UplodedDocs;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class ShowmoreDocumentsActivity extends AppCompatActivity {
 Toolbar toolbar;
@@ -84,4 +96,5 @@ Toolbar toolbar;
             window.setStatusBarColor(getResources().getColor(color));
         }
     }
+
 }

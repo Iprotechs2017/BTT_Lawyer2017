@@ -32,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.VideoCalling.sample.groupchatwebrtc.db.QbUsersDbManager;
 import com.VideoCalling.sample.groupchatwebrtc.services.NotificationService;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -67,6 +69,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,6 +88,7 @@ public class LoginActivity extends BaseActivity {
     Button btn_login;
     TextView screen_title;
     LinearLayout action_layout;
+    private QbUsersDbManager dbManager;
     public QBUser userForSave;
     RelativeLayout parent;
     String tag_json_obj = "json_obj_req";
@@ -103,7 +107,8 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getCurrentFocus()!=null) {
+        if(getCurrentFocus()!=null)
+        {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
@@ -146,17 +151,20 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_sign_in);
         getWindow().setBackgroundDrawableResource(R.drawable.sign_up_bg) ;
      //  startService(new Intent(LoginActivity.this, APIServices.class));
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         editor = getSharedPreferences("loginDetails", MODE_PRIVATE).edit();
         qbuserId = getSharedPreferences("QB", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
         link_signup=(TextView) findViewById(R.id.link_signup);
+        dbManager = QbUsersDbManager.getInstance(getApplicationContext());
         /*toolbar= (Toolbar) findViewById(R.id.toolbar);
         screen_title= (TextView) findViewById(R.id.screen_title);
         screen_title.setText("Signin");*/
         rq = Volley.newRequestQueue(this);
         parent= (RelativeLayout) findViewById(R.id.parent);
         pDialog = new ProgressDialog(this);
+        startLoadUsers();
         btn_login= (Button) findViewById(R.id.btn_login);
         link_signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,6 +203,28 @@ public class LoginActivity extends BaseActivity {
         });
         //initUI();
       /* */
+    }
+    private void startLoadUsers() {
+       // showProgressDialog(R.string.dlg_loading_opponents);
+
+        requestExecutor.loadUsersByTag(String.valueOf(Consts.PREF_CURREN_ROOM_NAME), new QBEntityCallback<ArrayList<QBUser>>() {
+            @Override
+            public void onSuccess(ArrayList<QBUser> result, Bundle params) {
+                dbManager.saveAllUsers(result, true);
+
+            }
+
+            @Override
+            public void onError(QBResponseException responseException) {
+                //hideProgressDialog();
+                showErrorSnackbar(R.string.loading_users_error, responseException, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startLoadUsers();
+                    }
+                });
+            }
+        });
     }
     public void chekCaseStaus(int status,JSONObject responseObject) throws JSONException {
         if(status==0)

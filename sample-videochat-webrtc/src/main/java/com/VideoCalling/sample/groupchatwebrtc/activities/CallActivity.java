@@ -82,24 +82,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * QuickBlox team
- */
 public class CallActivity extends BaseActivity implements QBRTCClientSessionCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback,
         OnCallEventsController, IncomeCallFragmentCallbackListener, ConversationFragmentCallbackListener, NetworkConnectionChecker.OnConnectivityChangedListener {
-
     private static final String TAG1 = CallActivity.class.getSimpleName();
     Long timeStamp;
     String videoPath;
-
     public static final String OPPONENTS_CALL_FRAGMENT = "opponents_call_fragment";
     public static final String INCOME_CALL_FRAGMENT = "income_call_fragment";
     public static final String CONVERSATION_CALL_FRAGMENT = "conversation_call_fragment";
     public static final String CALLER_NAME = "caller_name";
     public static final String SESSION_ID = "sessionID";
     public static final String START_CONVERSATION_REASON = "start_conversation_reason";
-
-
     private QBRTCSession currentSession;
     public List<QBUser> opponentsList;
     private Runnable showIncomingCallWindowTask;
@@ -142,23 +135,18 @@ public class CallActivity extends BaseActivity implements QBRTCClientSessionCall
     private MediaRecorder mMediaRecorder;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_PERMISSIONS = 10;
-
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
     public static void start(Context context,
                              boolean isIncomingCall) {
-
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.EXTRA_IS_INCOMING_CALL, isIncomingCall);
-
         context.startActivity(intent);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,7 +185,6 @@ public class CallActivity extends BaseActivity implements QBRTCClientSessionCall
         initRecorder();
         shareScreen();
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -209,7 +196,6 @@ public class CallActivity extends BaseActivity implements QBRTCClientSessionCall
 
         // startRecord.setText("startRecord");
         try {
-
             mMediaRecorder.stop();
             mMediaRecorder.reset();
             stopScreenSharing();
@@ -909,15 +895,15 @@ public class CallActivity extends BaseActivity implements QBRTCClientSessionCall
         else {
             SharedPreferences  prefs = getSharedPreferences("loginDetails", MODE_PRIVATE);
 
-           if(prefs.getInt("userType",-1)==1) {
-    Calendar c = Calendar.getInstance();
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    String formattedDate = df.format(c.getTime());
-    DashBoardActivity.service = "yes";
-    Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
-    DashBoardActivity.endtime = formattedDate;
-    DashBoardActivity.onResume = "yes";
-           }
+                           if(prefs.getInt("userType",-1)==1) {
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    String formattedDate = df.format(c.getTime());
+                    DashBoardActivity.service = "yes";
+                    Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
+                    DashBoardActivity.endtime = formattedDate;
+                    DashBoardActivity.onResume = "yes";
+                           }
            }
        /* try {
       if(OpponentsActivity.connection.equalsIgnoreCase("reconnect")) {

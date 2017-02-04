@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/background"
-android:id="@+id/parent"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/background"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
-        android:layout_gravity="center"
         android:layout_width="fill_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_margin="1dp"
         card_view:cardCornerRadius="2dp"
         card_view:contentPadding="10dp">
@@ -19,54 +19,73 @@ android:id="@+id/parent"
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-<ImageView
-    android:layout_width="35dp"
-    android:id="@+id/contactImage"
-    android:src="@drawable/contact"
-    android:layout_height="35dp" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="10dp"
-                android:layout_toRightOf="@+id/contactImage"
-                android:layout_height="wrap_content">
-            <TextView
-                android:text="Rajesh"
 
-                android:textColor="@color/black"
-               android:id="@+id/senderName"
-                android:textSize="15dp"
+            <ImageView
+                android:id="@+id/contactImage"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/contact" />
+
+            <TextView
+                android:id="@+id/notification_status"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_toLeftOf="@+id/lay"
+                android:background="@drawable/circle" />
+
+            <LinearLayout
+                android:id="@+id/lay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                />
+                android:layout_toRightOf="@+id/contactImage"
+                android:orientation="vertical"
+                android:paddingLeft="10dp">
+
                 <TextView
-                    android:layout_marginTop="4dp"
+                    android:id="@+id/senderName"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Rajesh"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+                <TextView
                     android:id="@+id/msg"
-                    android:layout_centerHorizontal="true"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:textSize="12dp"
-                    android:textColor="@color/text_color_medium_dark_grey"
-                    android:text="send me"
-                    android:maxLength="120"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
                     android:ellipsize="end"
+                    android:maxLength="120"
                     android:singleLine="true"
-                    android:layout_alignParentTop="true"/>
+                    android:text="send me"
+                    android:textColor="@color/text_color_medium_dark_grey"
+                    android:textSize="12dp" />
             </LinearLayout>
+
             <TextView
-                android:text="20-11-2016"
-
-                android:textColor="@color/date_color"
                 android:id="@+id/sentDate"
-                android:textSize="10dp"
-
-                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_marginTop="5dp"
+                android:text="20-11-2016"
+                android:textColor="@color/date_color"
+                android:textSize="10dp" />
 
-                />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/sentDate"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/recive_arrow" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

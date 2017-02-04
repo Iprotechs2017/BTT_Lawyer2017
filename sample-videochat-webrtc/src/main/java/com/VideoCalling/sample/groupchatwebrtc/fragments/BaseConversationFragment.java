@@ -204,17 +204,15 @@ public abstract class BaseConversationFragment extends Fragment implements CallA
                     actionButtonsEnabled(false);
                     handUpVideoCall.setEnabled(false);
                     handUpVideoCall.setActivated(false);
-                //OpponentsActivity.connection = "normal";
-
                     Calendar c = Calendar.getInstance();
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                String formattedDate = df.format(c.getTime());
-                DashBoardActivity.service="yes";
-                Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
-                DashBoardActivity.endtime=formattedDate;
-                DashBoardActivity.onResume="yes";
-                OpponentsActivity.connection="not";
-                conversationFragmentCallbackListener.onHangUpCurrentSession();
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    String formattedDate = df.format(c.getTime());
+                    DashBoardActivity.service="yes";
+                    Log.e("endTime", formattedDate + DashBoardActivity.callTo1 + "---");
+                    DashBoardActivity.endtime=formattedDate;
+                    DashBoardActivity.onResume="yes";
+                    OpponentsActivity.connection="not";
+                    conversationFragmentCallbackListener.onHangUpCurrentSession();
                     Log.d(TAG, "Call is stopped");
             }
         });

@@ -40,6 +40,9 @@ import com.VideoCalling.sample.groupchatwebrtc.util.LogoutClass;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
 import com.mancj.slideup.SlideUp;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -84,21 +87,27 @@ public class NotificationActivity extends AppCompatActivity {
     Dialog notification_dialog;
     de.hdodenhof.circleimageview.CircleImageView call, notification, logout;
     WebSocketClient mWebSocketClient;
+    ArrayList notificationIds = new ArrayList();
     int userId;
-int back=0;
+    int back = 0;
+    DB snappydb;
     SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
-     if(getIntent().getStringExtra("id")!=null)
-     {
-         userId=Integer.parseInt(getIntent().getStringExtra("id"));
-     }
-        else
-     {
-         userId=DashBoardActivity.selectedImmigrantId;
-     }
+        try {
+            snappydb = DBFactory.open(this);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        if (getIntent().getStringExtra("id") != null) {
+            userId = Integer.parseInt(getIntent().getStringExtra("id"));
+        } else {
+            userId = DashBoardActivity.selectedImmigrantId;
+        }
         notification_dialog = new Dialog(this);
         notification_dialog.setCancelable(false);
         notification_dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -113,7 +122,7 @@ int back=0;
         view_msg.setVisibility(View.VISIBLE);
         userName.setVisibility(View.VISIBLE);
         time_stamp.setVisibility(View.VISIBLE);
-int back=0;
+        int back = 0;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Notifications");
         connectWebSocket();
@@ -210,7 +219,7 @@ int back=0;
         ViewHolder viewHolder1;
         TextView senderName, msg, sentDate;
 
-        public RecyclerViewAdapter(Context context1, ArrayList msgs, ArrayList senderNames, ArrayList sentDates) {
+        public RecyclerViewAdapter(Context context1, ArrayList msgs, ArrayList senderNames, ArrayList sentDates, ArrayList notificationIds) {
 
             this.msgs = msgs;
             this.senderNames = senderNames;
@@ -220,7 +229,7 @@ int back=0;
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-            public TextView senderName, msg, sentDate;
+            public TextView senderName, msg, sentDate, notification_status;
             public LinearLayout parent;
 
             public ViewHolder(View v) {
@@ -229,6 +238,7 @@ int back=0;
 
                 senderName = (TextView) v.findViewById(R.id.senderName);
                 msg = (TextView) v.findViewById(R.id.msg);
+                notification_status = (TextView) v.findViewById(R.id.notification_status);
                 sentDate = (TextView) v.findViewById(R.id.sentDate);
                 parent = (LinearLayout) v.findViewById(R.id.parent);
                 parent.setOnClickListener(this);
@@ -244,7 +254,10 @@ int back=0;
                             time_stamp.setText(sentDates.get(getAdapterPosition()).toString());
                             userName.setText(senderNames.get(getAdapterPosition()).toString());
                             notification_dialog.show();
+                            snappydb.putInt(notificationIds.get(getAdapterPosition()).toString(), 1);
+                            recyclerViewAdapter.notifyDataSetChanged();
                             Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
+
                             // showMessage.show();
                             // slideUp.animateIn();
 
@@ -273,6 +286,16 @@ int back=0;
             holder.msg.setText(msgs.get(position).toString());
             holder.sentDate.setText(sentDates.get(position).toString());
             holder.senderName.setText(senderNames.get(position).toString());
+            try {
+                if (snappydb.getInt(notificationIds.get(position).toString()) == 0) {
+                    holder.notification_status.setVisibility(View.VISIBLE);
+
+                } else {
+                    holder.notification_status.setVisibility(View.GONE);
+                }
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -300,28 +323,39 @@ int back=0;
                 resultJson += line;
             }
             try {
-                msgs.clear(); senderNames.clear(); sentDates.clear();
+                msgs.clear();
+                senderNames.clear();
+                sentDates.clear();
+                notificationIds.clear();
                 JSONArray jsonArray = new JSONArray(resultJson);
                 for (int i = 0; i <= jsonArray.length() - 1; i++) {
                     JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
                     msgs.add(jsonObject.getString("notification"));
+                    notificationIds.add(jsonObject.getInt("id"));
                     //   senderNames.add(OpponentsActivity.OpponentNames.get(OpponentsActivity.OpponentIds.indexOf(jsonObject.getString("sentBy"))));
                     /*if(Integer.parseInt(jsonObject.getString("sentBy"))==prefs.getInt("userId", -1)) {
                         senderNames.add("You");
+
                     }
                     else
                     {*/
-                        senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
+                    try {
+                        snappydb.getInt(jsonObject.getInt("id") + "");
+                    } catch (Exception e) {
+                        snappydb.putInt(jsonObject.getInt("id") + "", 0);
+                    }
+                    senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
                     //}
 
-                 //   senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
+                    //   senderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
                     sentDates.add(jsonObject.getString("sentDate"));
                 }
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         progressDialog.dismiss();
-                        recyclerViewAdapter = new RecyclerViewAdapter(NotificationActivity.this, msgs, senderNames, sentDates);
+                        recyclerViewAdapter = new RecyclerViewAdapter(NotificationActivity.this, msgs, senderNames, sentDates, notificationIds);
                         recyclerView.setHasFixedSize(true);
                         recyclerView.setLayoutManager(new LinearLayoutManager(NotificationActivity.this));
                         recyclerView.setAdapter(recyclerViewAdapter);
@@ -354,7 +388,7 @@ int back=0;
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        back=1;
+        back = 1;
         editor.putString("service", "stop");
         editor.apply();
         stopService(new Intent(this, NotificationService.class));
@@ -379,7 +413,7 @@ int back=0;
             mWebSocketClient.close();
             startService(new Intent(this, NotificationService.class));
         }*/
-        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -388,16 +422,18 @@ int back=0;
         editor.apply();
         mWebSocketClient.close();
         startService(new Intent(this, NotificationService.class));*/
-        DashBoardActivity.onResume="yes";
+        DashBoardActivity.onResume = "yes";
     }
 
     private class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
         ProgressDialog progressDialog;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
         }
+
         protected Long doInBackground(URL... urls) {
             Long aLong = Long.valueOf(1);
 
@@ -408,7 +444,7 @@ int back=0;
                     //  postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/"+prefs.getInt("userId",-1), NotificationActivity.this);
                     postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + prefs.getInt("userId", -1), NotificationActivity.this);
                 } else {
-                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" +userId, NotificationActivity.this);
+                    postAPICall("http://35.163.24.72:8080/VedioApp/service/notifications/getTo/userid/" + userId, NotificationActivity.this);
                 }
 
             } catch (Exception e) {
@@ -454,7 +490,7 @@ int back=0;
                     @Override
                     public void run() {
                         progressDialog.dismiss();
-                               Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Something went wrong try again...!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -524,10 +560,11 @@ int back=0;
             window.setStatusBarColor(getResources().getColor(color));
         }
     }
+
     private void connectWebSocket() {
         URI uri;
         try {
-            uri = new URI("ws://183.82.113.165:8085");
+            uri = new URI("ws://183.82.113.165:8089");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
@@ -541,9 +578,7 @@ int back=0;
                 String data = userId + "-splspli-" + "reg";
                 try {
                     mWebSocketClient.send(data);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -562,6 +597,7 @@ int back=0;
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void createNotification(String message) {
                 try {
+                    DashBoardActivity.notifRelode="yes";
                     connectWebSocket();
                     // Log.e("data", message);
                     String[] split = message.split("-splspli-");
@@ -582,7 +618,7 @@ int back=0;
             public void onClose(int i, String s, boolean b)
 
             {
-                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
+                if (prefs.getString("service", "").equalsIgnoreCase("stop")) {
 
                     connectWebSocket();
                     Log.i("Websocket", "Closed " + s);
@@ -591,7 +627,7 @@ int back=0;
 
             @Override
             public void onError(Exception e) {
-                if(prefs.getString("service","").equalsIgnoreCase("stop")) {
+                if (prefs.getString("service", "").equalsIgnoreCase("stop")) {
 
                     connectWebSocket();
                 }

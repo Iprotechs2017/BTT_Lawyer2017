@@ -68,6 +68,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.readystatesoftware.viewbadger.BadgeView;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -104,6 +107,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     public static String onResume = "no";
     ArrayList notificationSenderNames = new ArrayList();
     ArrayList notificationSentDates = new ArrayList();
+    ArrayList notificationIds = new ArrayList();
     ArrayList videocallerName = new ArrayList();
     ArrayList videocallName = new ArrayList();
     ArrayList videocallDate = new ArrayList();
@@ -120,6 +124,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     ArrayList ImmigrantIds = new ArrayList();
     RecyclerViewAdapter recyclerViewAdapter;
     VideocallAdapter videoCallAdapter;
+    public static boolean docReload=false;
     public static String docRelode = "no";
     public static String logsRelode = "no";
     public static String notifRelode = "no";
@@ -157,11 +162,16 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
     SharedPreferences.Editor editor;
     private QbUsersDbManager dbManager;
     int back=0;
-
+    DB snappydb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        try {
+            snappydb = DBFactory.open(DashBoardActivity.this);
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
         if (getCurrentFocus() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -559,7 +569,9 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog.show();
+            if(!progressDialog.isShowing()) {
+                progressDialog.show();
+            }
         }
 
         protected Long doInBackground(URL... urls) {
@@ -592,7 +604,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
             userType++;
             if (userType < 3) {
                 new getDetailsById().execute();
-            } else {
+            } else  {
                 Bundle bundle = new Bundle();
                 bundle.putString("yes", "limit");
                 bundle.putString("userId", "0");
@@ -664,6 +676,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                         ImmigrantIds.add(jsonObject.getInt("id"));
                         ImmigrantNames.add(jsonObject.getString("name"));
                     } else if (jsonObject.getInt("userType") == 1) {
+                        Log.e("solicitor",jsonObject.getInt("id")+"--");
                         solicitor.put("id", jsonObject.getInt("id"));
                         solicitor.put("name", jsonObject.getString("name"));
                     } else if (jsonObject.getInt("userType") == 2) {
@@ -727,6 +740,8 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
 
 
             try {
+
+                Log.e("solid",solicitor.get("id") + "---");
                 if (prefs.getInt("userType", -1) != 0) {
                     getVideoLogs("http://35.163.24.72:8080/VedioApp/service/VideoLog/getLog/callFrom/" + Integer.parseInt(solicitor.get("id") + "") + "/callTo/" + selectedImmigrantId, DashBoardActivity.this);
                 } else {
@@ -810,8 +825,14 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
                             );
                             videoLogs.add(videoLogsModel);
                         }
-
-
+                        try
+                        {
+                            snappydb.getInt(jsonObject.getInt("id") + "");
+                        }
+                        catch (Exception e)
+                        {
+                            snappydb.putInt(jsonObject.getInt("id") + "", 0);
+                        }
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -927,8 +948,21 @@ if(!onResume.equalsIgnoreCase("yes")){
                         });
                     }
                     for (int i = 0; i <= jsonArray.length() - 1; i++) {
+
                         JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(i).toString());
                         msgs.add(jsonObject.getString("notification"));
+                        Log.e("snappy", jsonObject.getInt("id") + "");
+                        notificationIds.add(jsonObject.getInt("id"));
+
+                        try
+                {
+                    snappydb.getInt(jsonObject.getInt("id") + "");
+                }
+                catch (Exception e)
+                {
+                    snappydb.putInt(jsonObject.getInt("id") + "", 0);
+                }
+
                         //   senderNames.add(OpponentsActivity.OpponentNames.get(OpponentsActivity.OpponentIds.indexOf(jsonObject.getString("sentBy"))));
                       /* if(Integer.parseInt(jsonObject.getString("sentBy"))==prefs.getInt("userId", -1)) {
                            notificationSenderNames.add("Me");
@@ -937,8 +971,16 @@ if(!onResume.equalsIgnoreCase("yes")){
                        {*/
                            notificationSenderNames.add(userTypeDetailss.get(Integer.parseInt(jsonObject.getString("sentBy"))));
                        //}
-                           notificationSentDates.add(jsonObject.getString("sentDate"));
+                        notificationSentDates.add(jsonObject.getString("sentDate"));
                     }
+                    try
+                    {
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                       }
                     if (resultJson != null) {
 
                     }
@@ -990,10 +1032,11 @@ if(!onResume.equalsIgnoreCase("yes")){
         msgs.clear();
         notificationSenderNames.clear();
         notificationSentDates.clear();
+        notificationIds.clear();
     }
 
     public void refreshNotifications() {
-        recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates);
+        recyclerViewAdapter = new RecyclerViewAdapter(DashBoardActivity.this, msgs, notificationSenderNames, notificationSentDates,notificationIds);
         notificationsList.setHasFixedSize(true);
         notificationsList.setLayoutManager(new LinearLayoutManager(DashBoardActivity.this));
         notificationsList.setAdapter(recyclerViewAdapter);
@@ -1007,7 +1050,7 @@ if(!onResume.equalsIgnoreCase("yes")){
         ViewHolder viewHolder1;
         TextView senderName, msg, sentDate;
 
-        public RecyclerViewAdapter(Context context1, ArrayList msgs, ArrayList senderNames, ArrayList sentDates) {
+        public RecyclerViewAdapter(Context context1, ArrayList msgs, ArrayList senderNames, ArrayList sentDates,ArrayList notificationIds) {
 
             this.msgs = msgs;
             this.senderNames = senderNames;
@@ -1017,14 +1060,14 @@ if(!onResume.equalsIgnoreCase("yes")){
 
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-            public TextView senderName, msg, sentDate;
+            public TextView senderName, msg, sentDate,notification_status;
             public LinearLayout parent;
-
             public ViewHolder(View v) {
 
                 super(v);
 
                 senderName = (TextView) v.findViewById(R.id.senderName);
+                notification_status= (TextView) v.findViewById(R.id.notification_status);
                 msg = (TextView) v.findViewById(R.id.msg);
                 sentDate = (TextView) v.findViewById(R.id.sentDate);
                 parent = (LinearLayout) v.findViewById(R.id.parent);
@@ -1047,6 +1090,8 @@ if(!onResume.equalsIgnoreCase("yes")){
                             time_stamp.setText(sentDates.get(getAdapterPosition()).toString());
                             userName.setText(senderNames.get(getAdapterPosition()).toString());
                             notification_dialog.show();
+                            snappydb.putInt(notificationIds.get(getAdapterPosition()).toString(),1);
+                            recyclerViewAdapter.notifyDataSetChanged();
                             //Log.e("ok", "ok" + senderNames.get(getAdapterPosition()).toString());
                             // showMessage.show();
                             // slideUp.animateIn();
@@ -1078,6 +1123,15 @@ if(!onResume.equalsIgnoreCase("yes")){
                 holder.sentDate.setText(sentDates.get(position).toString());
                 holder.senderName.setText(senderNames.get(position).toString());
                 holder.msg.setTypeface(typeface);
+                if(snappydb.getInt(notificationIds.get(position).toString())==0)
+                {
+                holder.notification_status.setVisibility(View.VISIBLE);
+
+                }
+                else
+                {
+                    holder.notification_status.setVisibility(View.GONE);
+                }
                 holder.sentDate.setTypeface(typeface);
                 holder.senderName.setTypeface(typeface);
             } catch (Exception e) {
@@ -1108,13 +1162,14 @@ if(!onResume.equalsIgnoreCase("yes")){
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView callerName, videoName, callDate;
+            public TextView callerName, videoName, callDate,notification_status;
             LinearLayout share_and_down, parent;
-
+            ImageView arrow;
             public ViewHolder(View v) {
 
                 super(v);
-
+                notification_status= (TextView) v.findViewById(R.id.notification_status);
+                arrow= (ImageView) v.findViewById(R.id.arrow);
                 callerName = (TextView) v.findViewById(R.id.callerName);
                 videoName = (TextView) v.findViewById(R.id.videoName);
                 callDate = (TextView) v.findViewById(R.id.callDate);
@@ -1141,6 +1196,20 @@ if(!onResume.equalsIgnoreCase("yes")){
                 } else {
                     holder.videoName.setText(videoLogs.get(position).getCallFromName() + "," + videoLogs.get(position).getCallTo2Name() + "&" + videoLogs.get(position).getCallTo2Name());
                 }
+                try {
+                    if(snappydb.getInt(videoLogs.get(position).getId()+"")==0)
+                    {
+                        holder.notification_status.setVisibility(View.VISIBLE);
+
+                    }
+                    else
+                    {
+                        holder.notification_status.setVisibility(View.GONE);
+                    }
+                } catch (SnappydbException e) {
+                    e.printStackTrace();
+                }
+
                 holder.callDate.setText(videoLogs.get(position).getDay().toString());
                 holder.share_and_down.setVisibility(View.GONE);
                 holder.callerName.setVisibility(View.GONE);
@@ -1150,6 +1219,12 @@ if(!onResume.equalsIgnoreCase("yes")){
                 holder.parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        try {
+                            snappydb.putInt(videoLogs.get(position).getId()+"",1);
+                        } catch (SnappydbException e) {
+                            e.printStackTrace();
+                        }
+                        videoCallAdapter.notifyDataSetChanged();
                         startActivity(new Intent(DashBoardActivity.this, IndividualVideocallActivity.class).putExtra("position", position));
                     }
                 });
@@ -1177,7 +1252,7 @@ if(!onResume.equalsIgnoreCase("yes")){
     private void connectWebSocket() {
         URI uri;
         try {
-            uri = new URI("ws://183.82.113.165:8085");
+            uri = new URI("ws://183.82.113.165:8089");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
@@ -1246,7 +1321,15 @@ if(!onResume.equalsIgnoreCase("yes")){
                         noti.flags |= Notification.FLAG_AUTO_CANCEL;
                         noti.defaults = Notification.DEFAULT_ALL;
                         notificationManager.notify(NOTIFICATION_ID++, noti);
-
+                        UplodedDocs uplodedDocs = new UplodedDocs();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("yes", "no");
+                        bundle.putString("userId", "0");
+                        uplodedDocs.setArguments(bundle);
+                        FragmentManager manager = getSupportFragmentManager();
+                        FragmentTransaction transaction = manager.beginTransaction();
+                        transaction.replace(R.id.frameParent, uplodedDocs);
+                        transaction.commit();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1298,8 +1381,6 @@ if(!onResume.equalsIgnoreCase("yes")){
     @Override
     protected void onPause() {
         super.onPause();
-       //
-
         editor.putString("service","start");
         editor.putInt("dashBoard", 0);
         editor.apply();
@@ -1316,7 +1397,8 @@ if(!onResume.equalsIgnoreCase("yes")){
         editor.apply();
         stopService(new Intent(this, NotificationService.class));
         connectWebSocket();
-        if (docRelode.equalsIgnoreCase("yes")) {
+        if (docRelode.equalsIgnoreCase("yes"))
+        {
             Bundle bundle = new Bundle();
             bundle.putString("yes", "no");
             bundle.putString("userId", "0");
@@ -1329,9 +1411,13 @@ if(!onResume.equalsIgnoreCase("yes")){
             docRelode = "no";
         }
         if (onResume.equalsIgnoreCase("yes")) {
-
             new DownloadFilesTask().execute();
+            new VideoCallLogs().execute();
         }
-        new VideoCallLogs().execute();
+if(notifRelode.equalsIgnoreCase("yes"))
+{
+    new DownloadFilesTask().execute();
+    notifRelode="no";
+}
     }
 }

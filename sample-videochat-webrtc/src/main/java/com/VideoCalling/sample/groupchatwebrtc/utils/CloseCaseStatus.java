@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.VideoCalling.sample.groupchatwebrtc.R;
+import com.VideoCalling.sample.groupchatwebrtc.activities.DashBoardActivity;
 import com.VideoCalling.sample.groupchatwebrtc.services.NotificationService;
 import com.VideoCalling.sample.groupchatwebrtc.util.MyHttpClient;
 import com.VideoCalling.sample.groupchatwebrtc.util.NetworkCheck;
@@ -22,6 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.java_websocket.client.WebSocketClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,11 +39,15 @@ public class CloseCaseStatus {
     Context context;
     JSONObject userDetails;
     Activity activity;
-    public CloseCaseStatus(Context context,JSONObject userDetails,Activity activity)
+    WebSocketClient mWebSocketClient;
+    String data;
+    public CloseCaseStatus(Context context,JSONObject userDetails,Activity activity,WebSocketClient mWebSocketClient,String data)
     {
         this.context=context;
         this.activity=activity;
         this.userDetails=userDetails;
+        this.mWebSocketClient=mWebSocketClient;
+        this.data=data;
         new UpdateCase().execute();
     }
     public int postAPICall(String strurl, String jsonString, final Context context) throws Exception
@@ -95,7 +101,8 @@ public class CloseCaseStatus {
 progressDialog.dismiss();
             try {
                 if(result == 200) {
-                    new AlertDialog.Builder(context)
+                             mWebSocketClient.send(data);
+                            new AlertDialog.Builder(context)
                             .setMessage("Case status updated succesfully")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
