@@ -16,7 +16,6 @@ public class LogoutClass
         SharedPreferences settings = context.getSharedPreferences("loginDetails", Context.MODE_PRIVATE);
         settings.edit().clear().commit();
         Intent intent=new Intent(context, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);;
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(intent);
 

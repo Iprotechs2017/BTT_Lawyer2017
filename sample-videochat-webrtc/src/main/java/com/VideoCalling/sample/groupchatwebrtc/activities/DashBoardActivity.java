@@ -731,6 +731,7 @@ public class DashBoardActivity extends AppCompatActivity implements TabLayout.On
         }
 
         protected void onPostExecute(Long result) {
+            connectWebSocket();
         }
     }
 
@@ -1274,7 +1275,7 @@ if(!onResume.equalsIgnoreCase("yes")){
             @Override
             public void onMessage(String s) {
                 final String message = s;
-                Log.e("message---->", message);
+                Log.e("message Dashboard---->", message);
                 createNotification(message);
 
 
@@ -1283,54 +1284,70 @@ if(!onResume.equalsIgnoreCase("yes")){
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             public void createNotification(String message) {
                 try {
-                    // Log.e("data", message);
                     String[] split = message.split("-splspli-");
-                    //  Log.e("datata", split[3].toString() + "<--->" + split[2].toString());
-                    if (split[2].toString().indexOf("documents...") < 0) {
-                        if (split[2].toString().trim().length() > 0) {
-                            Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
+                    if(split.length!=6) {
+                        if (split[2].toString().indexOf("documents...") < 0) {
+                            if (split[2].toString().trim().length() > 0) {
+                                Intent intent = new Intent(DashBoardActivity.this, NotificationActivity.class);
+                                PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
+                                Notification noti = new Notification.Builder(DashBoardActivity.this)
+                                        .setSmallIcon(R.drawable.logo)
+                                        .setContentTitle("BTT Lawyer")
+                                        .setContentText(split[3].toString() + ":" + split[2].toString())
+                                        .setContentIntent(pIntent)
+                                        .build();
+
+                                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                                noti.flags |= Notification.FLAG_AUTO_CANCEL;
+                                noti.defaults = Notification.DEFAULT_ALL;
+                                notificationManager.notify(NOTIFICATION_ID++, noti);
+                                new DownloadFilesTask().execute();
+                            }
+                        } else {
+
+                            Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[3].toString());
                             PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                             Notification noti = new Notification.Builder(DashBoardActivity.this)
                                     .setSmallIcon(R.drawable.logo)
                                     .setContentTitle("BTT Lawyer")
-                                    .setContentText(split[3].toString() + ":" + split[2].toString())
+                                    .setContentText(split[2].toString())
                                     .setContentIntent(pIntent)
                                     .build();
-                            // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
 
                             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                             noti.flags |= Notification.FLAG_AUTO_CANCEL;
                             noti.defaults = Notification.DEFAULT_ALL;
                             notificationManager.notify(NOTIFICATION_ID++, noti);
-                            //Log.e("datata", split[3].toString() + ":" + split[2].toString());
-                            new DownloadFilesTask().execute();
+                            UplodedDocs uplodedDocs = new UplodedDocs();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("yes", "no");
+                            bundle.putString("userId", "0");
+                            uplodedDocs.setArguments(bundle);
+                            FragmentManager manager = getSupportFragmentManager();
+                            FragmentTransaction transaction = manager.beginTransaction();
+                            transaction.replace(R.id.frameParent, uplodedDocs);
+                            transaction.commit();
                         }
-                    } else {
-
-                        Intent intent = new Intent(DashBoardActivity.this, ShowmoreDocumentsActivity.class).putExtra("id", split[3].toString());
+                    }
+                    else
+                    {
+                        new LogoutClass().clearSesson(DashBoardActivity.this);
+                        DashBoardActivity.this.finish();
+                        Intent intent = new Intent(DashBoardActivity.this, LoginActivity.class);
                         PendingIntent pIntent = PendingIntent.getActivity(DashBoardActivity.this, (int) System.currentTimeMillis(), intent, 0);
                         Notification noti = new Notification.Builder(DashBoardActivity.this)
                                 .setSmallIcon(R.drawable.logo)
                                 .setContentTitle("BTT Lawyer")
-                                .setContentText(split[2].toString())
+                                .setContentText(split[3].toString() + ":" + split[2].toString())
                                 .setContentIntent(pIntent)
                                 .build();
-                        // Log.e("datata", split[3].toString() + "--->" + split[2].toString());
-
                         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         noti.flags |= Notification.FLAG_AUTO_CANCEL;
                         noti.defaults = Notification.DEFAULT_ALL;
                         notificationManager.notify(NOTIFICATION_ID++, noti);
-                        UplodedDocs uplodedDocs = new UplodedDocs();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("yes", "no");
-                        bundle.putString("userId", "0");
-                        uplodedDocs.setArguments(bundle);
-                        FragmentManager manager = getSupportFragmentManager();
-                        FragmentTransaction transaction = manager.beginTransaction();
-                        transaction.replace(R.id.frameParent, uplodedDocs);
-                        transaction.commit();
+
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
