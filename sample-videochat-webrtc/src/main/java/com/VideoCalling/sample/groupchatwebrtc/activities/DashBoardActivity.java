@@ -1,5 +1,4 @@
 package com.VideoCalling.sample.groupchatwebrtc.activities;
-
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.Notification;
@@ -1351,8 +1350,6 @@ if(!onResume.equalsIgnoreCase("yes")){
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
 
             @Override

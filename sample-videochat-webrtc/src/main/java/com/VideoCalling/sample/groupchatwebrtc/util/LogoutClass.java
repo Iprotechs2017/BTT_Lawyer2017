@@ -10,9 +10,8 @@ public class LogoutClass
     {
 
     }
-    public void clearSesson(Context context) {
-
-
+    public void clearSesson(Context context)
+    {
         SharedPreferences settings = context.getSharedPreferences("loginDetails", Context.MODE_PRIVATE);
         settings.edit().clear().commit();
         Intent intent=new Intent(context, LoginActivity.class);
